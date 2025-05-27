@@ -17,6 +17,7 @@ class AdminController extends Controller
     public function adminDetails($id)
     {
         $admin = Admin::where('id', $id)->where('role', 'admin')->firstOrFail();
+
         return view('admin.admin.admin_details', compact('admin'));
     }
 }
