@@ -20,7 +20,20 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
+
 Route::post('/createSeller', [SellerController::class, 'createSeller']);
 Route::post('/createBidder', [BidderController::class, 'createBidder']);
 Route::post('/sellerlogin', [SellerController::class, 'sellerLogin']);
 Route::post('/bidderlogin', [BidderController::class, 'bidderLogin']);
+
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::post('/sellerdashboard', [SellerController::class, 'sellerDashboard']);
+    Route::post('/bidderdashboard', [BidderController::class, 'bidderDashboard']);
+    Route::post('/bidderlogout', [BidderController::class, 'bidderLogout']);
+    Route::post('/sellerlogout', [SellerController::class, 'sellerLogout']);
+    Route::get('/view-seller-lot', [SellerController::class, 'viewSellerLots']);
+    Route::post('/seller-lot-details', [SellerController::class, 'sellerLotDetails']);
+
+});

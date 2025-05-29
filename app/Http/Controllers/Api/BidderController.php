@@ -13,11 +13,11 @@ class BidderController extends Controller
     public function createBidder(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'type' => 'required|in:1,2',
+            // 'type' => 'required|in:1,2',
 
-            'full_name' => 'required|string',
-            'email_address' => 'required|email|unique:bidders,email_address',
-            'phone_number' => 'required|string',
+            'name' => 'required|string',
+            'email' => 'required|email|unique:bidders,email_address',
+            'phone' => 'required|string',
             'country' => 'required|string',
             'password' => 'required|string|min:6',
 
@@ -45,9 +45,9 @@ class BidderController extends Controller
 
         // Common fields
         $bidder->type = $request->type;
-        $bidder->full_name = $request->full_name;
-        $bidder->email_address = $request->email_address;
-        $bidder->phone_number = $request->phone_number;
+        $bidder->full_name = $request->name;
+        $bidder->email_address = $request->email;
+        $bidder->phone_number = $request->phone;
         $bidder->country = $request->country;
         $bidder->password = Hash::make($request->password);
         $bidder->kyc_status = 0;
@@ -69,7 +69,8 @@ class BidderController extends Controller
         };
 
         // Company-specific
-        if ($request->type == 1) {
+        if ($request->type == "company") {
+            $bidder->type = 1;
             $bidder->company_name = $request->company_name;
             $bidder->registration_number = $request->registration_number;
             $bidder->director_name = $request->director_name;
@@ -83,7 +84,8 @@ class BidderController extends Controller
         }
 
         // Individual-specific
-        if ($request->type == 2) {
+        if ($request->type == "individual") {
+            $bidder->type = 2;
             $bidder->passport_copy = $handleUpload('passport_copy');
             $bidder->proof_of_address = $handleUpload('proof_of_address');
         }
@@ -91,6 +93,7 @@ class BidderController extends Controller
         $bidder->save();
 
         return response()->json([
+            'status' => true,
             'message' => 'Bidder created successfully',
             'data' => $bidder
         ], 201);
@@ -118,10 +121,46 @@ class BidderController extends Controller
             ], 401);
         }
 
+        $token = $bidder->createToken('bidder_token')->plainTextToken;
+
         return response()->json([
             'status' => true,
             'message' => 'Login successful',
+            'token' => $token,
             'data' => $bidder,
         ], 200);
+    }
+
+    public function bidderDashboard(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:bidders,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+        $bidder = Bidder::find($request->id);
+        $dashboardData = [
+            'full_name' => $bidder->full_name,
+            'email_address' => $bidder->email_address,
+        ];
+        return response()->json([
+            'status' => true,
+            'message' => 'Bidder dashboard data fetched successfully.',
+            'data' => $dashboardData,
+        ], 200);
+    }
+
+    public function bidderLogout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        return response()->json([
+            'status' => true,
+            'message' => 'Logged out successfully',
+        ]);
     }
 }

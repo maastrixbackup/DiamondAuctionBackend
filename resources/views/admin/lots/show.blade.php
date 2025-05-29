@@ -4,20 +4,6 @@
 @section('content')
     <div class="row mt-lg-4 pt-lg-4">
         <div class="page-inner">
-            {{-- <div class="page-header">
-                <h3 class="fw-bold mb-3">Lot Details</h3>
-                <ul class="breadcrumbs mb-3">
-                    <li class="nav-home">
-                        <a href="{{ route('admin.dashboard') }}">
-                            <i class="icon-home"></i>
-                        </a>
-                    </li>
-                    <li class="separator"><i class="icon-arrow-right"></i></li>
-                    <li class="nav-item"><a href="{{ route('admin.lots.index') }}">Lots</a></li>
-                    <li class="separator"><i class="icon-arrow-right"></i></li>
-                    <li class="nav-item">View Lot</li>
-                </ul>
-            </div> --}}
             <div class="page-header d-flex align-items-center justify-content-between flex-wrap mb-3">
                 <div class="d-flex align-items-center gap-3">
                     <h3 class="fw-bold mb-0">Lots</h3>
