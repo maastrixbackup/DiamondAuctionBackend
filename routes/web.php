@@ -57,6 +57,7 @@ Route::prefix('admin')->group(function () {
         Route::get('change-bidder-account-status/{id}', [BidderController::class, 'changeBidderAccountStatus'])->name('admin.change-bidder-account-status');
         Route::get('/admin', [AdminController::class, 'adminList'])->name('admin.admin');
         Route::get('/adminDetails/{id}', [AdminController::class, 'adminDetails'])->name('admin.adminDetails');
+        Route::get('/viewingRequest', [LotController::class, 'viewingRequest'])->name('admin.viewingRequest');
         // Route::get('/profile', [UserController::class, 'index'])->name('admin.profile');
     });
 });

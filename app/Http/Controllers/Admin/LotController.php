@@ -264,6 +264,11 @@ class LotController extends Controller
         return redirect()->route('admin.lots.index')->with('success', 'Lot deleted successfully.');
     }
 
+    public function viewingRequest(Request $request)
+    {
+        echo 123;exit;
+    }
+
 
     // public function changeLotStatus($id)
     // {
