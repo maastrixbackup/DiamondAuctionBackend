@@ -214,12 +214,12 @@ class SellerController extends Controller
         ]);
     }
 
-    public function sellerLogout(Request $request)
-    {
-        $request->user()->currentAccessToken()->delete();
-        return response()->json([
-            'status' => true,
-            'message' => 'Logged out successfully',
-        ]);
-    }
+    // public function sellerLogout(Request $request)
+    // {
+    //     $request->user()->currentAccessToken()->delete();
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Logged out successfully',
+    //     ]);
+    // }
 }
