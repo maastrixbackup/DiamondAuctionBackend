@@ -33,7 +33,7 @@
 
         <a href="{{ route('admin.viewingRequest') }}"
             class="flex items-center p-3 rounded transition hover:bg-brand-gold/80 hover:text-white {{ request()->routeIs('admin.viewingRequest') ? 'bg-brand-gold text-white' : '' }}">
-            <i class="fa fa-layer-group mx-2"></i> Viewing Request
+            <i class="fa fa-envelope mx-2"></i> Viewing Request
         </a>
 
         {{-- <li class="nav-item">

@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('lot_id');
             $table->unsignedBigInteger('slot_id');
+            $table->string('bidder_name');
+            $table->string('room_name');
+            $table->string('room_type');
             $table->time('start_time');
             $table->date('date_for_reservation');
             $table->unsignedBigInteger('bidder_id');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Bidder;
 use App\Models\Lot;
+use App\Models\Room;
 use App\Models\Slot;
 use App\Models\SlotBooking;
 use Illuminate\Http\Request;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class BidderController extends Controller
 {
@@ -173,6 +175,7 @@ class BidderController extends Controller
             $slots = Slot::where('date_for_reservation', $today)
                 // ->where('start_time', '>=', $roundedTime)
                 ->get();
+            // $slots = Slot::all();
 
             // Return specific fields only
             $data = $slots->map(function ($slot) {
@@ -219,11 +222,24 @@ class BidderController extends Controller
             // Fetch booked lot_ids for this time and date from SlotBooking table
             $bookedLotIds = SlotBooking::where('start_time', $slot->start_time)
                 ->where('date_for_reservation', $slot->date_for_reservation)
-                ->where('status',1)
+                ->where('status', 1)
                 ->pluck('lot_id')
                 ->toArray();
             // Get available lots
             $availableLots = Lot::whereNotIn('id', $bookedLotIds)->get();
+
+            $availableLots = $availableLots->map(function ($lot) {
+                if (is_array($lot->images)) {
+                    $lot->images = array_map(function ($image) {
+                        return asset('storage/images/lots/' . $image);
+                    }, $lot->images);
+                } else {
+                    $lot->images = [];
+                }
+                unset($lot->image_urls);
+
+                return $lot;
+            });
 
             return response()->json([
                 'status' => true,
@@ -262,7 +278,30 @@ class BidderController extends Controller
             }
 
             $slot = Slot::find($request->slot_id);
-            $bidderId = $request->user()->id;
+            if (!$slot) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Slot not found.',
+                ], 404);
+            }
+
+            // $bidderId = $request->user()->id;
+            $bidder = Bidder::find($request->user()->id);
+            if (!$bidder) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Bidder not found.',
+                ], 404);
+            }
+
+            $room = Room::find($slot->room_id);
+            if (!$room) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Room not found for the slot.',
+                ], 404);
+            }
+
             $insertData = [];
             foreach ($lotIds as $lotId) {
                 $insertData[] = [
@@ -270,7 +309,10 @@ class BidderController extends Controller
                     'lot_id' => $lotId,
                     'start_time' => $slot->start_time,
                     'date_for_reservation' => $slot->date_for_reservation,
-                    'bidder_id' => $bidderId,
+                    'bidder_id' => $bidder->id,
+                    'bidder_name' => $bidder->full_name,
+                    'room_name' => $room->room_name,
+                    'room_type' => $room->room_type,
                     'status' => 0,
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -295,6 +337,68 @@ class BidderController extends Controller
         }
     }
 
+    public function getBidderAssignedSlots(Request $request)
+    {
+        $bidderId = $request->user()->id;
+
+        $slotIds = SlotBooking::where('bidder_id', $bidderId)
+            ->where('status', 1) // approved
+            ->pluck('slot_id')
+            ->unique();
+
+        $slots = Slot::whereIn('id', $slotIds)->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Bidder assigned slots fetched.',
+            'slots' => $slots
+        ]);
+    }
+
+    public function bidderAssignedLotsBySlot(Request $request, $slotId)
+    {
+        $bidderId = $request->user()->id;
+
+        // Ensure the bidder has this slot assigned
+        $hasAccess = SlotBooking::where('bidder_id', $bidderId)
+            ->where('slot_id', $slotId)
+            ->where('status', 1)
+            ->exists();
+
+        if (!$hasAccess) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized access or slot not approved.'
+            ], 403);
+        }
+
+        // Get lot IDs for this slot
+        $lotIds = SlotBooking::where('slot_id', $slotId)
+            ->where('status', 1)
+            ->pluck('lot_id');
+
+        // Get actual lot records
+        $lots = Lot::whereIn('id', $lotIds)->get();
+
+        $lots = Lot::whereIn('id', $lotIds)->get()->map(function ($lot) {
+            // Ensure images are decoded
+            $images = is_array($lot->images) ? $lot->images : json_decode($lot->images, true);
+
+            // Convert to full asset URLs
+            $lot->images = collect($images)->map(function ($image) {
+                return asset('storage/images/lots/' . $image);
+            })->toArray();
+
+            return $lot;
+        });
+
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Bidder assigned lots fetched for slot.',
+            'lots' => $lots
+        ]);
+    }
 
     public function bidderLogout(Request $request)
     {

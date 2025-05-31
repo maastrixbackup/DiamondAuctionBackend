@@ -58,6 +58,10 @@ Route::prefix('admin')->group(function () {
         Route::get('/admin', [AdminController::class, 'adminList'])->name('admin.admin');
         Route::get('/adminDetails/{id}', [AdminController::class, 'adminDetails'])->name('admin.adminDetails');
         Route::get('/viewingRequest', [LotController::class, 'viewingRequest'])->name('admin.viewingRequest');
+        Route::get('/viewingRequestLots/{slotId}', [LotController::class, 'viewingRequestLots'])->name('admin.viewingRequestLots');
+        // Route::post('/update-request-lots-status/{bookingId}', [LotController::class, 'updateRequestLotStatus'])->name('admin.update-request-lots-status');
+        Route::post('/updateLotsStatus', [LotController::class, 'updateLotsStatus'])->name('admin.updateLotsStatus');
+
         // Route::get('/profile', [UserController::class, 'index'])->name('admin.profile');
     });
 });

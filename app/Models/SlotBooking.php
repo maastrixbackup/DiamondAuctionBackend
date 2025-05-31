@@ -15,6 +15,14 @@ class SlotBooking extends Model
         'start_time',
         'date_for_reservation',
         'bidder_id',
+        'bidder_name',
+        'room_name',
+        'room_type',
         'status',
     ];
+
+    public function slot()
+    {
+        return $this->belongsTo(Slot::class, 'slot_id');
+    }
 }

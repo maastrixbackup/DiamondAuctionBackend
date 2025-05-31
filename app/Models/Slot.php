@@ -22,4 +22,9 @@ class Slot extends Model
     {
         return $this->belongsTo(Room::class);
     }
+
+    // public function lots()
+    // {
+    //     return $this->hasMany(Lot::class, 'slot_id');
+    // }
 }

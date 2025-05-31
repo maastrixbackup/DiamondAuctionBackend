@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Lot;
 use App\Models\Seller;
+use App\Models\Slot;
+use App\Models\SlotBooking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -266,8 +268,86 @@ class LotController extends Controller
 
     public function viewingRequest(Request $request)
     {
-        echo 123;exit;
+        $groupedSlots = SlotBooking::select('slot_id', 'bidder_name', 'room_name', 'room_type', 'start_time', 'date_for_reservation')
+            ->groupBy('slot_id', 'bidder_name', 'room_name', 'room_type', 'start_time', 'date_for_reservation')
+            ->get();
+
+        return view('admin.lots.viewSlotRequest', compact('groupedSlots'));
     }
+
+    public function viewingRequestLots($slotId)
+    {
+        $lots = SlotBooking::where('slot_id', $slotId)
+            // ->where('status', 0)
+            ->get();
+
+        return view('admin.lots.viewRequestLots', compact('lots'));
+    }
+
+    // public function updateLotsStatus(Request $request)
+    // {
+    //     foreach ($request->input('lot_status', []) as $lotId => $status) {
+    //         if (in_array($status, [1, 2])) {
+    //             SlotBooking::where('id', $lotId)->update(['status' => $status]);
+    //         }
+    //     }
+
+    //     return response()->json(['success' => true]);
+    // }
+
+    public function updateLotsStatus(Request $request)
+    {
+        $lotStatusUpdates = $request->input('lot_status', []);
+        $updatedSlotIds = [];
+
+        foreach ($lotStatusUpdates as $lotId => $status) {
+            if (in_array($status, [1, 2])) {
+                $lot = SlotBooking::find($lotId);
+                if ($lot) {
+                    $lot->status = $status;
+                    $lot->save();
+
+                    // Track updated slot_id
+                    $updatedSlotIds[] = $lot->slot_id;
+                }
+            }
+        }
+
+        // Update slot status if ANY lot is approved
+        foreach (array_unique($updatedSlotIds) as $slotId) {
+            $slotLots = SlotBooking::where('slot_id', $slotId)->get();
+
+            // If at least one lot is approved, mark slot as reserved
+            if ($slotLots->contains(fn($lot) => $lot->status == 1)) {
+                Slot::where('id', $slotId)->update(['slot_status' => 2]); // 2 = Reserved
+            }
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+
+
+    // public function updateRequestLotStatus(Request $request, $bookingId)
+    // {
+    //     try {
+    //         $booking = SlotBooking::findOrFail($bookingId);
+    //         $booking->status = $request->status;
+    //         $booking->save();
+
+    //         return response()->json([
+    //             'status' => true,
+    //             'message' => 'Status updated successfully.',
+    //             'slot_id' => $booking->slot_id,
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Failed to update status.',
+    //         ], 500);
+    //     }
+    // }
+
 
 
     // public function changeLotStatus($id)

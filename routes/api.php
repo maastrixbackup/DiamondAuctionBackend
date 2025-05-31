@@ -38,4 +38,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/available-slots', [BidderController::class, 'availableSlots']);
     Route::post('/available-lots', [BidderController::class, 'availableLots']);
     Route::post('/slot-booking', [BidderController::class, 'slotBooking']);
+    Route::get('/get-bidder-assigned-slots', [BidderController::class, 'getBidderAssignedSlots']);
+    Route::get('/bidder-assigned-lots-by-slots/{slotId}', [BidderController::class, 'bidderAssignedLotsBySlot']);
 });
