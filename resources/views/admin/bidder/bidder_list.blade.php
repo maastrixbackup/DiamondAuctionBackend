@@ -60,24 +60,21 @@
 
                                                 <!-- KYC Status -->
                                                 <td>
-                                                    <a href="{{ route('admin.change-bidder-kyc-status', $bidder->id) }}"
-                                                        class="badge text-decoration-none badge-sm
-                                                        {{ $bidder->kyc_status == 1 ? 'bg-success' : ($bidder->kyc_status == 2 ? 'bg-danger' : 'bg-warning') }}"
-                                                        title="Change KYC Status"
-                                                        onclick="return confirm('Are you sure to change KYC status?')">
+                                                    <span
+                                                        class="badge badge-sm
+        {{ $bidder->kyc_status == 1 ? 'bg-success' : ($bidder->kyc_status == 2 ? 'bg-danger' : 'bg-warning') }}">
                                                         {{ $bidder->kyc_status == 1 ? 'Approved' : ($bidder->kyc_status == 2 ? 'Rejected' : 'Pending') }}
-                                                    </a>
+                                                    </span>
                                                 </td>
+
 
                                                 <!-- Account Status -->
                                                 <td>
-                                                    <a href="{{ route('admin.change-bidder-account-status', $bidder->id) }}"
-                                                        class="badge text-decoration-none badge-sm
-                                                        {{ $bidder->account_status == 1 ? 'bg-success' : ($bidder->account_status == 2 ? 'bg-danger' : 'bg-warning') }}"
-                                                        title="Change Account Status"
-                                                        onclick="return confirm('Are you sure to change Account status?')">
+                                                    <span
+                                                        class="badge badge-sm
+        {{ $bidder->account_status == 1 ? 'bg-success' : ($bidder->account_status == 2 ? 'bg-danger' : 'bg-warning') }}">
                                                         {{ $bidder->account_status == 1 ? 'Active' : ($bidder->account_status == 2 ? 'Suspended' : 'Pending') }}
-                                                    </a>
+                                                    </span>
                                                 </td>
 
                                                 <!-- View Action -->

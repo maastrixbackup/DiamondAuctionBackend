@@ -14,26 +14,26 @@ class SellerController extends Controller
     public function createSeller(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            // 'type' => 'required|in:1,2',
+            // 'type' => 'required|in:company,individual',
             'name' => 'required|string',
             'email' => 'required|email|unique:sellers,email_address',
             'phone' => 'required|string',
             'country' => 'required|string',
             'password' => 'required|string|min:6',
 
-            'company_name' => 'required_if:type,1|string',
-            'registration_number' => 'required_if:type,1|string',
-            'director_name' => 'required_if:type,1|string',
-            'director_email' => 'required_if:type,1|email',
-            'director_phone' => 'required_if:type,1|string',
-            'certificate_of_incorporation' => 'required_if:type,1|file',
-            'valid_trade_license' => 'required_if:type,1|file',
-            'passport_copy_authorised' => 'required_if:type,1|file',
-            'ubo_declaration' => 'required_if:type,1|file',
+            'company_name' => 'required_if:type,company|string',
+            'registration_number' => 'required_if:type,company|string',
+            'director_name' => 'required_if:type,company|string',
+            'director_email' => 'required_if:type,company|email',
+            'director_phone' => 'required_if:type,company|string',
+            'certificate_of_incorporation' => 'required_if:type,company|file',
+            'valid_trade_license' => 'required_if:type,company|file',
+            'passport_copy_authorised' => 'required_if:type,company|file',
+            'ubo_declaration' => 'required_if:type,company|file',
 
-            'source_of_goods' => 'required_if:type,2|string',
-            'passport_copy' => 'required_if:type,2|file',
-            'proof_of_ownership' => 'required_if:type,2|file',
+            'source_of_goods' => 'required_if:type,individual|string',
+            'passport_copy' => 'required_if:type,individual|file',
+            'proof_of_ownership' => 'required_if:type,individual|file',
         ]);
 
         if ($validator->fails()) {
@@ -42,8 +42,9 @@ class SellerController extends Controller
 
         $seller = new Seller();
 
-        // Common fields
-        // $seller->type = $request->type;
+        // Convert type to int for DB
+        $seller->type = $request->type === 'company' ? 1 : 2;
+
         $seller->full_name = $request->name;
         $seller->email_address = $request->email;
         $seller->phone_number = $request->phone;
@@ -57,7 +58,7 @@ class SellerController extends Controller
             mkdir($destinationPath, 0777, true);
         }
 
-        // File handler
+        // File upload handler
         $handleUpload = function ($field) use ($request, $destinationPath) {
             if ($request->hasFile($field)) {
                 $file = $request->file($field);
@@ -68,9 +69,8 @@ class SellerController extends Controller
             return null;
         };
 
-        // Company
-        if ($request->type == "company") {
-            $seller->type = 1;
+        // Company logic
+        if ($request->type === 'company') {
             $seller->company_name = $request->company_name;
             $seller->registration_number = $request->registration_number;
             $seller->director_name = $request->director_name;
@@ -78,18 +78,27 @@ class SellerController extends Controller
             $seller->director_phone = $request->director_phone;
 
             $seller->certificate_of_incorporation = $handleUpload('certificate_of_incorporation');
+            $seller->certificate_of_incorporation_status = 0;
+
             $seller->valid_trade_license = $handleUpload('valid_trade_license');
+            $seller->valid_trade_license_status = 0;
+
             $seller->passport_copy_authorised = $handleUpload('passport_copy_authorised');
+            $seller->passport_copy_authorised_status = 0;
+
             $seller->ubo_declaration = $handleUpload('ubo_declaration');
+            $seller->ubo_declaration_status = 0;
         }
 
-        // Individual
-        if ($request->type == "individual") {
-            $seller->type = 2;
+        // Individual logic
+        if ($request->type === 'individual') {
             $seller->source_of_goods = $request->source_of_goods;
 
             $seller->passport_copy = $handleUpload('passport_copy');
+            $seller->passport_copy_status = 0;
+
             $seller->proof_of_ownership = $handleUpload('proof_of_ownership');
+            $seller->proof_of_ownership_status = 0;
         }
 
         $seller->save();
@@ -168,7 +177,8 @@ class SellerController extends Controller
             ->map(function ($lot) {
                 // image
                 $lot->images = collect($lot->images, true)
-                    ->map(fn($img) => url('storage/images/lots/' . $img));
+                    // ->map(fn($img) => url('storage/images/lots/' . $img));
+                    ->map(fn($img) => 'storage/images/lots/' . ltrim($img, '/'));
 
                 // Category name
                 $lot->category_name = optional($lot->category)->name;
@@ -198,7 +208,8 @@ class SellerController extends Controller
         }
 
         $lot->images = collect($lot->images)
-            ->map(fn($img) => url('storage/images/lots/' . $img));
+            // ->map(fn($img) => url('storage/images/lots/' . $img));
+            ->map(fn($img) => 'storage/images/lots/' . ltrim($img, '/'));
 
         $lot->category_name = optional($lot->category)->name;
 

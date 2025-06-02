@@ -20,7 +20,7 @@ class BidderController extends Controller
     public function createBidder(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            // 'type' => 'required|in:1,2',
+            // 'type' => 'required|in:company,individual',
 
             'name' => 'required|string',
             'email' => 'required|email|unique:bidders,email_address',
@@ -29,19 +29,19 @@ class BidderController extends Controller
             'password' => 'required|string|min:6',
 
             // Company fields
-            'company_name' => 'required_if:type,1|string',
-            'registration_number' => 'required_if:type,1|string',
-            'director_name' => 'required_if:type,1|string',
-            'director_email' => 'required_if:type,1|email',
-            'director_phone' => 'required_if:type,1|string',
-            'certificate_of_incorporation' => 'required_if:type,1|file',
-            'valid_trade_license' => 'required_if:type,1|file',
-            'passport_copy_authorised' => 'required_if:type,1|file',
-            'ubo_declaration' => 'required_if:type,1|file',
+            'company_name' => 'required_if:type,company|string',
+            'registration_number' => 'required_if:type,company|string',
+            'director_name' => 'required_if:type,company|string',
+            'director_email' => 'required_if:type,company|email',
+            'director_phone' => 'required_if:type,company|string',
+            'certificate_of_incorporation' => 'required_if:type,company|file',
+            'valid_trade_license' => 'required_if:type,company|file',
+            'passport_copy_authorised' => 'required_if:type,company|file',
+            'ubo_declaration' => 'required_if:type,company|file',
 
             // Individual fields
-            'passport_copy' => 'required_if:type,2|file',
-            'proof_of_address' => 'required_if:type,2|file',
+            'passport_copy' => 'required_if:type,individual|file',
+            'proof_of_address' => 'required_if:type,individual|file',
         ]);
 
         if ($validator->fails()) {
@@ -51,7 +51,7 @@ class BidderController extends Controller
         $bidder = new Bidder();
 
         // Common fields
-        $bidder->type = $request->type;
+        $bidder->type = $request->type == "company" ? 1 : 2;
         $bidder->full_name = $request->name;
         $bidder->email_address = $request->email;
         $bidder->phone_number = $request->phone;
@@ -75,9 +75,8 @@ class BidderController extends Controller
             return null;
         };
 
-        // Company-specific
+        // Company-specific logic
         if ($request->type == "company") {
-            $bidder->type = 1;
             $bidder->company_name = $request->company_name;
             $bidder->registration_number = $request->registration_number;
             $bidder->director_name = $request->director_name;
@@ -85,16 +84,25 @@ class BidderController extends Controller
             $bidder->director_phone = $request->director_phone;
 
             $bidder->certificate_of_incorporation = $handleUpload('certificate_of_incorporation');
+            $bidder->certificate_of_incorporation_status = 0;
+
             $bidder->valid_trade_license = $handleUpload('valid_trade_license');
+            $bidder->valid_trade_license_status = 0;
+
             $bidder->passport_copy_authorised = $handleUpload('passport_copy_authorised');
+            $bidder->passport_copy_authorised_status = 0;
+
             $bidder->ubo_declaration = $handleUpload('ubo_declaration');
+            $bidder->ubo_declaration_status = 0;
         }
 
-        // Individual-specific
+        // Individual-specific logic
         if ($request->type == "individual") {
-            $bidder->type = 2;
             $bidder->passport_copy = $handleUpload('passport_copy');
+            $bidder->passport_copy_status = 0;
+
             $bidder->proof_of_address = $handleUpload('proof_of_address');
+            $bidder->proof_of_address_status = 0;
         }
 
         $bidder->save();
@@ -231,7 +239,8 @@ class BidderController extends Controller
             $availableLots = $availableLots->map(function ($lot) {
                 if (is_array($lot->images)) {
                     $lot->images = array_map(function ($image) {
-                        return asset('storage/images/lots/' . $image);
+                        // return asset('storage/images/lots/' . $image);
+                        return 'storage/images/lots/' . ltrim($image, '/');
                     }, $lot->images);
                 } else {
                     $lot->images = [];
@@ -386,7 +395,8 @@ class BidderController extends Controller
 
             // Convert to full asset URLs
             $lot->images = collect($images)->map(function ($image) {
-                return asset('storage/images/lots/' . $image);
+                return 'storage/images/lots/' . ltrim($image, '/');
+                // return asset('storage/images/lots/' . $image);
             })->toArray();
 
             return $lot;

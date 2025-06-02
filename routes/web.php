@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\SellerController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +25,16 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::get('/optimize', function () {
+    Artisan::call('route:clear');
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    return 'Command executed successfully!';
+});
+Route::get('/admin', function () {
+    return redirect()->route('admin.login');
 });
 
 // Route::get('/dashboard', function () {
@@ -49,18 +60,20 @@ Route::prefix('admin')->group(function () {
         Route::get('/sellerDetails/{id}', [SellerController::class, 'sellerDetails'])->name('admin.sellerDetails');
         // Route::get('change-seller-status/{id}', [SellerController::class, 'changeSellerStatus'])->name('admin.change-seller-status');
         Route::get('change-seller-kyc-status/{id}', [SellerController::class, 'changeSellerKycStatus'])->name('admin.change-seller-kyc-status');
-        Route::get('change-seller-account-status/{id}', [SellerController::class, 'changeSellerAccountStatus'])->name('admin.change-seller-account-status');
+        Route::get('change-seller-account-status/{id}/{status}', [SellerController::class, 'changeSellerAccountStatus'])->name('admin.change-seller-account-status');
         Route::resource('category', CategoryController::class)->names('admin.category');
         Route::get('/bidder', [BidderController::class, 'bidderList'])->name('admin.bidder');
         Route::get('/bidderDetails/{id}', [BidderController::class, 'bidderDetails'])->name('admin.bidderDetails');
         Route::get('change-bidder-kyc-status/{id}', [BidderController::class, 'changeBidderKycStatus'])->name('admin.change-bidder-kyc-status');
-        Route::get('change-bidder-account-status/{id}', [BidderController::class, 'changeBidderAccountStatus'])->name('admin.change-bidder-account-status');
+        Route::get('change-bidder-account-status/{id}/{status}', [BidderController::class, 'changeBidderAccountStatus'])->name('admin.change-bidder-account-status');
         Route::get('/admin', [AdminController::class, 'adminList'])->name('admin.admin');
         Route::get('/adminDetails/{id}', [AdminController::class, 'adminDetails'])->name('admin.adminDetails');
         Route::get('/viewingRequest', [LotController::class, 'viewingRequest'])->name('admin.viewingRequest');
         Route::get('/viewingRequestLots/{slotId}', [LotController::class, 'viewingRequestLots'])->name('admin.viewingRequestLots');
         // Route::post('/update-request-lots-status/{bookingId}', [LotController::class, 'updateRequestLotStatus'])->name('admin.update-request-lots-status');
         Route::post('/updateLotsStatus', [LotController::class, 'updateLotsStatus'])->name('admin.updateLotsStatus');
+        Route::post('/update-seller-document-status', [SellerController::class, 'updateSellerDocumentStatus'])->name('admin.update-seller-document-status');
+        Route::post('/update-bidder-document-status', [BidderController::class, 'updateBidderDocumentStatus'])->name('admin.update-bidder-document-status');
 
         // Route::get('/profile', [UserController::class, 'index'])->name('admin.profile');
     });

@@ -57,44 +57,24 @@
                                                 <td>{{ $seller->full_name }}</td>
                                                 <td>{{ $seller->email_address }}</td>
                                                 <td>{{ $seller->phone_number }}</td>
-                                                {{-- <td>
-                                                    @if ($seller->status == 0)
-                                                        <a href="{{ route('admin.change-seller-status', $seller->id) }}"
-                                                            class="badge text-decoration-none badge-sm mt-1 btn-danger"
-                                                            title="Change Status"
-                                                            onclick="return confirm('Are you sure to change status?')">
-                                                            Pending
-                                                        </a>
-                                                    @else
-                                                        <a href="{{ route('admin.change-seller-status', $seller->id) }}"
-                                                            class="badge text-decoration-none badge-sm mt-1 btn-success"
-                                                            title="Change Status"
-                                                            onclick="return confirm('Are you sure to change status?')">
-                                                            Approved
-                                                        </a>
-                                                    @endif
-                                                </td> --}}
                                                 <!-- KYC Status -->
                                                 <td>
-                                                    <a href="{{ route('admin.change-seller-kyc-status', $seller->id) }}"
-                                                        class="badge text-decoration-none badge-sm
-                                                        {{ $seller->kyc_status == 1 ? 'bg-success' : ($seller->kyc_status == 2 ? 'bg-danger' : 'bg-warning') }}"
-                                                        title="Change KYC Status"
-                                                        onclick="return confirm('Are you sure to change KYC status?')">
+                                                    <span
+                                                        class="badge badge-sm
+        {{ $seller->kyc_status == 1 ? 'bg-success' : ($seller->kyc_status == 2 ? 'bg-danger' : 'bg-warning') }}">
                                                         {{ $seller->kyc_status == 1 ? 'Approved' : ($seller->kyc_status == 2 ? 'Rejected' : 'Pending') }}
-                                                    </a>
+                                                    </span>
                                                 </td>
 
                                                 <!-- Account Status -->
                                                 <td>
-                                                    <a href="{{ route('admin.change-seller-account-status', $seller->id) }}"
-                                                        class="badge text-decoration-none badge-sm
-                                                        {{ $seller->account_status == 1 ? 'bg-success' : ($seller->account_status == 2 ? 'bg-danger' : 'bg-warning') }}"
-                                                        title="Change Account Status"
-                                                        onclick="return confirm('Are you sure to change Account status?')">
+                                                    <span
+                                                        class="badge badge-sm
+        {{ $seller->account_status == 1 ? 'bg-success' : ($seller->account_status == 2 ? 'bg-danger' : 'bg-warning') }}">
                                                         {{ $seller->account_status == 1 ? 'Active' : ($seller->account_status == 2 ? 'Suspended' : 'Pending') }}
-                                                    </a>
+                                                    </span>
                                                 </td>
+
                                                 <td>
                                                     <a href="{{ route('admin.sellerDetails', $seller->id) }}"
                                                         class="btn btn-sm btn-primary" title="View">

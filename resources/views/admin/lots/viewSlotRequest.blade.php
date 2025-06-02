@@ -68,8 +68,7 @@
                                             } elseif ($slotLots->every(fn($lot) => $lot->status == 2)) {
                                                 $statusText = 'Rejected';
                                                 $statusClass = 'danger';
-                                            }
-                                            elseif ($slotLots->contains(fn($lot) => $lot->status == 0)) {
+                                            } elseif ($slotLots->contains(fn($lot) => $lot->status == 0)) {
                                                 $statusText = 'Partial Pending';
                                                 $statusClass = 'warning';
                                             }
@@ -106,7 +105,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="lotsModalBody">
-                    Loading...
+                    {{-- Loading... --}}
                 </div>
             </div>
         </div>
@@ -115,8 +114,12 @@
 @endsection
 @push('scripts')
     <script>
+        const viewLotsUrl = "{{ url('/admin/viewingRequestLots') }}/";
+    </script>
+    <script>
         function viewLots(slotId) {
-            fetch(`/admin/viewingRequestLots/${slotId}`)
+            // fetch(`/admin/viewingRequestLots/${slotId}`)
+            fetch(viewLotsUrl + slotId)
                 .then(response => response.text())
                 .then(data => {
                     document.getElementById('lotsModalBody').innerHTML = data;

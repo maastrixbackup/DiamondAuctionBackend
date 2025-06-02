@@ -10,6 +10,7 @@ use App\Models\Slot;
 use App\Models\SlotBooking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class LotController extends Controller
 {
@@ -268,8 +269,16 @@ class LotController extends Controller
 
     public function viewingRequest(Request $request)
     {
-        $groupedSlots = SlotBooking::select('slot_id', 'bidder_name', 'room_name', 'room_type', 'start_time', 'date_for_reservation')
-            ->groupBy('slot_id', 'bidder_name', 'room_name', 'room_type', 'start_time', 'date_for_reservation')
+        // $groupedSlots = SlotBooking::select('slot_id', 'bidder_name', 'room_name', 'room_type', 'start_time', 'date_for_reservation')
+        //     ->groupBy('slot_id', 'bidder_name', 'room_name', 'room_type', 'start_time', 'date_for_reservation')
+        //     ->get();
+
+        $groupedSlots = SlotBooking::whereIn('id', function ($query) {
+            $query->select(DB::raw('MAX(id)'))
+                ->from('slot_bookings')
+                ->groupBy('slot_id');
+        })
+            ->orderByDesc('id')
             ->get();
 
         return view('admin.lots.viewSlotRequest', compact('groupedSlots'));
