@@ -166,6 +166,26 @@
     <!-- Kaiadmin DEMO methods, don't include it in your project! -->
     <script src="{{ asset('assets/js/setting-demo.js') }}"></script>
     <script src="{{ asset('assets/js/demo.js') }}"></script>
+
+    {{-- Toggle profile dropdown(View profile/logout)  --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownBtn = document.getElementById('profileDropdownBtn');
+            const dropdown = document.getElementById('profileDropdown');
+            // Toggle dropdown
+            dropdownBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+            // Close when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!dropdown.contains(e.target) && !dropdownBtn.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+
 </body>
 
 </html>

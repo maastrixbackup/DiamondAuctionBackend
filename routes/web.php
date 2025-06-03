@@ -55,6 +55,7 @@ Route::prefix('admin')->group(function () {
     Route::middleware(['admin', 'admin.role:superadmin'])->group(function () {
         Route::post('/logout', [LoginController::class, 'logout'])->name('admin.logout');
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+        Route::get('/profile', [DashboardController::class, 'profileDetails'])->name('admin.profile');
         Route::resource('lots', LotController::class)->names('admin.lots');
         Route::get('/seller', [SellerController::class, 'sellerList'])->name('admin.seller');
         Route::get('/sellerDetails/{id}', [SellerController::class, 'sellerDetails'])->name('admin.sellerDetails');

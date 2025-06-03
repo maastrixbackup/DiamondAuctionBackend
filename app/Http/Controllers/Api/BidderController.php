@@ -170,48 +170,145 @@ class BidderController extends Controller
         ], 200);
     }
 
-    public function availableSlots()
+    public function reuploadBidderDocument(Request $request)
+    {
+        $request->validate([
+            'bidder_id' => 'required|exists:bidders,id',
+            'field' => 'required|string|in:certificate_of_incorporation,valid_trade_license,passport_copy_authorised,ubo_declaration,passport_copy,proof_of_ownership',
+            'document' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        ]);
+
+        $bidder = Bidder::findOrFail($request->bidder_id);
+        $field = $request->field;
+        $statusField = $field . '_status';
+
+        if ($bidder->$statusField != 2) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Only rejected documents can be re-uploaded.',
+            ], 403);
+        }
+
+        $destinationPath = public_path('storage/document/bidder/');
+        if (!file_exists($destinationPath)) {
+            mkdir($destinationPath, 0777, true);
+        }
+
+        if ($bidder->$field && file_exists($destinationPath . $bidder->$field)) {
+            unlink($destinationPath . $bidder->$field);
+        }
+
+        $file = $request->file('document');
+        $filename = $field . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $file->move($destinationPath, $filename);
+
+        $bidder->$field = $filename;
+        $bidder->$statusField = 0;
+        $bidder->kyc_status = 0;
+        $bidder->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Document re-uploaded successfully.',
+        ], 200);
+    }
+
+
+    // public function availableSlots()
+    // {
+    //     try {
+    //         $today = Carbon::today()->toDateString();
+    //         $now = Carbon::now();
+
+    //         // Round up to the next 30-minute block
+    //         $minute = $now->minute;
+    //         $roundedTime = $now->copy()->minute($minute < 30 ? 30 : 0)->addMinutes($minute < 30 ? 0 : 30)->second(0)->format('H:i:s');
+
+    //         $slots = Slot::where('date_for_reservation', $today)
+    //             // ->where('start_time', '>=', $roundedTime)
+    //             ->get();
+    //         // $slots = Slot::all();
+
+    //         // Return specific fields only
+    //         $data = $slots->map(function ($slot) {
+    //             return [
+    //                 'slot_id' => $slot->id,
+    //                 'room_id' => $slot->room_id,
+    //                 'start_time' => $slot->start_time,
+    //                 'end_time' => $slot->end_time,
+    //                 'date' => $slot->date_for_reservation,
+    //                 'slot_status' => $slot->slot_status,
+    //             ];
+    //         });
+
+    //         return response()->json([
+    //             'status' => true,
+    //             'message' => 'Available slots from current time',
+    //             'data' => $data
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         Log::error('Error fetching available slots: ' . $e->getMessage());
+
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Something went wrong while fetching available slots.',
+    //             'error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
+    public function availableSlots(Request $request)
     {
         try {
-            $today = Carbon::today()->toDateString();
-            $now = Carbon::now();
+            $request->validate([
+                'room_type' => 'required|in:Physical,Virtual',
+                'date' => 'required|date',
+            ]);
 
-            // Round up to the next 30-minute block
-            $minute = $now->minute;
-            $roundedTime = $now->copy()->minute($minute < 30 ? 30 : 0)->addMinutes($minute < 30 ? 0 : 30)->second(0)->format('H:i:s');
+            $roomType = $request->room_type;
+            $date = $request->date;
 
-            $slots = Slot::where('date_for_reservation', $today)
-                // ->where('start_time', '>=', $roundedTime)
-                ->get();
-            // $slots = Slot::all();
+            $roomIds = Room::where('room_type', $roomType)->pluck('id');
 
-            // Return specific fields only
-            $data = $slots->map(function ($slot) {
-                return [
-                    'slot_id' => $slot->id,
-                    'room_id' => $slot->room_id,
-                    'start_time' => $slot->start_time,
-                    'end_time' => $slot->end_time,
-                    'date' => $slot->date_for_reservation,
-                    'slot_status' => $slot->slot_status,
-                ];
-            });
+            if ($roomIds->isEmpty()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No rooms found for the specified room type.',
+                ], 404);
+            }
+
+            $availableSlots = Slot::whereIn('room_id', $roomIds)
+                ->where('date_for_reservation', $date)
+                ->where('slot_status', 1)
+                ->pluck('start_time')
+                ->toArray();
+
+            $startTime = Carbon::createFromTimeString('09:00:00');
+            $endTime = Carbon::createFromTimeString('18:00:00');
+
+            $timeBlocks = [];
+            while ($startTime < $endTime) {
+                $timeStr = $startTime->format('H:i:s');
+                $timeBlocks[$timeStr] = in_array($timeStr, $availableSlots) ? 'available' : 'unavailable';
+                $startTime->addMinutes(30);
+            }
 
             return response()->json([
                 'status' => true,
-                'message' => 'Available slots from current time',
-                'data' => $data
+                'message' => 'Slot availability for the day',
+                'slots' => $timeBlocks
             ]);
         } catch (\Exception $e) {
-            Log::error('Error fetching available slots: ' . $e->getMessage());
+            Log::error('Error fetching slot availability: ' . $e->getMessage());
 
             return response()->json([
                 'status' => false,
-                'message' => 'Something went wrong while fetching available slots.',
+                'message' => 'Something went wrong while fetching slot availability.',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
+
 
     public function availableLots(Request $request)
     {

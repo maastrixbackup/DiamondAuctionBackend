@@ -35,9 +35,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/sellerlogout', [SellerController::class, 'sellerLogout']);
     Route::get('/view-seller-lot', [SellerController::class, 'viewSellerLots']);
     Route::get('/seller-lot-details/{id}', [SellerController::class, 'sellerLotDetails']);
-    Route::get('/available-slots', [BidderController::class, 'availableSlots']);
+    Route::post('/available-slots', [BidderController::class, 'availableSlots']);
     Route::post('/available-lots', [BidderController::class, 'availableLots']);
     Route::post('/slot-booking', [BidderController::class, 'slotBooking']);
     Route::get('/get-bidder-assigned-slots', [BidderController::class, 'getBidderAssignedSlots']);
     Route::get('/bidder-assigned-lots-by-slots/{slotId}', [BidderController::class, 'bidderAssignedLotsBySlot']);
+    Route::post('/reupload-bidder-document', [BidderController::class, 'reuploadBidderDocument'])->name('admin.reupload-bidder-document');
+    Route::post('/reupload-seller-document', [SellerController::class, 'reuploadSellerDocument'])->name('admin.reupload-seller-document');
+
 });

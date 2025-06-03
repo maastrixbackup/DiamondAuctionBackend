@@ -166,6 +166,50 @@ class SellerController extends Controller
         ], 200);
     }
 
+    public function reuploadSellerDocument(Request $request)
+    {
+            $request->validate([
+                'seller_id' => 'required|exists:sellers,id',
+                'field' => 'required|string|in:certificate_of_incorporation,valid_trade_license,passport_copy_authorised,ubo_declaration,passport_copy,proof_of_ownership',
+                'document' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            ]);
+
+            $seller = Seller::findOrFail($request->seller_id);
+            $field = $request->field;
+            $statusField = $field . '_status';
+
+            if ($seller->$statusField != 2) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Only rejected documents can be re-uploaded.',
+                ], 403);
+            }
+
+            $destinationPath = public_path('storage/document/seller/');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0777, true);
+            }
+
+            if ($seller->$field && file_exists($destinationPath . $seller->$field)) {
+                unlink($destinationPath . $seller->$field);
+            }
+
+            $file = $request->file('document');
+            $filename = $field . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move($destinationPath, $filename);
+
+            $seller->$field = $filename;
+            $seller->$statusField = 0;
+            $seller->kyc_status = 0;
+            $seller->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Document re-uploaded successfully.',
+            ], 200);
+    }
+
+
     public function viewSellerLots(Request $request)
     {
         $seller = $request->user(); //logged in seller id

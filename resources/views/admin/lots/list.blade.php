@@ -84,7 +84,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($lots as $lot)
+                                        @forelse ($lots as $lot)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 {{-- <td>{{ $lot->seller->full_name }}</td> --}}
@@ -118,7 +118,11 @@
                                                     </form>
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @empty
+                                            <tr>
+                                                <td colspan="6" class="text-center">No data found.</td>
+                                            </tr>
+                                        @endforelse
                                     </tbody>
                                 </table>
                             </div>
