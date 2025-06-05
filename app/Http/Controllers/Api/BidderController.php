@@ -366,11 +366,24 @@ class BidderController extends Controller
                     'message' => 'Bidder not found.',
                 ], 404);
             }
+            // Generate dynamic booking_id
+            $latestBooking = SlotBooking::whereNotNull('booking_id')
+                ->where('booking_id', 'like', 'DA-%')
+                ->orderByDesc('id')
+                ->first();
 
+            if ($latestBooking && preg_match('/DA-(\d+)/', $latestBooking->booking_id, $matches)) {
+                $nextNumber = str_pad(((int) $matches[1]) + 1, 4, '0', STR_PAD_LEFT);
+            } else {
+                $nextNumber = '0001';
+            }
+
+            $bookingId = 'DA-' . $nextNumber;
             $insertData = [];
             foreach ($lotIds as $lotId) {
                 $insertData[] = [
                     'lot_id' => $lotId,
+                    'booking_id' => $bookingId,
                     'start_time' => $request->time,
                     'date_for_reservation' => $request->date,
                     'bidder_id' => $bidder->id,

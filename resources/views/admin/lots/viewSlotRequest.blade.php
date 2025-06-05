@@ -87,11 +87,11 @@
                                         <td>
                                             <button class="btn btn-sm btn-primary"
                                                 onclick="viewLots(
-        '{{ $slot->bidder_id }}',
-        '{{ $slot->room_type }}',
-        '{{ $slot->start_time }}',
-        '{{ $slot->date_for_reservation }}'
-    )">
+                                                    '{{ $slot->bidder_id }}',
+                                                    '{{ $slot->room_type }}',
+                                                    '{{ $slot->start_time }}',
+                                                    '{{ $slot->date_for_reservation }}'
+                                                )">
                                                 View
                                             </button>
                                         </td>
@@ -149,59 +149,59 @@
                 });
         };
 
-        function submitLotStatuses() {
-            const form = document.getElementById('updateSlotForm');
-            const formData = new FormData(form);
+        // function submitLotStatuses() {
+        //     const form = document.getElementById('updateSlotForm');
+        //     const formData = new FormData(form);
 
-            fetch("{{ route('admin.updateLotsStatus') }}", {
-                    method: "POST",
-                    headers: {
-                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                    },
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const selects = form.querySelectorAll('select[name^="lot_status"]');
-                        selects.forEach(select => {
-                            const lotIdMatch = select.name.match(/lot_status\[(\d+)\]/);
-                            if (!lotIdMatch) return;
+        //     fetch("{{ route('admin.updateLotsStatus') }}", {
+        //             method: "POST",
+        //             headers: {
+        //                 'X-CSRF-TOKEN': "{{ csrf_token() }}"
+        //             },
+        //             body: formData
+        //         })
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             if (data.success) {
+        //                 const selects = form.querySelectorAll('select[name^="lot_status"]');
+        //                 selects.forEach(select => {
+        //                     const lotIdMatch = select.name.match(/lot_status\[(\d+)\]/);
+        //                     if (!lotIdMatch) return;
 
-                            const lotId = lotIdMatch[1];
-                            const status = select.value;
+        //                     const lotId = lotIdMatch[1];
+        //                     const status = select.value;
 
-                            const row = document.getElementById(`lot-row-${lotId}`);
-                            if (!row) return;
+        //                     const row = document.getElementById(`lot-row-${lotId}`);
+        //                     if (!row) return;
 
-                            const statusCell = row.children[6];
-                            const actionCell = row.children[7];
+        //                     const statusCell = row.children[6];
+        //                     const actionCell = row.children[7];
 
-                            if (status == 1) {
-                                statusCell.innerHTML = '<span class="badge bg-success">Approved</span>';
-                            } else if (status == 2) {
-                                statusCell.innerHTML = '<span class="badge bg-danger">Rejected</span>';
-                            }
+        //                     if (status == 1) {
+        //                         statusCell.innerHTML = '<span class="badge bg-success">Approved</span>';
+        //                     } else if (status == 2) {
+        //                         statusCell.innerHTML = '<span class="badge bg-danger">Rejected</span>';
+        //                     }
 
-                            actionCell.innerHTML = '<span class="text-muted"></span>';
-                        });
+        //                     actionCell.innerHTML = '<span class="text-muted"></span>';
+        //                 });
 
-                        const messageDiv = document.getElementById('successMessage');
-                        messageDiv.textContent = "Lots updated successfully!";
-                        messageDiv.classList.remove('d-none');
+        //                 const messageDiv = document.getElementById('successMessage');
+        //                 messageDiv.textContent = "Lots updated successfully!";
+        //                 messageDiv.classList.remove('d-none');
 
-                        setTimeout(() => {
-                            window.location.href = "{{ route('admin.viewingRequest') }}";
-                        }, 1000);
-                    } else {
-                        alert("Something went wrong.");
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert("An error occurred.");
-                });
-        }
+        //                 setTimeout(() => {
+        //                     window.location.href = "{{ route('admin.viewingRequest') }}";
+        //                 }, 1000);
+        //             } else {
+        //                 alert("Something went wrong.");
+        //             }
+        //         })
+        //         .catch(error => {
+        //             console.error('Error:', error);
+        //             alert("An error occurred.");
+        //         });
+        // }
 
         function submitAssignedRoom() {
             const form = document.getElementById('assignRoomForm');
@@ -227,6 +227,12 @@
                     console.error('Error:', error);
                     alert("An error occurred while assigning the room.");
                 });
+        }
+    </script>
+    <script>
+        function toggleMeetingLink() {
+            const container = document.getElementById('meetingLinkContainer');
+            container.classList.remove('d-none');
         }
     </script>
 @endpush
