@@ -1,60 +1,56 @@
-<h5>Available Rooms</h5>
-<form id="assignRoomForm" onsubmit="event.preventDefault(); submitAssignedRoom();">
-    @csrf
+@if (!$isRoomAlreadyAssigned)
+    <form id="assignRoomForm" onsubmit="event.preventDefault(); submitAssignedRoom();">
+        @csrf
 
-    {{-- Hidden fields required for controller filtering --}}
-    <input type="hidden" name="room_type" value="{{ $roomType }}">
-    <input type="hidden" name="start_time" value="{{ $startTime }}">
-    <input type="hidden" name="date" value="{{ $date }}">
+        {{-- Hidden fields required for controller filtering --}}
+        <input type="hidden" name="room_type" value="{{ $roomType }}">
+        <input type="hidden" name="start_time" value="{{ $startTime }}">
+        <input type="hidden" name="date" value="{{ $date }}">
 
-    <div class="mb-3">
-        @foreach ($rooms as $room)
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="rooms[]" value="{{ $room->id }}"
-                    id="room_{{ $room->id }}" {{ $room->is_available ? '' : 'disabled' }}>
-                <label class="form-check-label" for="room_{{ $room->id }}">
-                    {{ $room->name ?? 'Room ' . $room->id }} - {{ $room->is_available ? 'Available' : 'Unavailable' }}
-                </label>
+        <div class="mb-3">
+            @foreach ($rooms as $room)
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="rooms[]" value="{{ $room->id }}"
+                        id="room_{{ $room->id }}" {{ $room->is_available ? '' : 'disabled' }}
+                        onclick="toggleMeetingLink()">
+                    <label class="form-check-label" for="room_{{ $room->id }}">
+                        {{ $room->room_name }} - {{ $room->is_available ? 'Available' : 'Unavailable' }}
+                    </label>
+                </div>
+            @endforeach
+        </div>
+        @if ($roomType === 'Virtual' && $room->is_available)
+            {{-- Initially hidden; only shown when a virtual room is selected --}}
+            <div id="meetingLinkContainer" class="mt-2 d-none">
+                <label for="meeting_link" class="form-label">Meeting Link :</label>
+                <input type="url" name="meeting_link" id="meeting_link" class="form-control"
+                    placeholder="https://example.com/meeting-link" required>
             </div>
-        @endforeach
+        @endif
+        <div class="text-start">
+            <button type="submit" class="btn btn-primary mb-2 mt-2">Assign Room</button>
+        </div>
+    </form>
+@else
+    <div class="alert alert-info">
+        Room already assigned to this slot.
     </div>
-    <div class="text-end">
-        <button type="submit" class="btn btn-primary">Assign Room</button>
-    </div>
-</form>
+@endif
 
-{{-- <form id="assignRoomForm">
-    <div class="mb-3">
-        @foreach ($rooms as $room)
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="rooms[]" value="{{ $room->id }}"
-                    id="room_{{ $room->id }}" {{ $room->is_available ? '' : 'disabled' }}>
-                <label class="form-check-label" for="room_{{ $room->id }}">
-                    {{ $room->name ?? 'Room ' . $room->id }} - {{ $room->is_available ? 'Available' : 'Unavailable' }}
-                </label>
-            </div>
-        @endforeach
-    </div>
-    <div class="text-end">
-        <button type="submit" class="btn btn-primary">Assign Room</button>
-    </div>
-</form> --}}
-
-
-{{-- <form id="updateSlotForm">
+<form id="updateSlotForm">
     <div id="successMessage" class="alert alert-success d-none" role="alert"></div>
     <table class="table table-bordered">
         <thead>
             <tr>
                 <th>Lot ID</th>
                 <th>Bidder Name</th>
-                <th>Current Room</th>
+                <th>Room Name</th>
                 <th>Room Type</th>
                 <th>Date</th>
                 <th>Start Time</th>
                 <th>Status</th>
-                <th>Assign Room</th>
-                <th>Action</th>
+                {{-- <th>Assign Room</th>
+                <th>Action</th> --}}
             </tr>
         </thead>
         <tbody>
@@ -75,7 +71,7 @@
                             <span class="badge bg-danger">Rejected</span>
                         @endif
                     </td>
-                    <td>
+                    {{-- <td>
                         @if ($lot->status == 0)
                             <div class="d-flex flex-column gap-1">
                                 @foreach ($allRooms as $room)
@@ -105,13 +101,13 @@
                         @else
                             <span class="text-muted"></span>
                         @endif
-                    </td>
+                    </td> --}}
                 </tr>
             @endforeach
         </tbody>
     </table>
 
-    <div class="text-end mt-3">
+    {{-- <div class="text-end mt-3">
         <button type="button" class="btn btn-primary" onclick="submitLotStatuses()">Update Slot</button>
-    </div>
-</form> --}}
+    </div> --}}
+</form>

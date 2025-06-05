@@ -26,22 +26,22 @@
             </div>
 
             <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-title">Update Lot Information</div>
+                <div class="col-12">
+                    <div class="card shadow-sm border-0 rounded-4">
+                        <div class="card-header bg-light py-3 px-4 border-bottom">
+                            <h5 class="card-title mb-0 fw-semibold">Update Lot Information</h5>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body px-4 py-4">
                             <form action="{{ route('admin.lots.update', $lot->id) }}" method="POST"
                                 enctype="multipart/form-data">
                                 @csrf
                                 @method('PUT')
-                                <div class="row">
+                                <div class="row gy-4">
                                     <!-- Column 1 -->
                                     <div class="col-md-6 col-lg-4">
-                                        <div class="form-group">
-                                            <label for="seller_id">Select Seller</label>
-                                            <select name="seller_id" id="seller_id" class="form-control" required>
+                                        <div class="mb-3">
+                                            <label for="seller_id" class="form-label">Select Seller</label>
+                                            <select name="seller_id" id="seller_id" class="form-select" required>
                                                 <option value="">-- Select Seller --</option>
                                                 @foreach ($sellers as $seller)
                                                     <option value="{{ $seller->id }}"
@@ -52,56 +52,57 @@
                                             </select>
                                         </div>
 
-                                        <div class="form-group">
-                                            <label for="category_id">Select Category</label>
-                                            <select name="category_id" id="category_id" class="form-control" required>
+                                        <div class="mb-3">
+                                            <label for="category_id" class="form-label">Select Category</label>
+                                            <select name="category_id" id="category_id" class="form-select" required>
                                                 <option value="">-- Select Category --</option>
                                                 @foreach ($categories as $category)
                                                     <option value="{{ $category->id }}"
                                                         {{ $lot->category_id == $category->id ? 'selected' : '' }}>
-                                                        {{ $category->name }}</option>
+                                                        {{ $category->name }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>
 
-                                        <div class="form-group">
-                                            <label for="type">Type</label>
+                                        <div class="mb-3">
+                                            <label for="type" class="form-label">Type</label>
                                             <input type="text" name="type" id="type" class="form-control"
                                                 placeholder="Enter Type" value="{{ $lot->type }}" required>
                                         </div>
 
-                                        <div class="form-group">
-                                            <label for="color">Color</label>
+                                        <div class="mb-3">
+                                            <label for="color" class="form-label">Color</label>
                                             <input type="text" name="color" id="color" class="form-control"
                                                 placeholder="Enter Color" value="{{ $lot->color }}">
                                         </div>
 
-                                        <div class="form-group">
-                                            <label for="weight">Weight</label>
+                                        <div class="mb-3">
+                                            <label for="weight" class="form-label">Weight</label>
                                             <input type="text" name="weight" id="weight" class="form-control"
                                                 placeholder="Enter Weight" value="{{ $lot->weight }}" required>
                                         </div>
 
-                                        <div class="form-group">
-                                            <label for="size">Size</label>
+                                        <div class="mb-3">
+                                            <label for="size" class="form-label">Size</label>
                                             <input type="text" name="size" id="size" class="form-control"
                                                 placeholder="Enter Size" value="{{ $lot->size }}">
                                         </div>
 
-                                        <div class="form-group">
-                                            <label for="status">Status</label>
-                                            <select name="status" id="status" class="form-control">
+                                        <div class="mb-3">
+                                            <label for="status" class="form-label">Status</label>
+                                            <select name="status" id="status" class="form-select">
                                                 <option value="0" {{ $lot->status == 0 ? 'selected' : '' }}>Pending
                                                 </option>
-                                                <option value="1" {{ $lot->status == 1 ? 'selected' : '' }}>Active
+                                                <option value="1" {{ $lot->status == 1 ? 'selected' : '' }}>Live
                                                 </option>
                                                 <option value="2" {{ $lot->status == 2 ? 'selected' : '' }}>Sold
                                                 </option>
                                             </select>
                                         </div>
 
-                                        <div class="form-group">
-                                            <label>Upload Images</label>
+                                        <div class="mb-3">
+                                            <label class="form-label">Upload Images</label>
                                             <div id="image-upload-group">
                                                 {{-- Existing images --}}
                                                 @if ($lot->images && is_array($lot->images))
@@ -110,12 +111,12 @@
                                                             <input type="file" name="images[]"
                                                                 class="form-control image-input" accept="image/*">
                                                             <button type="button"
-                                                                class="btn btn-sm btn-danger remove-image">-</button>
+                                                                class="btn btn-outline-danger btn-sm remove-image">-</button>
                                                         </div>
-                                                        <div class="preview-group mb-2 d-flex flex-wrap gap-2">
+                                                        <div class="preview-group d-flex flex-wrap gap-2 mb-3">
                                                             <img src="{{ asset('storage/images/lots/' . $img) }}"
-                                                                style="max-width: 100px; max-height: 100px;"
-                                                                class="rounded border p-1">
+                                                                class="rounded border p-1"
+                                                                style="max-width: 100px; max-height: 100px;">
                                                             <input type="hidden" name="existing_images[]"
                                                                 value="{{ $img }}">
                                                         </div>
@@ -124,56 +125,54 @@
 
                                                 {{-- Add new image input --}}
                                                 <div class="input-group mb-2">
-                                                    <input type="file" name="images[]" class="form-control image-input"
-                                                        accept="image/*">
+                                                    <input type="file" name="images[]"
+                                                        class="form-control image-input" accept="image/*">
                                                     <button type="button"
-                                                        class="btn btn-sm btn-success add-more-image">+</button>
+                                                        class="btn btn-outline-success btn-sm add-more-image">+</button>
                                                 </div>
-                                                <div class="preview-group mb-2 d-flex flex-wrap gap-2"></div>
+                                                <div class="preview-group d-flex flex-wrap gap-2"></div>
                                             </div>
                                         </div>
-
-
-
                                     </div>
 
                                     <!-- Column 2 -->
                                     <div class="col-md-6 col-lg-4">
-                                        <div class="form-group">
-                                            <label for="shape">Shape</label>
+                                        <div class="mb-3">
+                                            <label for="shape" class="form-label">Shape</label>
                                             <input type="text" name="shape" id="shape" class="form-control"
                                                 placeholder="Enter Shape" value="{{ $lot->shape }}">
                                         </div>
 
-                                        <div class="form-group">
-                                            <label for="batch_code">Batch Code</label>
+                                        <div class="mb-3">
+                                            <label for="batch_code" class="form-label">Batch Code</label>
                                             <input type="text" name="batch_code" id="batch_code" class="form-control"
                                                 placeholder="Enter Batch Code" value="{{ $lot->batch_code }}">
                                         </div>
 
-                                        <div class="form-group">
-                                            <label for="report_number">Report Number</label>
+                                        <div class="mb-3">
+                                            <label for="report_number" class="form-label">Report Number</label>
                                             <input type="text" name="report_number" id="report_number"
                                                 class="form-control" placeholder="Enter Report Number"
                                                 value="{{ $lot->report_number }}">
                                         </div>
 
-                                        <div class="form-group">
-                                            <label for="colour_grade">Colour Grade</label>
+                                        <div class="mb-3">
+                                            <label for="colour_grade" class="form-label">Colour Grade</label>
                                             <input type="text" name="colour_grade" id="colour_grade"
                                                 class="form-control" placeholder="Enter Colour Grade"
                                                 value="{{ $lot->colour_grade }}">
                                         </div>
 
-                                        <div class="form-group">
-                                            <label for="colour_origin">Colour Origin</label>
+                                        <div class="mb-3">
+                                            <label for="colour_origin" class="form-label">Colour Origin</label>
                                             <input type="text" name="colour_origin" id="colour_origin"
                                                 class="form-control" placeholder="Enter Colour Origin"
                                                 value="{{ $lot->colour_origin }}">
                                         </div>
 
-                                        <div class="form-group">
-                                            <label for="colour_distribution">Colour Distribution</label>
+                                        <div class="mb-3">
+                                            <label for="colour_distribution" class="form-label">Colour
+                                                Distribution</label>
                                             <input type="text" name="colour_distribution" id="colour_distribution"
                                                 class="form-control" placeholder="Enter Colour Distribution"
                                                 value="{{ $lot->colour_distribution }}">
@@ -182,47 +181,49 @@
 
                                     <!-- Column 3 -->
                                     <div class="col-md-6 col-lg-4">
-                                        <div class="form-group">
-                                            <label for="polish">Polish</label>
+                                        <div class="mb-3">
+                                            <label for="polish" class="form-label">Polish</label>
                                             <input type="text" name="polish" id="polish" class="form-control"
                                                 placeholder="Enter Polish" value="{{ $lot->polish }}">
                                         </div>
 
-                                        <div class="form-group">
-                                            <label for="symmetry">Symmetry</label>
+                                        <div class="mb-3">
+                                            <label for="symmetry" class="form-label">Symmetry</label>
                                             <input type="text" name="symmetry" id="symmetry" class="form-control"
                                                 placeholder="Enter Symmetry" value="{{ $lot->symmetry }}">
                                         </div>
 
-                                        <div class="form-group">
-                                            <label for="fluorescence">Fluorescence</label>
+                                        <div class="mb-3">
+                                            <label for="fluorescence" class="form-label">Fluorescence</label>
                                             <input type="text" name="fluorescence" id="fluorescence"
                                                 class="form-control" placeholder="Enter Fluorescence"
                                                 value="{{ $lot->fluorescence }}">
                                         </div>
 
-                                        <div class="form-group">
-                                            <label for="stone">Stone</label>
+                                        <div class="mb-3">
+                                            <label for="stone" class="form-label">Stone</label>
                                             <input type="text" name="stone" id="stone" class="form-control"
                                                 placeholder="Enter Stone" value="{{ $lot->stone }}">
                                         </div>
 
-                                        <div class="form-group">
-                                            <label for="notes">Notes</label>
+                                        <div class="mb-3">
+                                            <label for="notes" class="form-label">Notes</label>
                                             <textarea name="notes" id="notes" rows="4" class="form-control" placeholder="Enter any notes...">{{ $lot->notes }}</textarea>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="card-action mt-4">
-                                    <button type="submit" class="btn btn-success">Update</button>
-                                    <a href="{{ route('admin.lots.index') }}" class="btn btn-danger">Cancel</a>
+                                <div class="mt-4 d-flex gap-2">
+                                    <button type="submit" class="btn btn-success px-4">Update</button>
+                                    <a href="{{ route('admin.lots.index') }}"
+                                        class="btn btn-outline-danger px-4">Cancel</a>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 @endsection

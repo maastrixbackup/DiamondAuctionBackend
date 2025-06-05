@@ -66,7 +66,7 @@
                                     @if ($lot->status == 0)
                                         <span class="badge bg-danger">Pending</span>
                                     @elseif ($lot->status == 1)
-                                        <span class="badge bg-success">Active</span>
+                                        <span class="badge bg-success">Live</span>
                                     @else
                                         <span class="badge bg-secondary">Sold</span>
                                     @endif
