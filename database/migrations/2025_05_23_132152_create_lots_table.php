@@ -13,12 +13,8 @@ return new class extends Migration
     {
         Schema::create('lots', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('seller_id')
-                ->constrained('sellers')
-                ->onDelete('cascade');
-            $table->foreignId('category_id')
-                ->constrained('categories')
-                ->onDelete('cascade');
+            $table->bigInteger('seller_id');
+            $table->bigInteger('category_id');
             $table->string('type');
             $table->string('color')->nullable();
             $table->string('weight')->nullable();

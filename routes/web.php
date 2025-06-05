@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LotController;
 use App\Http\Controllers\Admin\SellerController;
+use App\Http\Controllers\Admin\SlotController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -33,7 +34,7 @@ Route::get('/optimize', function () {
     Artisan::call('cache:clear');
     return 'Command executed successfully!';
 });
-Route::get('/admin', function () {
+Route::get('/', function () {
     return redirect()->route('admin.login');
 });
 
@@ -79,6 +80,11 @@ Route::prefix('admin')->group(function () {
         Route::post('/update-bidder-document-status', [BidderController::class, 'updateBidderDocumentStatus'])->name('admin.update-bidder-document-status');
 
         // Route::get('/profile', [UserController::class, 'index'])->name('admin.profile');
+
+
+
+        // slots
+        Route::resource('viewing-slots', SlotController::class)->names('admin.viewing-slots');
     });
 });
 
