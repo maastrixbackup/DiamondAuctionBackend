@@ -34,7 +34,7 @@
                             <thead>
                                 <tr>
                                     <th>SL</th>
-                                    <th>Slot ID</th>
+                                    {{-- <th>Slot ID</th> --}}
                                     <th>Bidder Name</th>
                                     <th>Room Name</th>
                                     <th>Room Type</th>
@@ -48,13 +48,13 @@
                                 @foreach ($groupedSlots as $index => $slot)
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
-                                        <td>{{ $slot->slot_id }}</td>
+                                        {{-- <td>{{ $slot->slot_id }}</td> --}}
                                         <td>{{ $slot->bidder_name }}</td>
-                                        <td>{{ $slot->room_name }}</td>
+                                        <td>{{ $slot->room_name ?? 'N/A' }}</td>
                                         <td>{{ $slot->room_type }}</td>
                                         <td>{{ $slot->date_for_reservation }}</td>
                                         <td>{{ \Carbon\Carbon::parse($slot->start_time)->format('h:i A') }}</td>
-                                        @php
+                                        {{-- @php
                                             $slotLots = \App\Models\SlotBooking::where(
                                                 'slot_id',
                                                 $slot->slot_id,
@@ -73,12 +73,25 @@
                                                 $statusClass = 'warning';
                                             }
                                         @endphp
-                                        <td><span class="badge bg-{{ $statusClass }}">{{ $statusText }}</span></td>
+                                        <td><span class="badge bg-{{ $statusClass }}">{{ $statusText }}</span></td> --}}
 
-                                        {{-- <td><span class="badge bg-warning">Pending</span></td> --}}
+                                        <td>
+                                            @if ($slot->status == 0)
+                                                <span class="badge bg-warning">Pending</span>
+                                            @elseif($slot->status == 1)
+                                                <span class="badge bg-success">Approved</span>
+                                            @else
+                                                <span class="badge bg-danger">Rejected</span>
+                                            @endif
+                                        </td>
                                         <td>
                                             <button class="btn btn-sm btn-primary"
-                                                onclick="viewLots({{ $slot->slot_id }})">
+                                                onclick="viewLots(
+        '{{ $slot->bidder_id }}',
+        '{{ $slot->room_type }}',
+        '{{ $slot->start_time }}',
+        '{{ $slot->date_for_reservation }}'
+    )">
                                                 View
                                             </button>
                                         </td>
@@ -114,12 +127,17 @@
 @endsection
 @push('scripts')
     <script>
-        const viewLotsUrl = "{{ url('/admin/viewingRequestLots') }}/";
-    </script>
-    <script>
-        function viewLots(slotId) {
-            // fetch(`/admin/viewingRequestLots/${slotId}`)
-            fetch(viewLotsUrl + slotId)
+        const viewLots = (bidderId, roomType, startTime, date) => {
+            const params = new URLSearchParams({
+                bidder_id: bidderId,
+                room_type: roomType,
+                start_time: startTime,
+                date: date
+            });
+
+            const fullUrl = "{{ url('/admin/viewingRequestLots') }}" + '?' + params.toString();
+
+            fetch(fullUrl)
                 .then(response => response.text())
                 .then(data => {
                     document.getElementById('lotsModalBody').innerHTML = data;
@@ -129,7 +147,7 @@
                     document.getElementById('lotsModalBody').innerHTML = 'Error loading lots.';
                     console.error(error);
                 });
-        }
+        };
 
         function submitLotStatuses() {
             const form = document.getElementById('updateSlotForm');
@@ -145,7 +163,6 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Update lot rows
                         const selects = form.querySelectorAll('select[name^="lot_status"]');
                         selects.forEach(select => {
                             const lotIdMatch = select.name.match(/lot_status\[(\d+)\]/);
@@ -169,16 +186,13 @@
                             actionCell.innerHTML = '<span class="text-muted"></span>';
                         });
 
-                        // Show success message
                         const messageDiv = document.getElementById('successMessage');
                         messageDiv.textContent = "Lots updated successfully!";
                         messageDiv.classList.remove('d-none');
 
-                        // Redirect after 2 seconds
                         setTimeout(() => {
                             window.location.href = "{{ route('admin.viewingRequest') }}";
                         }, 1000);
-
                     } else {
                         alert("Something went wrong.");
                     }
@@ -186,6 +200,32 @@
                 .catch(error => {
                     console.error('Error:', error);
                     alert("An error occurred.");
+                });
+        }
+
+        function submitAssignedRoom() {
+            const form = document.getElementById('assignRoomForm');
+            const formData = new FormData(form);
+
+            fetch("{{ route('admin.assignRoomToSlot') }}", {
+                    method: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status) {
+                        alert("Room assigned successfully!");
+                        window.location.reload();
+                    } else {
+                        alert("Failed to assign room.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("An error occurred while assigning the room.");
                 });
         }
     </script>

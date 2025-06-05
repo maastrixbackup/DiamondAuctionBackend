@@ -213,50 +213,6 @@ class BidderController extends Controller
         ], 200);
     }
 
-
-    // public function availableSlots()
-    // {
-    //     try {
-    //         $today = Carbon::today()->toDateString();
-    //         $now = Carbon::now();
-
-    //         // Round up to the next 30-minute block
-    //         $minute = $now->minute;
-    //         $roundedTime = $now->copy()->minute($minute < 30 ? 30 : 0)->addMinutes($minute < 30 ? 0 : 30)->second(0)->format('H:i:s');
-
-    //         $slots = Slot::where('date_for_reservation', $today)
-    //             // ->where('start_time', '>=', $roundedTime)
-    //             ->get();
-    //         // $slots = Slot::all();
-
-    //         // Return specific fields only
-    //         $data = $slots->map(function ($slot) {
-    //             return [
-    //                 'slot_id' => $slot->id,
-    //                 'room_id' => $slot->room_id,
-    //                 'start_time' => $slot->start_time,
-    //                 'end_time' => $slot->end_time,
-    //                 'date' => $slot->date_for_reservation,
-    //                 'slot_status' => $slot->slot_status,
-    //             ];
-    //         });
-
-    //         return response()->json([
-    //             'status' => true,
-    //             'message' => 'Available slots from current time',
-    //             'data' => $data
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         Log::error('Error fetching available slots: ' . $e->getMessage());
-
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => 'Something went wrong while fetching available slots.',
-    //             'error' => $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
-
     public function availableSlots(Request $request)
     {
         try {
@@ -309,41 +265,45 @@ class BidderController extends Controller
         }
     }
 
-
     public function availableLots(Request $request)
     {
         try {
-            $slotId = $request->slot_id;
-            $slot = Slot::select('start_time', 'date_for_reservation')
-                ->find($slotId);
+            $request->validate([
+                'date' => 'required|date',
+                'time' => 'required|date_format:H:i:s',
+                'room_type' => 'required|in:Physical,Virtual',
+            ]);
 
-            if (!$slot) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Slot not found.',
-                ], 404);
-            }
+            $date = $request->date;
+            $time = $request->time;
+            $roomType = $request->room_type;
 
-            // Fetch booked lot_ids for this time and date from SlotBooking table
-            $bookedLotIds = SlotBooking::where('start_time', $slot->start_time)
-                ->where('date_for_reservation', $slot->date_for_reservation)
+            $bookedLotIds = SlotBooking::where('start_time', $time)
+                ->where('date_for_reservation', $date)
+                ->where('room_type', $roomType)
                 ->where('status', 1)
                 ->pluck('lot_id')
                 ->toArray();
-            // Get available lots
+
             $availableLots = Lot::whereNotIn('id', $bookedLotIds)->get();
+
+            if ($availableLots->isEmpty()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No available lots found.',
+                    'available_lots' => []
+                ], 200);
+            }
 
             $availableLots = $availableLots->map(function ($lot) {
                 if (is_array($lot->images)) {
                     $lot->images = array_map(function ($image) {
-                        // return asset('storage/images/lots/' . $image);
                         return 'storage/images/lots/' . ltrim($image, '/');
                     }, $lot->images);
                 } else {
                     $lot->images = [];
                 }
                 unset($lot->image_urls);
-
                 return $lot;
             });
 
@@ -367,13 +327,18 @@ class BidderController extends Controller
     {
         try {
             $request->validate([
-                'slot_id' => 'required|exists:slots,id',
-                'lot_id' => 'required',
+                'room_type' => 'required|string|in:Physical,Virtual',
+                'time' => 'required|date_format:H:i:s',
+                'date' => 'required|date',
+                'lot_id' => 'required|string',
             ]);
+
             $lotIds = is_array($request->lot_id)
                 ? $request->lot_id
                 : explode(',', $request->lot_id);
+
             $lotIds = array_filter(array_map('trim', $lotIds));
+
             foreach ($lotIds as $lotId) {
                 if (!is_numeric($lotId)) {
                     return response()->json([
@@ -383,15 +348,17 @@ class BidderController extends Controller
                 }
             }
 
-            $slot = Slot::find($request->slot_id);
-            if (!$slot) {
+            $existingLotIds = Lot::whereIn('id', $lotIds)->pluck('id')->toArray();
+            $invalidLotIds = array_diff($lotIds, $existingLotIds);
+
+            if (!empty($invalidLotIds)) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Slot not found.',
-                ], 404);
+                    'message' => 'Invalid lot IDs found.',
+                    'invalid_lot_ids' => array_values($invalidLotIds),
+                ], 400);
             }
 
-            // $bidderId = $request->user()->id;
             $bidder = Bidder::find($request->user()->id);
             if (!$bidder) {
                 return response()->json([
@@ -400,38 +367,27 @@ class BidderController extends Controller
                 ], 404);
             }
 
-            $room = Room::find($slot->room_id);
-            if (!$room) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Room not found for the slot.',
-                ], 404);
-            }
-
             $insertData = [];
             foreach ($lotIds as $lotId) {
                 $insertData[] = [
-                    'slot_id' => $slot->id,
                     'lot_id' => $lotId,
-                    'start_time' => $slot->start_time,
-                    'date_for_reservation' => $slot->date_for_reservation,
+                    'start_time' => $request->time,
+                    'date_for_reservation' => $request->date,
                     'bidder_id' => $bidder->id,
                     'bidder_name' => $bidder->full_name,
-                    'room_name' => $room->room_name,
-                    'room_type' => $room->room_type,
+                    'room_type' => $request->room_type,
                     'status' => 0,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
             }
 
-            // Bulk insert
             SlotBooking::insert($insertData);
 
             return response()->json([
                 'status' => true,
                 'message' => 'Slot booked successfully.',
-            ]);
+            ], 200);
         } catch (\Exception $e) {
             Log::error('Slot booking error: ' . $e->getMessage());
 
