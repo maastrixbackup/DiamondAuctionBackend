@@ -312,8 +312,6 @@ class LotController extends Controller
         $startTime = $request->start_time;
         $date = $request->date;
 
-
-
         $roomIds = Room::where('room_type', $roomType)->pluck('id');
         $rooms = Room::whereIn('id', $roomIds)->get();
 
@@ -327,8 +325,18 @@ class LotController extends Controller
             $room->is_available = !in_array($room->id, $bookedRoomIds);
         }
 
+        $lots = SlotBooking::where('bidder_id', $request->bidder_id)
+            ->where('room_type', $request->room_type)
+            ->where('start_time', $request->start_time)
+            ->where('date_for_reservation', $request->date)
+            ->get();
+
+        $isRoomAlreadyAssigned = $lots->contains(function ($lot) {
+            return !empty($lot->room_name);
+        });
+
         // return view('admin.lots.viewRequestLots', compact('rooms', 'startTime', 'date'));
-        return view('admin.lots.viewRequestLots', compact('rooms', 'startTime', 'date', 'roomType'));
+        return view('admin.lots.viewRequestLots', compact('rooms', 'startTime', 'date', 'roomType', 'lots', 'isRoomAlreadyAssigned'));
     }
 
     public function assignRoomToSlot(Request $request)
@@ -349,6 +357,7 @@ class LotController extends Controller
                 'message' => 'Selected room not found.',
             ], 404);
         }
+        $meetingLink = $request->meeting_link ?? null;
 
         // Update all SlotBooking records with the same Room Type, Date, and Start Time
         SlotBooking::where('room_type', $request->room_type)
@@ -356,12 +365,20 @@ class LotController extends Controller
             ->where('date_for_reservation', $request->date)
             ->update([
                 'room_name' => $room->room_name,
-                'status' => 1
+                'status' => 1,
+                'meeting_link' => $meetingLink,
+            ]);
+
+        // Update Slot table status
+        Slot::where('start_time', $request->start_time)
+            ->where('date_for_reservation', $request->date)
+            ->update([
+                'slot_status' => 2, // 2 = reserved
             ]);
 
         return response()->json([
             'status' => true,
-            'message' => 'Room assigned to all matching bookings successfully.',
+            'message' => 'Room assigned successfully.',
         ]);
     }
 
