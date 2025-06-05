@@ -20,7 +20,7 @@
                             <a href="{{ route('admin.lots.index') }}">Lots</a>
                         </li>
                         <li class="separator"><i class="icon-arrow-right"></i></li>
-                        <li class="nav-item"><a href="#">Add Lot</a></li>
+                        <li class="nav-item"><a href="javscript:;">Add Lot</a></li>
                     </ul>
                 </div>
             </div>

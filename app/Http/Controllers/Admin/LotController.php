@@ -273,9 +273,26 @@ class LotController extends Controller
         // $groupedSlots = SlotBooking::select('bidder_id', 'room_name', 'bidder_name', 'room_type', 'start_time', 'date_for_reservation')
         //     ->groupBy('bidder_id', 'room_name', 'bidder_name', 'room_type', 'start_time', 'date_for_reservation')
         //     ->get();
+        // $groupedSlots = SlotBooking::selectRaw('
+        //         bidder_id,
+        //         ANY_VALUE(room_name) as room_name,
+        //         bidder_name,
+        //         room_type,
+        //         start_time,
+        //         date_for_reservation,
+        //         MAX(status) as status
+        //     ')
+        //     ->groupBy(
+        //         'bidder_id',
+        //         'bidder_name',
+        //         'room_type',
+        //         'start_time',
+        //         'date_for_reservation'
+        //     )
+        //     ->get();
         $groupedSlots = SlotBooking::selectRaw('
                 bidder_id,
-                ANY_VALUE(room_name) as room_name,
+                MAX(room_name) as room_name,
                 bidder_name,
                 room_type,
                 start_time,
@@ -290,6 +307,7 @@ class LotController extends Controller
                 'date_for_reservation'
             )
             ->get();
+
 
 
         return view('admin.lots.viewSlotRequest', compact('groupedSlots'));

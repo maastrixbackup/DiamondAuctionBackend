@@ -13,6 +13,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 
@@ -32,12 +33,16 @@
     <link href="https://fonts.googleapis.com/css?family=Aleo:400,700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600&display=swap" rel="stylesheet">
     <style>
-        body {
+        /* body {
             font-family: 'Open Sans', sans-serif;
         }
 
         .font-aleo {
             font-family: 'Aleo', serif !important;
+        } */
+
+        body {
+            font-family: 'Segoe UI';
         }
 
         .brand-gold {
