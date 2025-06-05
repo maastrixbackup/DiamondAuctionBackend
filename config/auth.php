@@ -44,6 +44,14 @@ return [
             'driver' => 'session',
             'provider' => 'admins',
         ],
+        'seller' => [
+            'driver' => 'sanctum',
+            'provider' => 'sellers',
+        ],
+        'bidder' => [
+            'driver' => 'sanctum',
+            'provider' => 'bidders',
+        ],
     ],
 
     /*
@@ -71,6 +79,14 @@ return [
         'admins' => [
             'driver' => 'eloquent',
             'model' => App\Models\Admin::class,
+        ],
+        'sellers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Seller::class,
+        ],
+        'bidders' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Bidder::class,
         ],
 
         // 'users' => [

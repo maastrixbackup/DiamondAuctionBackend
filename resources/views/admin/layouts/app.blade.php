@@ -16,21 +16,24 @@
 
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 
+    @vite('resources/css/app.css')
 
     <!-- Add Select2 -->
+    <link href="{{ asset('assets/css/custom.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/css/plugins.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/css/demo.css') }}" rel="stylesheet" />
     <script src="{{ asset('assets/js/plugin/webfont/webfont.min.js') }}"></script>
 
     <!-- Scripts -->
+    {{-- <script src="https://cdn.tailwindcss.com"></script> --}}
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css?family=Aleo:400,700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Open Sans', sans-serif ;
+            font-family: 'Open Sans', sans-serif;
         }
 
         .font-aleo {
@@ -81,17 +84,17 @@
     {{-- <div class="wrapper"> --}}
 
 
-        {{-- <div class="main-panel"> --}}
+    {{-- <div class="main-panel"> --}}
 
-            <!-- Page Content -->
-           <main class="lg:ml-64 pt-24 px-4 sm:px-8 max-w-7xl ">
-                {{-- <div class="container">
+    <!-- Page Content -->
+    <main class="lg:ml-64 pt-24 px-4 sm:px-8 max-w-7xl ">
+        {{-- <div class="container">
                     <div class="page-inner"> --}}
-                        @yield('content')
-                    {{-- </div>
+        @yield('content')
+        {{-- </div>
                 </div> --}}
-            </main>
-        {{-- </div> --}}
+    </main>
+    {{-- </div> --}}
     {{-- </div> --}}
 
     @stack('scripts')
@@ -163,6 +166,26 @@
     <!-- Kaiadmin DEMO methods, don't include it in your project! -->
     <script src="{{ asset('assets/js/setting-demo.js') }}"></script>
     <script src="{{ asset('assets/js/demo.js') }}"></script>
+
+    {{-- Toggle profile dropdown(View profile/logout)  --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownBtn = document.getElementById('profileDropdownBtn');
+            const dropdown = document.getElementById('profileDropdown');
+            // Toggle dropdown
+            dropdownBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+            // Close when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!dropdown.contains(e.target) && !dropdownBtn.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+
 </body>
 
 </html>

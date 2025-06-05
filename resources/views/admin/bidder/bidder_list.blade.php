@@ -4,21 +4,23 @@
 @section('content')
     <div class="row mt-lg-4 pt-lg-4">
         <div class="page-inner">
-            <div class="page-header">
-                <h3 class="fw-bold mb-3">Bidders</h3>
-                <ul class="breadcrumbs mb-3">
-                    <li class="nav-home">
-                        <a href="{{ route('admin.dashboard') }}">
-                            <i class="icon-home"></i>
-                        </a>
-                    </li>
-                    <li class="separator">
-                        <i class="icon-arrow-right"></i>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#">Bidders</a>
-                    </li>
-                </ul>
+            <div class="page-header d-flex align-items-center justify-content-between flex-wrap mb-3">
+                <div class="d-flex align-items-center gap-3">
+                    <h3 class="fw-bold mb-0">Bidders</h3>
+                    <ul class="breadcrumbs d-flex align-items-center mb-0">
+                        <li class="nav-home me-2">
+                            <a href="{{ route('admin.dashboard') }}">
+                                <i class="icon-home"></i>
+                            </a>
+                        </li>
+                        <li class="separator me-2">
+                            <i class="icon-arrow-right"></i>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#">Bidders</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
 
             <div class="row">
@@ -58,24 +60,21 @@
 
                                                 <!-- KYC Status -->
                                                 <td>
-                                                    <a href="{{ route('admin.change-bidder-kyc-status', $bidder->id) }}"
-                                                        class="badge text-decoration-none badge-sm
-                                                        {{ $bidder->kyc_status == 1 ? 'btn-success' : ($bidder->kyc_status == 2 ? 'btn-danger' : 'btn-warning') }}"
-                                                        title="Change KYC Status"
-                                                        onclick="return confirm('Are you sure to change KYC status?')">
+                                                    <span
+                                                        class="badge badge-sm
+        {{ $bidder->kyc_status == 1 ? 'bg-success' : ($bidder->kyc_status == 2 ? 'bg-danger' : 'bg-warning') }}">
                                                         {{ $bidder->kyc_status == 1 ? 'Approved' : ($bidder->kyc_status == 2 ? 'Rejected' : 'Pending') }}
-                                                    </a>
+                                                    </span>
                                                 </td>
+
 
                                                 <!-- Account Status -->
                                                 <td>
-                                                    <a href="{{ route('admin.change-bidder-account-status', $bidder->id) }}"
-                                                        class="badge text-decoration-none badge-sm
-                                                        {{ $bidder->account_status == 1 ? 'btn-success' : ($bidder->account_status == 2 ? 'btn-danger' : 'btn-warning') }}"
-                                                        title="Change Account Status"
-                                                        onclick="return confirm('Are you sure to change Account status?')">
+                                                    <span
+                                                        class="badge badge-sm
+        {{ $bidder->account_status == 1 ? 'bg-success' : ($bidder->account_status == 2 ? 'bg-danger' : 'bg-warning') }}">
                                                         {{ $bidder->account_status == 1 ? 'Active' : ($bidder->account_status == 2 ? 'Suspended' : 'Pending') }}
-                                                    </a>
+                                                    </span>
                                                 </td>
 
                                                 <!-- View Action -->

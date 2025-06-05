@@ -1,5 +1,5 @@
 <aside id="sidebar"
-    class="fixed top-0 left-0 h-screen w-64 bg-[#232323] text-gray-100 shadow-lg pt-24 transition sidebar-hide lg:sidebar-show z-30 flex flex-col justify-between">
+    class="fixed top-0 h-screen w-64 bg-[#232323] text-gray-100 shadow-lg pt-24 transition lg:sidebar-show z-30 flex flex-col justify-between">
     <nav class="flex flex-col space-y-1 px-0">
         <a href="{{ route('admin.dashboard') }}"
             class="flex items-center p-3 rounded transition hover:bg-brand-gold/80 hover:text-white {{ request()->routeIs('admin.dashboard') ? 'bg-brand-gold text-white' : '' }}">
@@ -29,6 +29,11 @@
         <a href="{{ route('admin.category.index') }}"
             class="flex items-center p-3 rounded transition hover:bg-brand-gold/80 hover:text-white {{ request()->routeIs('admin.category.*') ? 'bg-brand-gold text-white' : '' }}">
             <i class="fa fa-layer-group mx-2"></i> Categories
+        </a>
+
+        <a href="{{ route('admin.viewingRequest') }}"
+            class="flex items-center p-3 rounded transition hover:bg-brand-gold/80 hover:text-white {{ request()->routeIs('admin.viewingRequest') ? 'bg-brand-gold text-white' : '' }}">
+            <i class="fa fa-envelope mx-2"></i> Viewing Request
         </a>
 
         {{-- <li class="nav-item">

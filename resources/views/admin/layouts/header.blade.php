@@ -151,7 +151,7 @@
         <div class="flex-1 flex items-center justify-center">
             <span class="font-bold text-gray-700 text-xl font-aleo">Welcome, Admin</span>
         </div>
-        <div class="flex items-center space-x-4">
+        {{-- <div class="flex items-center space-x-4">
             <button class="relative focus:outline-none">
                 <i class="fa fa-bell-o w-6 h-6"></i>
 
@@ -163,5 +163,43 @@
                 class="lg:hidden ml-2 p-2 rounded hover:bg-gray-100 focus:outline-none transition">
                 <i data-lucide="menu" class="w-7 h-7 text-gray-500"></i>
             </button>
+        </div> --}}
+        <div class="flex items-center space-x-4">
+            <!-- Notification Icon -->
+            <button class="relative focus:outline-none">
+                <i class="fa fa-bell-o w-6 h-6"></i>
+                <span class="absolute top-0 right-0 block h-2 w-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+            </button>
+
+            <!-- Profile Picture and Dropdown -->
+            <div class="relative">
+                <!-- Profile Image Button -->
+                <button id="profileDropdownBtn" class="focus:outline-none">
+                    <img src="https://randomuser.me/api/portraits/men/44.jpg" alt="Profile"
+                        class="h-10 w-10 rounded-full border-2 border-brand-gold">
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div id="profileDropdown"
+                    class="hidden absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-50">
+                    <a href="{{ route('admin.profile') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        View Profile
+                    </a>
+                    <form method="POST" action="{{ route('admin.logout') }}">
+                        @csrf
+                        <button type="submit" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Sidebar Toggle -->
+            <button id="sidebar-toggle"
+                class="lg:hidden ml-2 p-2 rounded hover:bg-gray-100 focus:outline-none transition">
+                <i data-lucide="menu" class="w-7 h-7 text-gray-500"></i>
+            </button>
         </div>
+
+
     </header>
