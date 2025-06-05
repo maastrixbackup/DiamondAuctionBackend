@@ -42,5 +42,4 @@
         </a>
     </nav>
     <div class="pb-8"></div>
-    
 </aside>
