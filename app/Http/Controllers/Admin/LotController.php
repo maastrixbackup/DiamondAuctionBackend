@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use App\Models\Category;
 use App\Models\Lot;
 use App\Models\Room;
@@ -20,7 +21,8 @@ class LotController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Lot::with('seller');
+        // $query = Lot::with('seller');
+        $query = Lot::with(['seller', 'category']);
 
         if ($request->has('status') && $request->status != '') {
             $query->where('status', $request->status);
@@ -34,9 +36,14 @@ class LotController extends Controller
             $query->where('weight', 'like', '%' . $request->weight . '%');
         }
 
-        $lots = $query->latest()->get();
+        if ($request->has('category_id') && $request->category_id != '') {
+            $query->where('category_id', $request->category_id);
+        }
 
-        return view('admin.lots.list', compact('lots'));
+        $lots = $query->latest()->get();
+        $categories = Category::orderBy('name')->get();
+
+        return view('admin.lots.list', compact('lots', 'categories'));
     }
 
     /**
@@ -57,6 +64,8 @@ class LotController extends Controller
         $validator = Validator::make($request->all(), [
             'seller_id' => 'required|exists:sellers,id',
             'category_id' => 'nullable|integer',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'type' => 'required|string|max:255',
             'color' => 'nullable|string|max:255',
             'weight' => 'required|string|max:255',
@@ -74,6 +83,7 @@ class LotController extends Controller
             'symmetry' => 'nullable|string|max:255',
             'fluorescence' => 'nullable|string|max:255',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'video' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -86,6 +96,9 @@ class LotController extends Controller
             $lot = new Lot();
             $lot->seller_id = $request->seller_id;
             $lot->category_id = $request->category_id;
+            $lot->title = $request->title;
+            $lot->description = $request->description;
+            $lot->video = $request->video;
             $lot->type = $request->type;
             $lot->color = $request->color;
             $lot->weight = $request->weight;
@@ -163,6 +176,8 @@ class LotController extends Controller
         $validator = Validator::make($request->all(), [
             'seller_id' => 'required|exists:sellers,id',
             'category_id' => 'nullable|integer',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'type' => 'required|string|max:255',
             'color' => 'nullable|string|max:255',
             'weight' => 'required|string|max:255',
@@ -180,6 +195,7 @@ class LotController extends Controller
             'symmetry' => 'nullable|string|max:255',
             'fluorescence' => 'nullable|string|max:255',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'video' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -191,6 +207,9 @@ class LotController extends Controller
         $lot = Lot::findOrFail($id);
         $lot->seller_id = $request->seller_id;
         $lot->category_id = $request->category_id;
+        $lot->title = $request->title;
+        $lot->description = $request->description;
+        $lot->video = $request->video;
         $lot->type = $request->type;
         $lot->color = $request->color;
         $lot->weight = $request->weight;
@@ -313,16 +332,6 @@ class LotController extends Controller
         return view('admin.lots.viewSlotRequest', compact('groupedSlots'));
     }
 
-    // public function viewingRequestLots($slotId)
-    // {
-    //     $lots = SlotBooking::where('slot_id', $slotId)
-    //         // ->where('status', 0)
-    //         ->get();
-    //     $allRooms = Room::select('id', 'name', 'type')->get();
-
-    //     return view('admin.lots.viewRequestLots', compact('lots','allRooms'));
-    // }
-
     public function viewingRequestLots(Request $request)
     {
         $bidderId = $request->bidder_id;
@@ -377,6 +386,11 @@ class LotController extends Controller
         }
         $meetingLink = $request->meeting_link ?? null;
 
+        $bookingIds = SlotBooking::where('room_type', $request->room_type)
+            ->where('start_time', $request->start_time)
+            ->where('date_for_reservation', $request->date)
+            ->pluck('booking_id')
+            ->unique();
         // Update all SlotBooking records with the same Room Type, Date, and Start Time
         SlotBooking::where('room_type', $request->room_type)
             ->where('start_time', $request->start_time)
@@ -393,15 +407,17 @@ class LotController extends Controller
             ->update([
                 'slot_status' => 2, // 2 = reserved
             ]);
+        //Update booking table room name
+        Booking::whereIn('booking_id', $bookingIds)
+            ->update([
+                'room_name' => $room->room_name,
+            ]);
 
         return response()->json([
             'status' => true,
             'message' => 'Room assigned successfully.',
         ]);
     }
-
-
-
 
     // public function viewingRequestLots(Request $request)
     // {

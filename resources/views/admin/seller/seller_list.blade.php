@@ -23,73 +23,80 @@
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4 class="card-title mb-0">All Sellers</h4>
-                        </div>
-                        @if (session('success'))
-                            <div class="alert alert-success" id="success-alert">
-                                {{ session('success') }}
-                            </div>
-                        @endif
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table id="basic-datatables" class="display table table-striped table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>SL</th>
-                                            <th>Type</th>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                            <th>Phone</th>
-                                            <th>KYC Status</th>
-                                            <th>Account Status</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($sellers as $seller)
-                                            <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $seller->type == 1 ? 'Company' : 'Individual' }}</td>
-                                                <td>{{ $seller->full_name }}</td>
-                                                <td>{{ $seller->email_address }}</td>
-                                                <td>{{ $seller->phone_number }}</td>
-                                                <!-- KYC Status -->
-                                                <td>
-                                                    <span
-                                                        class="badge badge-sm
-        {{ $seller->kyc_status == 1 ? 'bg-success' : ($seller->kyc_status == 2 ? 'bg-danger' : 'bg-warning') }}">
-                                                        {{ $seller->kyc_status == 1 ? 'Approved' : ($seller->kyc_status == 2 ? 'Rejected' : 'Pending') }}
-                                                    </span>
-                                                </td>
+           <div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center py-3 px-4">
+                <h4 class="card-title mb-0 fw-semibold">All Sellers</h4>
+            </div>
 
-                                                <!-- Account Status -->
-                                                <td>
-                                                    <span
-                                                        class="badge badge-sm
-        {{ $seller->account_status == 1 ? 'bg-success' : ($seller->account_status == 2 ? 'bg-danger' : 'bg-warning') }}">
-                                                        {{ $seller->account_status == 1 ? 'Active' : ($seller->account_status == 2 ? 'Suspended' : 'Pending') }}
-                                                    </span>
-                                                </td>
+            @if (session('success'))
+                <div class="alert alert-success mx-4 mt-3 rounded-3 shadow-sm" id="success-alert">
+                    {{ session('success') }}
+                </div>
+            @endif
 
-                                                <td>
-                                                    <a href="{{ route('admin.sellerDetails', $seller->id) }}"
-                                                        class="btn btn-sm btn-primary" title="View">
-                                                        <i class="icon-eye"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+            <div class="card-body px-4 pb-4">
+                <div class="table-responsive">
+                    <table id="basic-datatables" class="table table-hover align-middle text-nowrap table-bordered rounded-3 overflow-hidden">
+                        <thead class="table-light">
+                            <tr>
+                                <th>SL</th>
+                                <th>Type</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>KYC Status</th>
+                                <th>Account Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($sellers as $seller)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $seller->type == 1 ? 'Company' : 'Individual' }}</td>
+                                    <td>{{ $seller->full_name }}</td>
+                                    <td>{{ $seller->email_address }}</td>
+                                    <td>{{ $seller->phone_number }}</td>
+
+                                    <!-- KYC Status -->
+                                    <td>
+                                        <span class="badge rounded-pill
+                                            {{ $seller->kyc_status == 1 ? 'bg-success-subtle text-success-emphasis' :
+                                                ($seller->kyc_status == 2 ? 'bg-danger-subtle text-danger-emphasis' : 'bg-warning-subtle text-warning-emphasis') }}">
+                                            {{ $seller->kyc_status == 1 ? 'Approved' :
+                                                ($seller->kyc_status == 2 ? 'Rejected' : 'Pending') }}
+                                        </span>
+                                    </td>
+
+                                    <!-- Account Status -->
+                                    <td>
+                                        <span class="badge rounded-pill
+                                            {{ $seller->account_status == 1 ? 'bg-success-subtle text-success-emphasis' :
+                                                ($seller->account_status == 2 ? 'bg-danger-subtle text-danger-emphasis' : 'bg-warning-subtle text-warning-emphasis') }}">
+                                            {{ $seller->account_status == 1 ? 'Active' :
+                                                ($seller->account_status == 2 ? 'Suspended' : 'Pending') }}
+                                        </span>
+                                    </td>
+
+                                    <!-- Action -->
+                                    <td>
+                                        <a href="{{ route('admin.sellerDetails', $seller->id) }}"
+                                           class="btn btn-sm btn-outline-primary d-inline-flex align-items-center" title="View">
+                                            <i class="icon-eye me-1"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
         </div>
     </div>
 

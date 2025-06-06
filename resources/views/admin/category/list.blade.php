@@ -24,62 +24,64 @@
             </div>
 
             <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4 class="card-title mb-0">All Categories</h4>
-                            <a href="{{ route('admin.category.create') }}" class="btn btn-primary" title="Add Category">
-                                + Add
-                            </a>
-                        </div>
+    <div class="col-md-12">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-header d-flex justify-content-between align-items-center bg-light py-3 px-4">
+                <h4 class="card-title mb-0 fw-semibold">All Categories</h4>
+                <a href="{{ route('admin.category.create') }}" class="btn btn-sm btn-primary">
+                    + Add
+                </a>
+            </div>
 
-                        @if (session('success'))
-                            <div class="alert alert-success" id="success-alert">
-                                {{ session('success') }}
-                            </div>
-                        @endif
+            @if (session('success'))
+                <div class="alert alert-success m-4" id="success-alert">
+                    {{ session('success') }}
+                </div>
+            @endif
 
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table id="basic-datatables" class="display table table-striped table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>SL</th>
-                                            <th>Name</th>
-                                            <th>Created At</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($categories as $category)
-                                            <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $category->name }}</td>
-                                                <td>{{ $category->created_at->format('d M Y') }}</td>
-                                                <td>
-                                                    <a href="{{ route('admin.category.edit', $category->id) }}"
-                                                        class="btn btn-sm btn-info" title="Edit">
-                                                        <i class="icon-pencil"></i>
-                                                    </a>
-                                                    <form action="{{ route('admin.category.destroy', $category->id) }}"
-                                                        method="POST" class="d-inline">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button class="btn btn-sm btn-danger" title="Delete"
-                                                            onclick="return confirm('Are you sure to delete this?')">
-                                                            <i class="icon-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+            <div class="card-body px-4 pb-4">
+                <div class="table-responsive">
+                    <table id="basic-datatables" class="table table-bordered table-striped table-hover align-middle text-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>SL</th>
+                                <th>Name</th>
+                                <th>Created At</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($categories as $category)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $category->name }}</td>
+                                    <td>{{ $category->created_at->format('d M Y') }}</td>
+                                    <td>
+                                        <div class="d-flex gap-2">
+                                            <a href="{{ route('admin.category.edit', $category->id) }}"
+                                               class="btn btn-sm btn-outline-primary" title="Edit">
+                                                <i class="icon-pencil"></i>
+                                            </a>
+                                            <form action="{{ route('admin.category.destroy', $category->id) }}"
+                                                  method="POST" onsubmit="return confirm('Are you sure to delete this?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                    <i class="icon-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
         </div>
     </div>
 

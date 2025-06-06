@@ -226,6 +226,12 @@
                                         </div>
 
                                         <div class="mb-3">
+                                            <label for="title" class="form-label">Title</label>
+                                            <input type="text" name="title" id="title" class="form-control"
+                                                placeholder="Enter Title" required>
+                                        </div>
+
+                                        <div class="mb-3">
                                             <label for="type" class="form-label">Type</label>
                                             <input type="text" name="type" id="type" class="form-control"
                                                 placeholder="Enter Type" required>
@@ -249,14 +255,14 @@
                                                 placeholder="Enter Size">
                                         </div>
 
-                                        <div class="mb-3">
+                                        {{-- <div class="mb-3">
                                             <label for="status" class="form-label">Status</label>
                                             <select name="status" id="status" class="form-select">
                                                 <option value="0">Pending</option>
                                                 <option value="1" selected>Live</option>
                                                 <option value="2">Sold</option>
                                             </select>
-                                        </div>
+                                        </div> --}}
 
                                         <div class="mb-3">
                                             <label class="form-label">Upload Images</label>
@@ -295,20 +301,34 @@
                                         <div class="mb-3">
                                             <label for="colour_grade" class="form-label">Colour Grade</label>
                                             <input type="text" name="colour_grade" id="colour_grade"
-                                                class="form-control" placeholder="Enter Colour Grade">
+                                                class="form-control" placeholder="Enter Grade">
                                         </div>
 
                                         <div class="mb-3">
-                                            <label for="colour_origin" class="form-label">Colour Origin</label>
+                                            <label for="colour_origin" class="form-label">Origin</label>
                                             <input type="text" name="colour_origin" id="colour_origin"
-                                                class="form-control" placeholder="Enter Colour Origin">
+                                                class="form-control" placeholder="Enter Origin">
                                         </div>
 
                                         <div class="mb-3">
-                                            <label for="colour_distribution" class="form-label">Colour
-                                                Distribution</label>
+                                            <label for="colour_distribution" class="form-label">Distribution</label>
                                             <input type="text" name="colour_distribution" id="colour_distribution"
-                                                class="form-control" placeholder="Enter Colour Distribution">
+                                                class="form-control" placeholder="Enter Distribution">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="video" class="form-label">Video Link</label>
+                                            <input type="text" name="video" id="video" class="form-control"
+                                                placeholder="Enter Video link">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="status" class="form-label">Status</label>
+                                            <select name="status" id="status" class="form-select">
+                                                <option value="0">Pending</option>
+                                                <option value="1" selected>Live</option>
+                                                <option value="2">Sold</option>
+                                            </select>
                                         </div>
                                     </div>
 
@@ -341,6 +361,12 @@
                                         <div class="mb-3">
                                             <label for="notes" class="form-label">Notes</label>
                                             <textarea name="notes" id="notes" rows="4" class="form-control" placeholder="Enter any notes..."></textarea>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="description" class="form-label">Description</label>
+                                            <textarea name="description" id="description" rows="4" class="form-control"
+                                                placeholder="Enter description..."></textarea>
                                         </div>
                                     </div>
                                 </div>
