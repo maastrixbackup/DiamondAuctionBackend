@@ -12,6 +12,7 @@ class Lot extends Model
     protected $fillable = [
         'seller_id',
         'category_id',
+        'title',
         'type',
         'weight',
         'status',

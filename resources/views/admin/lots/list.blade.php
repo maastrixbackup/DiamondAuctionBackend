@@ -80,8 +80,15 @@
 
                             {{-- Categories with extra padding --}}
                             <div class="px-4">
-                                <select class="form-select form-select-sm rounded-pill border-0 shadow-none">
-                                    <option>All Categories</option>
+                                <select name="category_id"
+                                    class="form-select form-select-sm rounded-pill border-0 shadow-none">
+                                    <option value="">All Categories</option>
+                                    @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}"
+                                            {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @endforeach
                                 </select>
                             </div>
 
@@ -204,12 +211,13 @@
 
                         <div class="card-body p-4">
                             <div class="table-responsive">
-                                <table id="basic-datatables"
+                                <table id="lotsTable"
                                     class="table table-hover align-middle text-nowrap table-bordered rounded-3 overflow-hidden">
                                     <thead class="table-light align-middle">
                                         <tr>
                                             <th>SL</th>
                                             <th>Seller</th>
+                                            <th>Title</th>
                                             <th>Type</th>
                                             <th>Weight</th>
                                             <th>Status</th>
@@ -221,6 +229,7 @@
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ $lot->seller ? $lot->seller->full_name : 'N/A' }}</td>
+                                                <td>{{ $lot->title }}</td>
                                                 <td>{{ $lot->type }}</td>
                                                 <td>{{ $lot->weight }}</td>
                                                 <td>
@@ -290,5 +299,17 @@
                 }, 3000); // 3 seconds
             }
         };
+    </script>
+    <script>
+        $(document).ready(function() {
+            var table = $('#lotsTable').DataTable({
+                lengthChange: false,
+                searching: false,
+                'columnDefs': [{
+                    'targets': [4], // column index (start from 0)
+                    'orderable': false, // set orderable false for selected columns
+                }]
+            });
+        });
     </script>
 @endpush

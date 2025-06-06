@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bidder;
+use App\Models\Booking;
 use App\Models\Lot;
 use App\Models\Room;
 use App\Models\Slot;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class BidderController extends Controller
 {
@@ -330,7 +332,7 @@ class BidderController extends Controller
                 'room_type' => 'required|string|in:Physical,Virtual',
                 'time' => 'required|date_format:H:i:s',
                 'date' => 'required|date',
-                'lot_id' => 'required|string',
+                'lot_id' => 'required',
             ]);
 
             $lotIds = is_array($request->lot_id)
@@ -366,6 +368,7 @@ class BidderController extends Controller
                     'message' => 'Bidder not found.',
                 ], 404);
             }
+            DB::beginTransaction();
             // Generate dynamic booking_id
             $latestBooking = SlotBooking::whereNotNull('booking_id')
                 ->where('booking_id', 'like', 'DA-%')
@@ -379,6 +382,20 @@ class BidderController extends Controller
             }
 
             $bookingId = 'DA-' . $nextNumber;
+            Booking::create([
+                'booking_id' => $bookingId,
+                'bidder_id' => $bidder->id,
+                'room_name' => null,
+                'room_type' => $request->room_type,
+                'start_time' => $request->time,
+                'date_for_reservation' => $request->date,
+                'booking_lot_id' => $lotIds,
+                'lot_booking_flag' => count($lotIds) >= 15 ? 1 : 0,
+                'requested_lot_id' => null,
+                'lot_requested_flag' => 0,
+                'timer' => null,
+                'timer_status' => 0,
+            ]);
             $insertData = [];
             foreach ($lotIds as $lotId) {
                 $insertData[] = [
@@ -397,11 +414,14 @@ class BidderController extends Controller
 
             SlotBooking::insert($insertData);
 
+            DB::commit();
+
             return response()->json([
                 'status' => true,
                 'message' => 'Slot booked successfully.',
             ], 200);
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Slot booking error: ' . $e->getMessage());
 
             return response()->json([

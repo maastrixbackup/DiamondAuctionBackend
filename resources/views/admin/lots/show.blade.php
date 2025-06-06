@@ -45,6 +45,10 @@
                                 <td>{{ $lot->category ? $lot->category->name : 'N/A' }}</td>
                             </tr>
                             <tr>
+                                <th>Title</th>
+                                <td>{{ $lot->title }}</td>
+                            </tr>
+                            <tr>
                                 <th>Type</th>
                                 <td>{{ $lot->type }}</td>
                             </tr>
@@ -89,11 +93,11 @@
                                 <td>{{ $lot->colour_grade }}</td>
                             </tr>
                             <tr>
-                                <th>Colour Origin</th>
+                                <th>Origin</th>
                                 <td>{{ $lot->colour_origin }}</td>
                             </tr>
                             <tr>
-                                <th>Colour Distribution</th>
+                                <th>Distribution</th>
                                 <td>{{ $lot->colour_distribution }}</td>
                             </tr>
                             <tr>
@@ -115,6 +119,14 @@
                             <tr>
                                 <th>Notes</th>
                                 <td>{!! nl2br(e($lot->notes)) !!}</td>
+                            </tr>
+                            <tr>
+                                <th>Description</th>
+                                <td>{!! nl2br(e($lot->description)) !!}</td>
+                            </tr>
+                            <tr>
+                                <th>Video</th>
+                                <td>{{ $lot->video }}</td>
                             </tr>
                             <tr>
                                 <th>Images</th>

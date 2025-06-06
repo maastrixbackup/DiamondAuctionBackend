@@ -28,13 +28,12 @@
                     <h4 class="card-title mb-0">Viewing Requests</h4>
                 </div>
 
-                <div class="card-body">
+                <div class="card-body px-4">
                     <div class="table-responsive">
-                        <table id="basic-datatables" class="display table table-striped table-hover">
-                            <thead>
+                        <table id="viewingRequestTable" class="table table-striped table-hover align-middle">
+                            <thead class="table-light">
                                 <tr>
                                     <th>SL</th>
-                                    {{-- <th>Slot ID</th> --}}
                                     <th>Bidder Name</th>
                                     <th>Room Name</th>
                                     <th>Room Type</th>
@@ -45,36 +44,14 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($groupedSlots as $index => $slot)
+                                @forelse ($groupedSlots as $index => $slot)
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
-                                        {{-- <td>{{ $slot->slot_id }}</td> --}}
                                         <td>{{ $slot->bidder_name }}</td>
                                         <td>{{ $slot->room_name ?? 'N/A' }}</td>
                                         <td>{{ $slot->room_type }}</td>
                                         <td>{{ $slot->date_for_reservation }}</td>
                                         <td>{{ \Carbon\Carbon::parse($slot->start_time)->format('h:i A') }}</td>
-                                        {{-- @php
-                                            $slotLots = \App\Models\SlotBooking::where(
-                                                'slot_id',
-                                                $slot->slot_id,
-                                            )->get();
-                                            $statusText = 'Pending';
-                                            $statusClass = 'warning';
-
-                                            if ($slotLots->every(fn($lot) => $lot->status == 1)) {
-                                                $statusText = 'Approved';
-                                                $statusClass = 'success';
-                                            } elseif ($slotLots->every(fn($lot) => $lot->status == 2)) {
-                                                $statusText = 'Rejected';
-                                                $statusClass = 'danger';
-                                            } elseif ($slotLots->contains(fn($lot) => $lot->status == 0)) {
-                                                $statusText = 'Partial Pending';
-                                                $statusClass = 'warning';
-                                            }
-                                        @endphp
-                                        <td><span class="badge bg-{{ $statusClass }}">{{ $statusText }}</span></td> --}}
-
                                         <td>
                                             @if ($slot->status == 0)
                                                 <span class="badge bg-warning">Pending</span>
@@ -85,27 +62,32 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <button class="btn btn-sm btn-primary"
+                                            <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
                                                 onclick="viewLots(
                                                     '{{ $slot->bidder_id }}',
                                                     '{{ $slot->room_type }}',
                                                     '{{ $slot->start_time }}',
                                                     '{{ $slot->date_for_reservation }}'
                                                 )">
-                                                View
+                                                <i class="icon-eye"></i>
+                                                <span>View</span>
                                             </button>
                                         </td>
                                     </tr>
-                                @endforeach
+                                @empty
+                                    <tr>
+                                        <td colspan="8">
+                                            <div class="text-center py-3 text-muted">
+                                                No pending slot booking requests found.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
-                        @if ($groupedSlots->isEmpty())
-                            <div class="text-center py-3 text-muted">
-                                No pending slot booking requests found.
-                            </div>
-                        @endif
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -234,5 +216,16 @@
             const container = document.getElementById('meetingLinkContainer');
             container.classList.remove('d-none');
         }
+    </script>
+    <script>
+        $(document).ready(function() {
+            var table = $('#viewingRequestTable').DataTable({
+                lengthChange: false,
+                'columnDefs': [{
+                    'targets': [4], // column index (start from 0)
+                    'orderable': false, // set orderable false for selected columns
+                }]
+            });
+        });
     </script>
 @endpush

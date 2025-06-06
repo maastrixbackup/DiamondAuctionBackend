@@ -32,20 +32,21 @@
                     }
                 @endphp
                 <div class="col-md-12">
-                    <form method="GET" action="{{ route('admin.viewing-slots.index') }}" class="mb-3">
-                        <div class="bg-light rounded-4 px-3 py-4 d-flex flex-wrap align-items-center gap-2 shadow-sm">
-                            <div class="px-4">
+                    <form method="GET" action="{{ route('admin.viewing-slots.index') }}" class="mb-4">
+                        <div class="bg-light rounded-4 px-4 py-4 d-flex flex-wrap align-items-center gap-3 shadow-sm">
+                            <div class="px-2" style="min-width: 200px;">
                                 <input type="date" name="day" id="day"
                                     class="form-control form-control-sm rounded-pill border-0 shadow-none"
                                     value="{{ $reqDay }}">
                             </div>
-                            <div class="px-4">
+                            <div class="px-2" style="min-width: 200px;">
                                 <select name="room" id="room"
                                     class="form-select form-select-sm rounded-pill border-0 shadow-none">
                                     <option value="">-- All Rooms --</option>
                                     @foreach ($rooms as $room)
                                         <option value="{{ $room }}" {{ $roomName == $room ? 'selected' : '' }}>
-                                            {{ $room }}</option>
+                                            {{ $room }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -56,10 +57,13 @@
                             </div>
                             <div class="px-2">
                                 <a href="{{ route('admin.viewing-slots.index') }}"
-                                    class="btn btn-sm btn-link text-decoration-none text-muted px-3">Reset</a>
+                                    class="btn btn-sm btn-link text-decoration-none text-muted px-3">
+                                    Reset
+                                </a>
                             </div>
                         </div>
                     </form>
+
 
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
@@ -73,7 +77,7 @@
 
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table id="basic-datatables" class="display  table table-hover table-bordered">
+                                <table id="basic-datatables" class="display  table table-bordered">
                                     <thead>
                                         @php
                                             $days = [];
@@ -137,7 +141,7 @@
                                                                         if ($booking) {
                                                                             $bgClass =
                                                                                 $booking->status == 1
-                                                                                    ? 'bg-[#c8f7c5]' // light green
+                                                                                    ? 'bg-[#e6fffa]' // light green
                                                                                     : ($booking->status == 2
                                                                                         ? 'bg-[#f8d7da]' // light red
                                                                                         : 'bg-[#ebf1f5]');
@@ -147,9 +151,10 @@
                                                                     @if (empty($roomName) || $roomName == $room)
                                                                         <div
                                                                             class="col card m-1"@if ($booking) style="min-width: 80px; height:90px;" @else style="width: 30px; height:90px; border:1px dashed #d0d5d9" @endif>
-                                                                            <div class="card-body p-1 text-center {{ $bgClass }}">
+                                                                            <div class="card-body p-1 text-center {{ $bgClass }}"
+                                                                                style="color:#065f46;">
                                                                                 @if ($booking)
-                                                                                    <strong>{{ $booking->bidder_name }}</strong><br>
+                                                                                    {{ $booking->bidder_name }}<br>
 
                                                                                     Lot:
                                                                                     {{ implode(', ', $booking->lot_ids) }}

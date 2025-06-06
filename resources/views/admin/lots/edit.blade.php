@@ -66,6 +66,12 @@
                                         </div>
 
                                         <div class="mb-3">
+                                            <label for="title" class="form-label">Title</label>
+                                            <input type="text" name="title" id="title" class="form-control"
+                                                placeholder="Enter Title" value="{{ $lot->title }}" required>
+                                        </div>
+
+                                        <div class="mb-3">
                                             <label for="type" class="form-label">Type</label>
                                             <input type="text" name="type" id="type" class="form-control"
                                                 placeholder="Enter Type" value="{{ $lot->type }}" required>
@@ -89,7 +95,7 @@
                                                 placeholder="Enter Size" value="{{ $lot->size }}">
                                         </div>
 
-                                        <div class="mb-3">
+                                        {{-- <div class="mb-3">
                                             <label for="status" class="form-label">Status</label>
                                             <select name="status" id="status" class="form-select">
                                                 <option value="0" {{ $lot->status == 0 ? 'selected' : '' }}>Pending
@@ -99,7 +105,7 @@
                                                 <option value="2" {{ $lot->status == 2 ? 'selected' : '' }}>Sold
                                                 </option>
                                             </select>
-                                        </div>
+                                        </div> --}}
 
                                         <div class="mb-3">
                                             <label class="form-label">Upload Images</label>
@@ -164,18 +170,35 @@
                                         </div>
 
                                         <div class="mb-3">
-                                            <label for="colour_origin" class="form-label">Colour Origin</label>
+                                            <label for="colour_origin" class="form-label">Origin</label>
                                             <input type="text" name="colour_origin" id="colour_origin"
-                                                class="form-control" placeholder="Enter Colour Origin"
+                                                class="form-control" placeholder="Enter Origin"
                                                 value="{{ $lot->colour_origin }}">
                                         </div>
 
                                         <div class="mb-3">
-                                            <label for="colour_distribution" class="form-label">Colour
-                                                Distribution</label>
+                                            <label for="colour_distribution" class="form-label">Distribution</label>
                                             <input type="text" name="colour_distribution" id="colour_distribution"
-                                                class="form-control" placeholder="Enter Colour Distribution"
+                                                class="form-control" placeholder="Enter Distribution"
                                                 value="{{ $lot->colour_distribution }}">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="video" class="form-label">Video Link</label>
+                                            <input type="text" name="video" id="video" class="form-control"
+                                                placeholder="Enter Video link" value="{{ $lot->video }}">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="status" class="form-label">Status</label>
+                                            <select name="status" id="status" class="form-select">
+                                                <option value="0" {{ $lot->status == 0 ? 'selected' : '' }}>Pending
+                                                </option>
+                                                <option value="1" {{ $lot->status == 1 ? 'selected' : '' }}>Live
+                                                </option>
+                                                <option value="2" {{ $lot->status == 2 ? 'selected' : '' }}>Sold
+                                                </option>
+                                            </select>
                                         </div>
                                     </div>
 
@@ -209,6 +232,12 @@
                                         <div class="mb-3">
                                             <label for="notes" class="form-label">Notes</label>
                                             <textarea name="notes" id="notes" rows="4" class="form-control" placeholder="Enter any notes...">{{ $lot->notes }}</textarea>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="description" class="form-label">Description</label>
+                                            <textarea name="description" id="description" rows="4" class="form-control"
+                                                placeholder="Enter description...">{{ $lot->description }}</textarea>
                                         </div>
                                     </div>
                                 </div>
