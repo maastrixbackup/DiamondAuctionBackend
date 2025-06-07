@@ -29,7 +29,8 @@ class SlotController extends Controller
                 'start_time',
                 'date_for_reservation'
             )
-            ->whereIn('status', [1, 2])
+            ->where('status', 1)
+            // ->whereIn('status', [1, 2])
             ->whereBetween('date_for_reservation', [$currD, $additionalD])
             ->groupBy('room_name', 'start_time', 'date_for_reservation');
 

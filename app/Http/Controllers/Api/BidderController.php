@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -507,6 +508,126 @@ class BidderController extends Controller
         ]);
     }
 
+    public function getBidderSlots(Request $request)
+    {
+        try {
+            $bidderId = $request->user()->id;
+            $currDate = date('Y-m-d');
+            $bidderExists = DB::table('bidders')->where('id', $bidderId)->exists();
+            if (!$bidderExists) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Bidder not found.'
+                ], 404);
+            }
+
+            $bookings = Booking::where('bidder_id', $bidderId)
+                ->where('date_for_reservation', $currDate)
+                ->get();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Bidder slots fetched successfully.',
+                'bookings' => $bookings
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while fetching bidder slots.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getBookingDetails(Request $request, $id)
+    {
+        $bidderId = $request->user()->id;
+        // return $bidderId;
+        try {
+            $booking = Booking::where('booking_id', $id)
+                ->where('bidder_id', $bidderId)->whereNotNull('room_name')->first();
+
+            if (!$booking) {
+                return response()->json(['status' => false, 'message' => 'Booking Not Found'], 404);
+            }
+
+            $lots = Lot::whereIn('id', $booking->booking_lot_id)
+                ->get()->map(function ($lot) {
+                    $images = $lot->images ? $lot->images : [];
+                    $imageUrls = array_map(function ($img) {
+                        return asset('storage/images/lots/' . $img);
+                    }, $images);
+                    return [
+                        "id" => $lot->id,
+                        "seller_id" => $lot->seller_id,
+                        "category_id" => $lot->category_id,
+                        "title" => $lot->title,
+                        "description" => $lot->description,
+                        "type" => $lot->type,
+                        "color" => $lot->color,
+                        "weight" => $lot->weight,
+                        "size" => $lot->size,
+                        "stone" => $lot->stone,
+                        "shape" => $lot->shape,
+                        "notes" => $lot->notes,
+                        "batch_code" => $lot->batch_code,
+                        "status" => $lot->status,
+                        "report_number" => $lot->report_number,
+                        "colour_grade" => $lot->colour_grade,
+                        "colour_origin" => $lot->colour_origin,
+                        "colour_distribution" => $lot->colour_distribution,
+                        "polish" => $lot->polish,
+                        "symmetry" => $lot->symmetry,
+                        "fluorescence" => $lot->fluorescence,
+                        "images" => $imageUrls,
+                        "video" => $lot->video,
+                    ];
+                });
+
+            // Create Booking Details
+            $bookingDetails = $booking ? [
+                'id' => $booking->id,
+                'booking_id' => $booking->booking_id,
+                'bidder_id' => $booking->bidder_id,
+                'room_name' => $booking->room_name,
+                'room_type' => $booking->room_type,
+                'start_time' => $booking->start_time,
+                'date_for_reservation' => $booking->date_for_reservation,
+                'lot_details' => $lots,
+            ] : null;
+
+            return response()->json(['status' => true, 'message' => 'Booking Details Fetched', 'booking' => $bookingDetails]);
+        } catch (\Throwable $th) {
+            Log::error('Failed to Fetch :' . $th->getMessage());
+            return response()->json(['status' => false, 'message' => $th->getMessage()]);
+        }
+    }
+
+    public function updateBiddetails(Request $request)
+    {
+        $bidderId = $request->user()->id;
+        $bookingId = $request->booking_id;
+        $lotId = $request->lot_id;
+        $price = $request->bidding_price;
+
+        try {
+            $bookingSlot = SlotBooking::where('booking_id', $bookingId)
+                ->where('lot_id', $lotId)
+                ->where('bidder_id', $bidderId)
+                ->first();
+
+            if (!$bookingSlot) {
+                return response()->json(['status' => false, 'message' => 'Lot Details not found'], 404);
+            }
+
+            $bookingSlot->bidding_price = $price;
+            $bookingSlot->save();
+            return response()->json(['status' => true, 'message' => 'Details Updated']);
+        } catch (\Throwable $th) {
+            Log::error('Fails to update:' . $th->getMessage());
+            return response()->json(['status' => false, 'message' => $th->getMessage()]);
+        }
+    }
     public function bidderLogout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

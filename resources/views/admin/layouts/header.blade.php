@@ -167,7 +167,7 @@
         <div class="flex items-center space-x-4">
             <!-- Notification Icon -->
             <button class="relative focus:outline-none">
-                <i class="fa fa-bell-o w-6 h-6"></i>
+                <i class="fa fa-bell w-6 h-6"></i>
                 <span class="absolute top-0 right-0 block h-2 w-2 bg-red-500 rounded-full ring-2 ring-white"></span>
             </button>
 
