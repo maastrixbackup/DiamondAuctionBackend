@@ -25,132 +25,217 @@
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">Lot Details</h4>
-                </div>
-                <div class="card-body">
-                    <table class="table table-bordered table-striped">
-                        <tbody>
-                            <tr>
-                                <th>ID</th>
-                                <td>{{ $lot->id }}</td>
-                            </tr>
-                            <tr>
-                                <th>Seller</th>
-                                <td>{{ $lot->seller ? $lot->seller->full_name : 'N/A' }}</td>
-                            </tr>
-                            <tr>
-                                <th>Category</th>
-                                <td>{{ $lot->category ? $lot->category->name : 'N/A' }}</td>
-                            </tr>
-                            <tr>
-                                <th>Title</th>
-                                <td>{{ $lot->title }}</td>
-                            </tr>
-                            <tr>
-                                <th>Type</th>
-                                <td>{{ $lot->type }}</td>
-                            </tr>
-                            <tr>
-                                <th>Color</th>
-                                <td>{{ $lot->color }}</td>
-                            </tr>
-                            <tr>
-                                <th>Weight</th>
-                                <td>{{ $lot->weight }}</td>
-                            </tr>
-                            <tr>
-                                <th>Size</th>
-                                <td>{{ $lot->size }}</td>
-                            </tr>
-                            <tr>
-                                <th>Status</th>
-                                <td>
-                                    @if ($lot->status == 0)
-                                        <span class="badge bg-danger">Pending</span>
-                                    @elseif ($lot->status == 1)
-                                        <span class="badge bg-success">Live</span>
-                                    @else
-                                        <span class="badge bg-secondary">Sold</span>
-                                    @endif
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Shape</th>
-                                <td>{{ $lot->shape }}</td>
-                            </tr>
-                            <tr>
-                                <th>Batch Code</th>
-                                <td>{{ $lot->batch_code }}</td>
-                            </tr>
-                            <tr>
-                                <th>Report Number</th>
-                                <td>{{ $lot->report_number }}</td>
-                            </tr>
-                            <tr>
-                                <th>Colour Grade</th>
-                                <td>{{ $lot->colour_grade }}</td>
-                            </tr>
-                            <tr>
-                                <th>Origin</th>
-                                <td>{{ $lot->colour_origin }}</td>
-                            </tr>
-                            <tr>
-                                <th>Distribution</th>
-                                <td>{{ $lot->colour_distribution }}</td>
-                            </tr>
-                            <tr>
-                                <th>Polish</th>
-                                <td>{{ $lot->polish }}</td>
-                            </tr>
-                            <tr>
-                                <th>Symmetry</th>
-                                <td>{{ $lot->symmetry }}</td>
-                            </tr>
-                            <tr>
-                                <th>Fluorescence</th>
-                                <td>{{ $lot->fluorescence }}</td>
-                            </tr>
-                            <tr>
-                                <th>Stone</th>
-                                <td>{{ $lot->stone }}</td>
-                            </tr>
-                            <tr>
-                                <th>Notes</th>
-                                <td>{!! nl2br(e($lot->notes)) !!}</td>
-                            </tr>
-                            <tr>
-                                <th>Description</th>
-                                <td>{!! nl2br(e($lot->description)) !!}</td>
-                            </tr>
-                            <tr>
-                                <th>Video</th>
-                                <td>{{ $lot->video }}</td>
-                            </tr>
-                            <tr>
-                                <th>Images</th>
-                                <td>
-                                    @if ($lot->images && is_array($lot->images) && count($lot->images))
-                                        <div class="d-flex flex-wrap">
-                                            @foreach ($lot->images as $image)
-                                                <div>
-                                                    <img src="{{ asset('storage/images/lots/' . $image) }}"
-                                                        style="max-width: 100px; max-height: 100px;" class="rounded p-1">
-                                                </div>
-                                            @endforeach
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="card shadow-sm">
+                        @if ($lot->images && is_array($lot->images) && count($lot->images))
+                            <!-- Main image carousel -->
+                            <div id="lotImageCarousel" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-inner">
+                                    @foreach ($lot->images as $index => $image)
+                                        <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                            <img src="{{ asset('storage/images/lots/' . $image) }}"
+                                                class="d-block w-100 img-fluid rounded-top"
+                                                style="object-fit: cover; max-height: 400px;">
                                         </div>
-                                    @else
-                                        <p class="text-muted">No images uploaded</p>
-                                    @endif
+                                    @endforeach
+                                </div>
+                                <!-- Carousel controls -->
+                                @if (count($lot->images) > 1)
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#lotImageCarousel"
+                                        data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon"></span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#lotImageCarousel"
+                                        data-bs-slide="next">
+                                        <span class="carousel-control-next-icon"></span>
+                                    </button>
+                                @endif
+                            </div>
+                        @else
+                            <div class="p-5 text-center text-muted">No image available</div>
+                        @endif
 
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <a href="{{ route('admin.lots.index') }}" class="btn btn-secondary mt-3">Back to List</a>
+                        <div
+                            class="card-body border-top d-flex flex-wrap justify-content-around text-secondary small fw-semibold">
+                            <div><i class="fa fa-ruler-combined me-1 text-primary"></i>Size: {{ $lot->size ?? '-' }}</div>
+                            <div><i class="fa fa-gem me-1 text-primary"></i>Stones: {{ $lot->stone ?? '-' }}</div>
+                            <div><i class="fa fa-weight-hanging me-1 text-primary"></i>Weight: {{ $lot->weight ?? '-' }}
+                            </div>
+                            <div><i class="fa fa-shapes me-1 text-primary"></i>Shape: {{ $lot->shape ?? '-' }}</div>
+                        </div>
+                    </div>
+                    {{-- Video Preview Section --}}
+                    @if (!empty($lot->video))
+                        <div class="card mt-3 shadow-sm">
+                            <div class="card-body">
+                                <label for="video" class="form-label fw-semibold">Video</label>
+                                <input type="hidden" name="video" id="video" class="form-control"
+                                    placeholder="Enter Video link" value="{{ $lot->video }}"
+                                    onkeyup="generatePreview(this.value)" />
+                                <div class="my-3" id="previewContainer"></div>
+                            </div>
+                        </div>
+                    @else
+                        <div class="card mt-3 shadow-sm">
+                            <div class="card-body text-muted text-center">
+                                No video available
+                            </div>
+                        </div>
+                    @endif
+
+                </div>
+
+                <!-- Right: Lot Info -->
+                <div class="col-lg-6">
+                    <div class="card mb-4 shadow-sm border-0">
+                        <div class="card-body">
+                            <h5 class="card-title border-bottom pb-2 mb-3 text-primary">
+                                <i class="fas fa-gem me-2"></i>Lot Details
+                            </h5>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="bg-light rounded-3 p-3">
+                                        <div><strong>Lot ID:</strong> {{ $lot->id }}</div>
+                                        <div><strong>Seller:</strong> {{ $lot->seller?->full_name ?? 'N/A' }}</div>
+                                        <div><strong>Category:</strong> {{ $lot->category?->name ?? 'N/A' }}</div>
+                                        <div><strong>Type:</strong> {{ $lot->type }}</div>
+                                        <div><strong>Color:</strong> {{ $lot->color }}</div>
+                                        <div><strong>Status:</strong>
+                                            @if ($lot->status == 0)
+                                                <span class="badge bg-danger">Pending</span>
+                                            @elseif ($lot->status == 1)
+                                                <span class="badge bg-success">Live</span>
+                                            @else
+                                                <span class="badge bg-secondary">Sold</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="bg-light rounded-3 p-3">
+                                        <div><strong>Weight:</strong> {{ $lot->weight }}</div>
+                                        <div><strong>Size:</strong> {{ $lot->size }}</div>
+                                        <div><strong>Stone:</strong> {{ $lot->stone }}</div>
+                                        <div><strong>Shape:</strong> {{ $lot->shape }}</div>
+                                        <div><strong>Batch Code:</strong> {{ $lot->batch_code }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <strong>Notes:</strong>
+                                <div class="bg-light rounded-3 p-3 mt-1">
+                                    {!! nl2br(e($lot->notes)) !!}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <h5 class="card-title border-bottom pb-2 mb-3 text-primary">
+                                <i class="fas fa-file-alt me-2"></i>Report & Quality Details
+                            </h5>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="bg-light rounded-3 p-3">
+                                        <div><strong>Report Number:</strong> {{ $lot->report_number }}</div>
+                                        <div><strong>Colour Grade:</strong> {{ $lot->colour_grade }}</div>
+                                        <div><strong>Origin:</strong> {{ $lot->colour_origin }}</div>
+                                        <div><strong>Distribution:</strong> {{ $lot->colour_distribution }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="bg-light rounded-3 p-3">
+                                        <div><strong>Polish:</strong> {{ $lot->polish }}</div>
+                                        <div><strong>Symmetry:</strong> {{ $lot->symmetry }}</div>
+                                        <div><strong>Fluorescence:</strong> {{ $lot->fluorescence }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-12">
+                    <a href="{{ route('admin.lots.index') }}" class="btn btn-secondary mt-4">Back</a>
                 </div>
             </div>
+
         </div>
     </div>
 @endsection
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let urlField = document.getElementById("video");
+
+        // If the field has a value on page load, generate preview
+        if (urlField.value.trim()) {
+            generatePreview(urlField.value.trim());
+        }
+    });
+
+    function generatePreview(url) {
+        let previewContainer = document.getElementById("previewContainer");
+
+        if (!url.trim()) {
+            previewContainer.innerHTML = `<p class="text-danger">Please enter a YouTube URL</p>`;
+            return;
+        }
+
+        let videoId = extractVideoId(url);
+        if (videoId) {
+            let maxresUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+            let sdUrl = `https://img.youtube.com/vi/${videoId}/sddefault.jpg`;
+            let hqUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+
+            checkImageAvailability(maxresUrl, function(available) {
+                let thumbnailUrl = available ? maxresUrl : sdUrl;
+                checkImageAvailability(thumbnailUrl, function(available) {
+                    if (!available) {
+                        thumbnailUrl = hqUrl;
+                    }
+                    previewContainer.innerHTML = `
+                        <img src="${thumbnailUrl}" alt="YouTube Preview" style="width: 200px; cursor: pointer;" onclick="playVideo('${videoId}')">
+                    `;
+                });
+            });
+        } else {
+            previewContainer.innerHTML = `<p class="text-danger">Invalid YouTube URL</p>`;
+        }
+    }
+
+    function extractVideoId(url) {
+        let match = url.match(
+            /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
+        );
+        return match ? match[1] : null;
+    }
+
+    function playVideo(videoId) {
+        document.getElementById("previewContainer").innerHTML = `
+            <div class="ratio ratio-16x9">
+                <iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            </div>
+        `;
+    }
+
+    function checkImageAvailability(url, callback) {
+        let img = new Image();
+        img.src = url;
+        img.onload = function() {
+            callback(true);
+        };
+        img.onerror = function() {
+            callback(false);
+        };
+    }
+</script>

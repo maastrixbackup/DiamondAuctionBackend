@@ -432,22 +432,33 @@ class BidderController extends Controller
         }
     }
 
-    public function getBidderAssignedSlots(Request $request)
+    public function getBidderSlots(Request $request)
     {
-        $bidderId = $request->user()->id;
+        try {
+            $bidderId = $request->user()->id;
 
-        $slotIds = SlotBooking::where('bidder_id', $bidderId)
-            ->where('status', 1) // approved
-            ->pluck('slot_id')
-            ->unique();
+            $bidderExists = DB::table('bidders')->where('id', $bidderId)->exists();
+            if (!$bidderExists) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Bidder not found.'
+                ], 404);
+            }
 
-        $slots = Slot::whereIn('id', $slotIds)->get();
+            $bookings = Booking::where('bidder_id', $bidderId)->get();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Bidder assigned slots fetched.',
-            'slots' => $slots
-        ]);
+            return response()->json([
+                'status' => true,
+                'message' => 'Bidder slots fetched successfully.',
+                'bookings' => $bookings
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while fetching bidder slots.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function bidderAssignedLotsBySlot(Request $request, $slotId)

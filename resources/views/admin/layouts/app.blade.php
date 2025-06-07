@@ -43,7 +43,8 @@
         } */
 
         body {
-            font-family: 'Segoe UI';
+            /* font-family: 'Segoe UI'; */
+            font-family: 'Open Sans';
         }
 
         .brand-gold {

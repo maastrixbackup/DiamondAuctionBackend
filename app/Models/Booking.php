@@ -30,6 +30,7 @@ class Booking extends Model
         // 'lot_booking_flag' => 'boolean',
         // 'lot_requested_flag' => 'boolean',
         // 'timer_status' => 'boolean',
+        // 'bid_details' => 'array',
     ];
 
     // Relationships
