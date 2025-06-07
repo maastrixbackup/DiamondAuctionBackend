@@ -1,7 +1,7 @@
 <aside id="sidebar"
     class="fixed top-0 h-screen w-64 bg-[#2E3744] text-white shadow-lg pt-24 z-30 flex flex-col justify-between">
 
-    <nav class="flex flex-col space-y-1 px-0 text-sm font-medium">
+    <nav class="flex flex-col space-y-1 px-0 text-lg font-medium">
         <a href="{{ route('admin.dashboard') }}"
             class="flex items-center px-4 py-3 hover:bg-[#3B4756] transition rounded-r-full {{ request()->routeIs('admin.dashboard') ? 'bg-[#3B4756]' : '' }}">
             <i class="fa fa-home me-2"></i> Dashboard
