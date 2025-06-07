@@ -184,12 +184,6 @@
                                         </div>
 
                                         <div class="mb-3">
-                                            <label for="video" class="form-label">Video Link</label>
-                                            <input type="text" name="video" id="video" class="form-control"
-                                                placeholder="Enter Video link" value="{{ $lot->video }}">
-                                        </div>
-
-                                        <div class="mb-3">
                                             <label for="status" class="form-label">Status</label>
                                             <select name="status" id="status" class="form-select">
                                                 <option value="0" {{ $lot->status == 0 ? 'selected' : '' }}>Pending
@@ -199,6 +193,14 @@
                                                 <option value="2" {{ $lot->status == 2 ? 'selected' : '' }}>Sold
                                                 </option>
                                             </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="video" class="form-label">Video Link</label>
+                                            <input type="text" name="video" id="video" class="form-control"
+                                                placeholder="Enter Video link" value="{{ $lot->video }}"
+                                                onkeyup="generatePreview(this.value)">
+                                            <div class="my-2" id="previewContainer"></div>
                                         </div>
                                     </div>
 
@@ -318,5 +320,70 @@
                 }
             });
         });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let urlField = document.getElementById("video");
+
+            // If the field has a value on page load, generate preview
+            if (urlField.value.trim()) {
+                generatePreview(urlField.value.trim());
+            }
+        });
+
+        function generatePreview(url) {
+            let previewContainer = document.getElementById("previewContainer");
+
+            if (!url.trim()) {
+                previewContainer.innerHTML = `<p style="color:red;">Please enter a YouTube URL</p>`;
+                return;
+            }
+
+            let videoId = extractVideoId(url);
+            if (videoId) {
+                // Try fetching the maxresdefault thumbnail first
+                let maxresUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+                let sdUrl = `https://img.youtube.com/vi/${videoId}/sddefault.jpg`;
+                let hqUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+
+                checkImageAvailability(maxresUrl, function(available) {
+                    let thumbnailUrl = available ? maxresUrl : sdUrl;
+                    checkImageAvailability(thumbnailUrl, function(available) {
+                        if (!available) {
+                            thumbnailUrl = hqUrl;
+                        }
+                        previewContainer.innerHTML = `
+                    <img src="${thumbnailUrl}" alt="YouTube Preview" style="width: 100px; cursor: pointer;" onclick="playVideo('${videoId}')">
+                `;
+                    });
+                });
+            } else {
+                previewContainer.innerHTML = `<p style="color:red;">Invalid YouTube URL</p>`;
+            }
+        }
+
+        function extractVideoId(url) {
+            let match = url.match(
+                /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
+            );
+            return match ? match[1] : null;
+        }
+
+        function playVideo(videoId) {
+            document.getElementById("previewContainer").innerHTML = `
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    `;
+        }
+
+        function checkImageAvailability(url, callback) {
+            let img = new Image();
+            img.src = url;
+            img.onload = function() {
+                callback(true);
+            };
+            img.onerror = function() {
+                callback(false);
+            };
+        }
     </script>
 @endpush
