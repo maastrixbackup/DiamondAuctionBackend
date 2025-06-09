@@ -1,4 +1,5 @@
 @if (!$isRoomAlreadyAssigned)
+    <div id="successMessage" class="alert d-none" role="alert"></div>
     <form id="assignRoomForm" onsubmit="event.preventDefault(); submitAssignedRoom();">
         @csrf
 

@@ -151,26 +151,68 @@ class BidderController extends Controller
 
     public function bidderDashboard(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'id' => 'required|exists:bidders,id',
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required|exists:bidders,id',
+            ]);
 
-        if ($validator->fails()) {
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+
+            $bidder = Bidder::find($request->id);
+
+            if (!$bidder) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Bidder not found.',
+                ], 404);
+            }
+
+            $docBase = asset('storage/document/bidder');
+
+            $docUrl = fn(string|null $file) => $file ? "{$docBase}/{$file}" : null;
+
+            $documentStatus = [
+                0 => 'Pending',
+                1 => 'Approved',
+                2 => 'Rejected',
+            ];
+
+            $dashboardData = [
+                'full_name' => $bidder->full_name,
+                'email_address' => $bidder->email_address,
+                'certificate_of_incorporation' => $docUrl($bidder->certificate_of_incorporation),
+                'certificate_of_incorporation_status' => $documentStatus[$bidder->certificate_of_incorporation_status],
+                'valid_trade_license' => $docUrl($bidder->valid_trade_license),
+                'valid_trade_license_status' => $documentStatus[$bidder->valid_trade_license_status],
+                'passport_copy_authorised' => $docUrl($bidder->passport_copy_authorised),
+                'passport_copy_authorised_status' => $documentStatus[$bidder->passport_copy_authorised_status],
+                'ubo_declaration' => $docUrl($bidder->ubo_declaration),
+                'ubo_declaration_status' => $documentStatus[$bidder->ubo_declaration_status],
+                'passport_copy' => $docUrl($bidder->passport_copy),
+                'passport_copy_status' => $documentStatus[$bidder->passport_copy_status],
+                'proof_of_address' => $docUrl($bidder->proof_of_address),
+                'proof_of_address_status' => $documentStatus[$bidder->proof_of_address_status],
+            ];
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Bidder dashboard data fetched successfully.',
+                'data' => $dashboardData,
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error fetching bidder dashboard: ' . $e->getMessage());
+
             return response()->json([
                 'status' => false,
-                'errors' => $validator->errors(),
-            ], 422);
+                'message' => 'An error occurred while fetching the dashboard.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-        $bidder = Bidder::find($request->id);
-        $dashboardData = [
-            'full_name' => $bidder->full_name,
-            'email_address' => $bidder->email_address,
-        ];
-        return response()->json([
-            'status' => true,
-            'message' => 'Bidder dashboard data fetched successfully.',
-            'data' => $dashboardData,
-        ], 200);
     }
 
     public function reuploadBidderDocument(Request $request)
@@ -181,39 +223,49 @@ class BidderController extends Controller
             'document' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
-        $bidder = Bidder::findOrFail($request->bidder_id);
-        $field = $request->field;
-        $statusField = $field . '_status';
+        try {
+            $bidder = Bidder::findOrFail($request->bidder_id);
+            $field = $request->field;
+            $statusField = $field . '_status';
 
-        if ($bidder->$statusField != 2) {
+            if ($bidder->$statusField != 2) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Only rejected documents can be re-uploaded.',
+                ], 403);
+            }
+
+            $destinationPath = public_path('storage/document/bidder/');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0777, true);
+            }
+
+            if ($bidder->$field && file_exists($destinationPath . $bidder->$field)) {
+                unlink($destinationPath . $bidder->$field);
+            }
+
+            $file = $request->file('document');
+            $filename = $field . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move($destinationPath, $filename);
+
+            $bidder->$field = $filename;
+            $bidder->$statusField = 0;
+            $bidder->kyc_status = 0;
+            $bidder->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Document re-uploaded successfully.',
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Reupload document error: ' . $e->getMessage());
+
             return response()->json([
                 'status' => false,
-                'message' => 'Only rejected documents can be re-uploaded.',
-            ], 403);
+                'message' => 'An error occurred while re-uploading the document.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        $destinationPath = public_path('storage/document/bidder/');
-        if (!file_exists($destinationPath)) {
-            mkdir($destinationPath, 0777, true);
-        }
-
-        if ($bidder->$field && file_exists($destinationPath . $bidder->$field)) {
-            unlink($destinationPath . $bidder->$field);
-        }
-
-        $file = $request->file('document');
-        $filename = $field . '_' . time() . '.' . $file->getClientOriginalExtension();
-        $file->move($destinationPath, $filename);
-
-        $bidder->$field = $filename;
-        $bidder->$statusField = 0;
-        $bidder->kyc_status = 0;
-        $bidder->save();
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Document re-uploaded successfully.',
-        ], 200);
     }
 
     public function availableSlots(Request $request)
@@ -245,10 +297,19 @@ class BidderController extends Controller
             $startTime = Carbon::createFromTimeString('09:00:00');
             $endTime = Carbon::createFromTimeString('18:00:00');
 
+            $now = Carbon::now();
+            $queryDate = Carbon::parse($date)->toDateString();
+
             $timeBlocks = [];
             while ($startTime < $endTime) {
                 $timeStr = $startTime->format('H:i:s');
-                $timeBlocks[$timeStr] = in_array($timeStr, $availableSlots) ? 'available' : 'unavailable';
+                $slotDateTime = Carbon::parse($date . ' ' . $timeStr);
+
+                if ($queryDate === $now->toDateString() && $slotDateTime->lessThan($now)) {
+                    $timeBlocks[$timeStr] = 'Disabled';
+                } else {
+                    $timeBlocks[$timeStr] = in_array($timeStr, $availableSlots) ? 'available' : 'unavailable';
+                }
                 $startTime->addMinutes(30);
             }
 
@@ -369,6 +430,14 @@ class BidderController extends Controller
                     'message' => 'Bidder not found.',
                 ], 404);
             }
+
+            if ($bidder->kyc_status != 1 || $bidder->account_status != 1) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Booking not allowed. Your KYC or account is not approved.',
+                ], 403);
+            }
+
             DB::beginTransaction();
             // Generate dynamic booking_id
             $latestBooking = SlotBooking::whereNotNull('booking_id')
