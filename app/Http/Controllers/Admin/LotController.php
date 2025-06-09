@@ -309,6 +309,7 @@ class LotController extends Controller
         //         'date_for_reservation'
         //     )
         //     ->get();
+        $currDate = date('Y-m-d');
         $groupedSlots = SlotBooking::selectRaw('
                 bidder_id,
                 MAX(room_name) as room_name,
@@ -325,6 +326,8 @@ class LotController extends Controller
                 'start_time',
                 'date_for_reservation'
             )
+            ->where('date_for_reservation', '>=', $currDate)
+            ->orderBy('date_for_reservation', 'desc')
             ->get();
 
 
