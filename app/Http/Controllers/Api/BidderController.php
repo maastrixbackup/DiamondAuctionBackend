@@ -542,6 +542,7 @@ class BidderController extends Controller
                         "shape" => $lot->shape,
                         "notes" => $lot->notes,
                         "batch_code" => $lot->batch_code,
+                        "bidding_price" => $lot->bidding_price,
                         "status" => $lot->status,
                         "report_number" => $lot->report_number,
                         "colour_grade" => $lot->colour_grade,
@@ -593,7 +594,7 @@ class BidderController extends Controller
 
             $bookingSlot->bidding_price = $price;
             $bookingSlot->save();
-            return response()->json(['status' => true, 'message' => 'Details Updated']);
+            return response()->json(['status' => true, 'message' => 'Price Updated']);
         } catch (\Throwable $th) {
             Log::error('Fails to update:' . $th->getMessage());
             return response()->json(['status' => false, 'message' => $th->getMessage()]);
