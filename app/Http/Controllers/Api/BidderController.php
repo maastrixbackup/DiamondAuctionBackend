@@ -245,10 +245,19 @@ class BidderController extends Controller
             $startTime = Carbon::createFromTimeString('09:00:00');
             $endTime = Carbon::createFromTimeString('18:00:00');
 
+            $now = Carbon::now();
+            $queryDate = Carbon::parse($date)->toDateString();
+
             $timeBlocks = [];
             while ($startTime < $endTime) {
                 $timeStr = $startTime->format('H:i:s');
-                $timeBlocks[$timeStr] = in_array($timeStr, $availableSlots) ? 'available' : 'unavailable';
+                $slotDateTime = Carbon::parse($date . ' ' . $timeStr);
+
+                if ($queryDate === $now->toDateString() && $slotDateTime->lessThan($now)) {
+                    $timeBlocks[$timeStr] = 'Disabled';
+                } else {
+                    $timeBlocks[$timeStr] = in_array($timeStr, $availableSlots) ? 'available' : 'unavailable';
+                }
                 $startTime->addMinutes(30);
             }
 
