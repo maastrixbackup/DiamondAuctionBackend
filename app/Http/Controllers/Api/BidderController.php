@@ -539,7 +539,7 @@ class BidderController extends Controller
                 $images = is_array($lot->images) ? $lot->images : [];
                 $imageUrls = array_map(fn($img) => asset('storage/images/lots/' . $img), $images);
 
-                $biddingPrice = optional($slotBookings->get($lot->id))->bidding_price ?? null;
+                $biddingPrice = optional($slotBookings->get($lot->id))->bidding_price ?? 0;
 
                 return [
                     "id" => $lot->id,
