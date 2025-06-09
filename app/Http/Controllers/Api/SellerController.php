@@ -8,6 +8,7 @@ use App\Models\Seller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class SellerController extends Controller
 {
@@ -144,26 +145,69 @@ class SellerController extends Controller
 
     public function sellerDashboard(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'id' => 'required|exists:sellers,id',
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required|exists:sellers,id',
+            ]);
 
-        if ($validator->fails()) {
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+
+            $seller = Seller::find($request->id);
+
+            if (!$seller) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Seller not found.',
+                ], 404);
+            }
+
+            $docBase = asset('storage/document/seller');
+
+            $docUrl = fn(string|null $file) => $file ? "{$docBase}/{$file}" : null;
+
+            $documentStatus = [
+                0 => 'Pending',
+                1 => 'Approved',
+                2 => 'Rejected',
+            ];
+
+            $dashboardData = [
+                'full_name' => $seller->full_name,
+                'email_address' => $seller->email_address,
+                'certificate_of_incorporation' => $docUrl($seller->certificate_of_incorporation),
+                'certificate_of_incorporation_status' => $documentStatus[$seller->certificate_of_incorporation_status],
+                'valid_trade_license' => $docUrl($seller->valid_trade_license),
+                'valid_trade_license_status' => $documentStatus[$seller->valid_trade_license_status],
+                'passport_copy_authorised' => $docUrl($seller->passport_copy_authorised),
+                'passport_copy_authorised_status' => $documentStatus[$seller->passport_copy_authorised_status],
+                'ubo_declaration' => $docUrl($seller->ubo_declaration),
+                'ubo_declaration_status' => $documentStatus[$seller->ubo_declaration_status],
+                'passport_copy' => $docUrl($seller->passport_copy),
+                'passport_copy_status' => $documentStatus[$seller->passport_copy_status],
+                'proof_of_ownership' => $docUrl($seller->proof_of_ownership),
+                'proof_of_ownership_status' => $documentStatus[$seller->proof_of_ownership_status],
+
+            ];
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Seller dashboard data fetched successfully.',
+                'data' => $dashboardData,
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error fetching seller dashboard: ' . $e->getMessage());
+
             return response()->json([
                 'status' => false,
-                'errors' => $validator->errors(),
-            ], 422);
+                'message' => 'An error occurred while fetching the seller dashboard.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-        $seller = Seller::find($request->id);
-        $dashboardData = [
-            'full_name' => $seller->full_name,
-            'email_address' => $seller->email_address,
-        ];
-        return response()->json([
-            'status' => true,
-            'message' => 'Seller dashboard data fetched successfully.',
-            'data' => $dashboardData,
-        ], 200);
     }
 
     public function reuploadSellerDocument(Request $request)
