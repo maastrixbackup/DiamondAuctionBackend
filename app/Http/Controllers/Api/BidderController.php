@@ -23,98 +23,113 @@ class BidderController extends Controller
     public function createBidder(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            // 'type' => 'required|in:company,individual',
+            'type' => 'required|in:company,individual',
 
-            'name' => 'required|string',
-            'email' => 'required|email|unique:bidders,email_address',
-            'phone' => 'required|string',
-            'country' => 'required|string',
-            'password' => 'required|string|min:6',
+            // Company
+            'companyName' => 'required_if:type,company|string',
+            'regNumber' => 'required_if:type,company|string',
+            'directorName' => 'required_if:type,company|string',
+            'directorEmail' => 'required_if:type,company|email',
+            'directorPhone' => 'required_if:type,company|string',
+            'companyfullName' => 'required_if:type,company|string',
+            'companyEmail' => 'required_if:type,company|email|unique:bidders,email_address',
+            'companyPhone' => 'required_if:type,company|string',
+            'companyCountry' => 'required_if:type,company|string',
+            'companyPassword' => 'required_if:type,company|string|min:6',
 
-            // Company fields
-            'company_name' => 'required_if:type,company|string',
-            'registration_number' => 'required_if:type,company|string',
-            'director_name' => 'required_if:type,company|string',
-            'director_email' => 'required_if:type,company|email',
-            'director_phone' => 'required_if:type,company|string',
-            'certificate_of_incorporation' => 'required_if:type,company|file',
-            'valid_trade_license' => 'required_if:type,company|file',
-            'passport_copy_authorised' => 'required_if:type,company|file',
+            'incorporation' => 'required_if:type,company|file',
+            'trade_license' => 'required_if:type,company|file',
+            'passport_signatory' => 'required_if:type,company|file',
             'ubo_declaration' => 'required_if:type,company|file',
 
-            // Individual fields
-            'passport_copy' => 'required_if:type,individual|file',
-            'proof_of_address' => 'required_if:type,individual|file',
+            // Individual
+            'name' => 'required_if:type,individual|string',
+            'email' => 'required_if:type,individual|email|unique:bidders,email_address',
+            'phone' => 'required_if:type,individual|string',
+            'country' => 'required_if:type,individual|string',
+            'password' => 'required_if:type,individual|string|min:6',
+
+            'passport_ind' => 'required_if:type,individual|file',
+            'ownership_proof' => 'required_if:type,individual|file',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $bidder = new Bidder();
+        try {
+            $bidder = new Bidder();
+            $bidder->type = $request->type === 'company' ? 1 : 2;
+            $bidder->kyc_status = 0;
+            $bidder->account_status = 0;
 
-        // Common fields
-        $bidder->type = $request->type == "company" ? 1 : 2;
-        $bidder->full_name = $request->name;
-        $bidder->email_address = $request->email;
-        $bidder->phone_number = $request->phone;
-        $bidder->country = $request->country;
-        $bidder->password = Hash::make($request->password);
-        $bidder->kyc_status = 0;
-        $bidder->account_status = 0;
-
-        $destinationPath = public_path('storage/document/bidder/');
-        if (!file_exists($destinationPath)) {
-            mkdir($destinationPath, 0777, true);
-        }
-
-        $handleUpload = function ($field) use ($request, $destinationPath) {
-            if ($request->hasFile($field)) {
-                $file = $request->file($field);
-                $filename = $field . '_' . time() . '.' . $file->getClientOriginalExtension();
-                $file->move($destinationPath, $filename);
-                return $filename;
+            $destinationPath = public_path('storage/document/bidder/');
+            if (!is_dir($destinationPath)) {
+                mkdir($destinationPath, 0777, true);
             }
-            return null;
-        };
 
-        // Company-specific logic
-        if ($request->type == "company") {
-            $bidder->company_name = $request->company_name;
-            $bidder->registration_number = $request->registration_number;
-            $bidder->director_name = $request->director_name;
-            $bidder->director_email = $request->director_email;
-            $bidder->director_phone = $request->director_phone;
+            $handleUpload = function (string $field) use ($request, $destinationPath) {
+                if ($request->hasFile($field)) {
+                    $file = $request->file($field);
+                    $filename = $field . '_' . time() . '.' . $file->getClientOriginalExtension();
+                    $file->move($destinationPath, $filename);
+                    return $filename;
+                }
+                return null;
+            };
 
-            $bidder->certificate_of_incorporation = $handleUpload('certificate_of_incorporation');
-            $bidder->certificate_of_incorporation_status = 0;
+            if ($request->type === 'company') {
+                $bidder->full_name = $request->companyfullName;
+                $bidder->email_address = $request->companyEmail;
+                $bidder->phone_number = $request->companyPhone;
+                $bidder->country = $request->companyCountry;
+                $bidder->password = Hash::make($request->companyPassword);
 
-            $bidder->valid_trade_license = $handleUpload('valid_trade_license');
-            $bidder->valid_trade_license_status = 0;
+                $bidder->company_name = $request->companyName;
+                $bidder->registration_number = $request->regNumber;
+                $bidder->director_name = $request->directorName;
+                $bidder->director_email = $request->directorEmail;
+                $bidder->director_phone = $request->directorPhone;
 
-            $bidder->passport_copy_authorised = $handleUpload('passport_copy_authorised');
-            $bidder->passport_copy_authorised_status = 0;
+                $bidder->certificate_of_incorporation = $handleUpload('incorporation');
+                $bidder->certificate_of_incorporation_status = 0;
 
-            $bidder->ubo_declaration = $handleUpload('ubo_declaration');
-            $bidder->ubo_declaration_status = 0;
+                $bidder->valid_trade_license = $handleUpload('trade_license');
+                $bidder->valid_trade_license_status = 0;
+
+                $bidder->passport_copy_authorised = $handleUpload('passport_signatory');
+                $bidder->passport_copy_authorised_status = 0;
+
+                $bidder->ubo_declaration = $handleUpload('ubo_declaration');
+                $bidder->ubo_declaration_status = 0;
+            } else {
+                $bidder->full_name = $request->name;
+                $bidder->email_address = $request->email;
+                $bidder->phone_number = $request->phone;
+                $bidder->country = $request->country;
+                $bidder->password = Hash::make($request->password);
+
+                $bidder->passport_copy = $handleUpload('passport_ind');
+                $bidder->passport_copy_status = 0;
+
+                $bidder->proof_of_address = $handleUpload('ownership_proof');
+                $bidder->proof_of_address_status = 0;
+            }
+
+            $bidder->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Bidder created successfully',
+                'data' => $bidder
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to create bidder',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        // Individual-specific logic
-        if ($request->type == "individual") {
-            $bidder->passport_copy = $handleUpload('passport_copy');
-            $bidder->passport_copy_status = 0;
-
-            $bidder->proof_of_address = $handleUpload('proof_of_address');
-            $bidder->proof_of_address_status = 0;
-        }
-
-        $bidder->save();
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Bidder created successfully',
-            'data' => $bidder
-        ], 201);
     }
 
     public function bidderLogin(Request $request)
@@ -182,6 +197,18 @@ class BidderController extends Controller
                 2 => 'Rejected',
             ];
 
+            $kycStatus = [
+                0 => 'Pending',
+                1 => 'Approved',
+                2 => 'Rejected',
+            ];
+
+            $accountStatus = [
+                0 => 'Pending',
+                1 => 'Active',
+                2 => 'Suspended',
+            ];
+
             $dashboardData = [
                 'full_name' => $bidder->full_name,
                 'email_address' => $bidder->email_address,
@@ -197,6 +224,8 @@ class BidderController extends Controller
                 'passport_copy_status' => $documentStatus[$bidder->passport_copy_status],
                 'proof_of_address' => $docUrl($bidder->proof_of_address),
                 'proof_of_address_status' => $documentStatus[$bidder->proof_of_address_status],
+                'kyc_status' => $kycStatus[$bidder->kyc_status],
+                'account_status' => $accountStatus[$bidder->account_status],
             ];
 
             return response()->json([
@@ -552,7 +581,8 @@ class BidderController extends Controller
     {
         try {
             $bidderId = $request->user()->id;
-            $currDate = date('Y-m-d');
+            $currentDateTime = now();
+
             $bidderExists = DB::table('bidders')->where('id', $bidderId)->exists();
             if (!$bidderExists) {
                 return response()->json([
@@ -562,12 +592,14 @@ class BidderController extends Controller
             }
 
             $bookings = Booking::where('bidder_id', $bidderId)
-                ->where('date_for_reservation', $currDate)
+                ->whereRaw("STR_TO_DATE(CONCAT(date_for_reservation, ' ', start_time), '%Y-%m-%d %H:%i:%s') >= ?", [$currentDateTime])
+                ->orderBy('date_for_reservation')
+                ->orderBy('start_time')
                 ->get();
 
             return response()->json([
                 'status' => true,
-                'message' => 'Bidder slots fetched successfully.',
+                'message' => 'Upcoming bidder slots fetched successfully.',
                 'bookings' => $bookings
             ]);
         } catch (\Exception $e) {

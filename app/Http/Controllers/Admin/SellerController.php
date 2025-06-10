@@ -10,7 +10,7 @@ class SellerController extends Controller
 {
     public function sellerList(Request $request)
     {
-        $sellers = Seller::all();
+        $sellers = Seller::orderBy('id', 'desc')->get();
         return view('admin.seller.seller_list', compact('sellers'));
     }
 

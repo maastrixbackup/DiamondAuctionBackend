@@ -9,106 +9,123 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class SellerController extends Controller
 {
     public function createSeller(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            // 'type' => 'required|in:company,individual',
-            'name' => 'required|string',
-            'email' => 'required|email|unique:sellers,email_address',
-            'phone' => 'required|string',
-            'country' => 'required|string',
-            'password' => 'required|string|min:6',
+            'type' => 'required|in:company,individual',
 
-            'company_name' => 'required_if:type,company|string',
-            'registration_number' => 'required_if:type,company|string',
-            'director_name' => 'required_if:type,company|string',
-            'director_email' => 'required_if:type,company|email',
-            'director_phone' => 'required_if:type,company|string',
-            'certificate_of_incorporation' => 'required_if:type,company|file',
-            'valid_trade_license' => 'required_if:type,company|file',
-            'passport_copy_authorised' => 'required_if:type,company|file',
+            //Company
+            'companyName' => 'required_if:type,company|string',
+            'regNumber' => 'required_if:type,company|string',
+            'directorName' => 'required_if:type,company|string',
+            'directorEmail' => 'required_if:type,company|email',
+            'directorPhone' => 'required_if:type,company|string',
+            'companyfullName' => 'required_if:type,company|string',
+            'companyEmail' => 'required_if:type,company|email|unique:sellers,email_address',
+            'companyPhone' => 'required_if:type,company|string',
+            'companyCountry' => 'required_if:type,company|string',
+            'companyPassword' => 'required_if:type,company|string|min:6',
+
+            'incorporation' => 'required_if:type,company|file',
+            'trade_license' => 'required_if:type,company|file',
+            'passport_signatory' => 'required_if:type,company|file',
             'ubo_declaration' => 'required_if:type,company|file',
 
-            'source_of_goods' => 'required_if:type,individual|string',
-            'passport_copy' => 'required_if:type,individual|file',
-            'proof_of_ownership' => 'required_if:type,individual|file',
+            //Individual
+            'name' => 'required_if:type,individual|string',
+            'email' => 'required_if:type,individual|email|unique:sellers,email_address',
+            'phone' => 'required_if:type,individual|string',
+            'country' => 'required_if:type,individual|string',
+            'password' => 'required_if:type,individual|string|min:6',
+
+            'passport_ind' => 'required_if:type,individual|file',
+            'ownership_proof' => 'required_if:type,individual|file',
+            'source_goods' => 'required_if:type,individual|string',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $seller = new Seller();
+        try {
+            $seller = new Seller();
+            $seller->type = $request->type === 'company' ? 1 : 2;   // 1 = company, 2 = individual
+            $seller->kyc_status = 0;
+            $seller->account_status = 0;
 
-        // Convert type to int for DB
-        $seller->type = $request->type === 'company' ? 1 : 2;
-
-        $seller->full_name = $request->name;
-        $seller->email_address = $request->email;
-        $seller->phone_number = $request->phone;
-        $seller->country = $request->country;
-        $seller->password = Hash::make($request->password);
-        $seller->kyc_status = 0;
-        $seller->account_status = 0;
-
-        $destinationPath = public_path('storage/document/seller/');
-        if (!file_exists($destinationPath)) {
-            mkdir($destinationPath, 0777, true);
-        }
-
-        // File upload handler
-        $handleUpload = function ($field) use ($request, $destinationPath) {
-            if ($request->hasFile($field)) {
-                $file = $request->file($field);
-                $filename = $field . '_' . time() . '.' . $file->getClientOriginalExtension();
-                $file->move($destinationPath, $filename);
-                return $filename;
+            $destinationPath = public_path('storage/document/seller/');
+            if (! is_dir($destinationPath)) {
+                mkdir($destinationPath, 0777, true);
             }
-            return null;
-        };
+            $handleUpload = function (string $field) use ($request, $destinationPath) {
+                if ($request->hasFile($field)) {
+                    $file = $request->file($field);
+                    $filename = $field . '_' . time() . '.' . $file->getClientOriginalExtension();
+                    $file->move($destinationPath, $filename);
+                    return $filename;
+                }
+                return null;
+            };
 
-        // Company logic
-        if ($request->type === 'company') {
-            $seller->company_name = $request->company_name;
-            $seller->registration_number = $request->registration_number;
-            $seller->director_name = $request->director_name;
-            $seller->director_email = $request->director_email;
-            $seller->director_phone = $request->director_phone;
+            if ($request->type === 'company') {
+                $seller->full_name = $request->companyfullName;
+                $seller->email_address = $request->companyEmail;
+                $seller->phone_number = $request->companyPhone;
+                $seller->country = $request->companyCountry;
+                $seller->password = Hash::make($request->companyPassword);
 
-            $seller->certificate_of_incorporation = $handleUpload('certificate_of_incorporation');
-            $seller->certificate_of_incorporation_status = 0;
+                $seller->company_name = $request->companyName;
+                $seller->registration_number = $request->regNumber;
+                $seller->director_name = $request->directorName;
+                $seller->director_email = $request->directorEmail;
+                $seller->director_phone = $request->directorPhone;
 
-            $seller->valid_trade_license = $handleUpload('valid_trade_license');
-            $seller->valid_trade_license_status = 0;
+                $seller->certificate_of_incorporation = $handleUpload('incorporation');
+                $seller->certificate_of_incorporation_status = 0;
 
-            $seller->passport_copy_authorised = $handleUpload('passport_copy_authorised');
-            $seller->passport_copy_authorised_status = 0;
+                $seller->valid_trade_license = $handleUpload('trade_license');
+                $seller->valid_trade_license_status = 0;
 
-            $seller->ubo_declaration = $handleUpload('ubo_declaration');
-            $seller->ubo_declaration_status = 0;
+                $seller->passport_copy_authorised = $handleUpload('passport_signatory');
+                $seller->passport_copy_authorised_status = 0;
+
+                $seller->ubo_declaration = $handleUpload('ubo_declaration');
+                $seller->ubo_declaration_status = 0;
+            } else {
+                //Individual
+                $seller->full_name = $request->name;
+                $seller->email_address = $request->email;
+                $seller->phone_number = $request->phone;
+                $seller->country = $request->country;
+                $seller->password = Hash::make($request->password);
+
+                $seller->source_of_goods = $request->source_goods;
+
+                $seller->passport_copy = $handleUpload('passport_ind');
+                $seller->passport_copy_status = 0;
+
+                $seller->proof_of_ownership = $handleUpload('ownership_proof');
+                $seller->proof_of_ownership_status = 0;
+            }
+
+            $seller->save();
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Seller created successfully',
+                'data'    => $seller
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Failed to create seller',
+                'error'   => $e->getMessage()
+            ], 500);
         }
-
-        // Individual logic
-        if ($request->type === 'individual') {
-            $seller->source_of_goods = $request->source_of_goods;
-
-            $seller->passport_copy = $handleUpload('passport_copy');
-            $seller->passport_copy_status = 0;
-
-            $seller->proof_of_ownership = $handleUpload('proof_of_ownership');
-            $seller->proof_of_ownership_status = 0;
-        }
-
-        $seller->save();
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Seller created successfully',
-            'data' => $seller
-        ], 201);
     }
 
     public function sellerLogin(Request $request)
@@ -176,6 +193,18 @@ class SellerController extends Controller
                 2 => 'Rejected',
             ];
 
+            $kycStatus = [
+                0 => 'Pending',
+                1 => 'Approved',
+                2 => 'Rejected',
+            ];
+
+            $accountStatus = [
+                0 => 'Pending',
+                1 => 'Active',
+                2 => 'Suspended',
+            ];
+
             $dashboardData = [
                 'full_name' => $seller->full_name,
                 'email_address' => $seller->email_address,
@@ -191,6 +220,8 @@ class SellerController extends Controller
                 'passport_copy_status' => $documentStatus[$seller->passport_copy_status],
                 'proof_of_ownership' => $docUrl($seller->proof_of_ownership),
                 'proof_of_ownership_status' => $documentStatus[$seller->proof_of_ownership_status],
+                'kyc_status' => $kycStatus[$seller->kyc_status],
+                'account_status' => $accountStatus[$seller->account_status],
 
             ];
 
@@ -333,6 +364,32 @@ class SellerController extends Controller
             'data' => $lot,
         ]);
     }
+
+    // public function forgotPassword(Request $request)
+    // {
+    //     $request->validate([
+    //         'email' => 'required|email|exists:sellers,email_address',
+    //     ]);
+
+    //     $token = Str::random(64);
+    //     $email = $request->email;
+
+    //     DB::table('password_resets')->updateOrInsert(
+    //         ['email' => $email],
+    //         [
+    //             'token' => Hash::make($token),
+    //             'created_at' => now()
+    //         ]
+    //     );
+
+    //     // Send email
+    //     Mail::raw("Use this token to reset your password: $token", function ($message) use ($email) {
+    //         $message->to($email)
+    //             ->subject('Seller Password Reset');
+    //     });
+
+    //     return response()->json(['message' => 'Reset token sent to your email.'], 200);
+    // }
 
     public function sellerLogout(Request $request)
     {

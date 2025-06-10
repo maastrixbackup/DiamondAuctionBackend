@@ -8,7 +8,7 @@
         <input type="hidden" name="start_time" value="{{ $startTime }}">
         <input type="hidden" name="date" value="{{ $date }}">
 
-        <div class="mb-3">
+        <div class="mb-3 d-flex">
             @foreach ($rooms as $room)
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="rooms[]" value="{{ $room->id }}"

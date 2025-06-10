@@ -10,7 +10,7 @@ class BidderController extends Controller
 {
     public function bidderList(Request $request)
     {
-        $bidders = Bidder::all();
+        $bidders = Bidder::orderBy('id', 'desc')->get();
         return view('admin.bidder.bidder_list', compact('bidders'));
     }
 
