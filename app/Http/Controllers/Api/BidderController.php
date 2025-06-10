@@ -582,50 +582,63 @@ class BidderController extends Controller
     public function getBookingDetails(Request $request, $id)
     {
         $bidderId = $request->user()->id;
-        // return $bidderId;
+
         try {
             $booking = Booking::where('booking_id', $id)
-                ->where('bidder_id', $bidderId)->whereNotNull('room_name')->first();
+                ->where('bidder_id', $bidderId)
+                ->whereNotNull('room_name')
+                ->first();
 
             if (!$booking) {
                 return response()->json(['status' => false, 'message' => 'Booking Not Found'], 404);
             }
 
-            $lots = Lot::whereIn('id', $booking->booking_lot_id)
-                ->get()->map(function ($lot) {
-                    $images = $lot->images ? $lot->images : [];
-                    $imageUrls = array_map(function ($img) {
-                        return asset('storage/images/lots/' . $img);
-                    }, $images);
-                    return [
-                        "id" => $lot->id,
-                        "seller_id" => $lot->seller_id,
-                        "category_id" => $lot->category_id,
-                        "title" => $lot->title,
-                        "description" => $lot->description,
-                        "type" => $lot->type,
-                        "color" => $lot->color,
-                        "weight" => $lot->weight,
-                        "size" => $lot->size,
-                        "stone" => $lot->stone,
-                        "shape" => $lot->shape,
-                        "notes" => $lot->notes,
-                        "batch_code" => $lot->batch_code,
-                        "status" => $lot->status,
-                        "report_number" => $lot->report_number,
-                        "colour_grade" => $lot->colour_grade,
-                        "colour_origin" => $lot->colour_origin,
-                        "colour_distribution" => $lot->colour_distribution,
-                        "polish" => $lot->polish,
-                        "symmetry" => $lot->symmetry,
-                        "fluorescence" => $lot->fluorescence,
-                        "images" => $imageUrls,
-                        "video" => $lot->video,
-                    ];
-                });
+            // Get lots
+            $lotIds = $booking->booking_lot_id ?? [];
+            $lots = Lot::whereIn('id', $lotIds)->get();
 
-            // Create Booking Details
-            $bookingDetails = $booking ? [
+            // Pre-fetch all slot bookings for performance (avoid N+1)
+            $slotBookings = SlotBooking::whereIn('lot_id', $lotIds)
+                ->where('booking_id', $booking->booking_id)
+                ->where('bidder_id', $bidderId)
+                ->get()
+                ->keyBy('lot_id'); // Map by lot_id
+
+            $lotDetails = $lots->map(function ($lot) use ($slotBookings) {
+                $images = is_array($lot->images) ? $lot->images : [];
+                $imageUrls = array_map(fn($img) => asset('storage/images/lots/' . $img), $images);
+
+                $biddingPrice = optional($slotBookings->get($lot->id))->bidding_price ?? 0;
+
+                return [
+                    "id" => $lot->id,
+                    "seller_id" => $lot->seller_id,
+                    "category_id" => $lot->category_id,
+                    "title" => $lot->title,
+                    "description" => $lot->description,
+                    "type" => $lot->type,
+                    "color" => $lot->color,
+                    "weight" => $lot->weight,
+                    "size" => $lot->size,
+                    "stone" => $lot->stone,
+                    "shape" => $lot->shape,
+                    "notes" => $lot->notes,
+                    "batch_code" => $lot->batch_code,
+                    "bidding_price" => $biddingPrice,
+                    "status" => $lot->status,
+                    "report_number" => $lot->report_number,
+                    "colour_grade" => $lot->colour_grade,
+                    "colour_origin" => $lot->colour_origin,
+                    "colour_distribution" => $lot->colour_distribution,
+                    "polish" => $lot->polish,
+                    "symmetry" => $lot->symmetry,
+                    "fluorescence" => $lot->fluorescence,
+                    "images" => $imageUrls,
+                    "video" => $lot->video,
+                ];
+            });
+
+            $bookingDetails = [
                 'id' => $booking->id,
                 'booking_id' => $booking->booking_id,
                 'bidder_id' => $booking->bidder_id,
@@ -633,15 +646,23 @@ class BidderController extends Controller
                 'room_type' => $booking->room_type,
                 'start_time' => $booking->start_time,
                 'date_for_reservation' => $booking->date_for_reservation,
-                'lot_details' => $lots,
-            ] : null;
+                'lot_details' => $lotDetails,
+            ];
 
-            return response()->json(['status' => true, 'message' => 'Booking Details Fetched', 'booking' => $bookingDetails]);
+            return response()->json([
+                'status' => true,
+                'message' => 'Booking Details Fetched',
+                'booking' => $bookingDetails,
+            ]);
         } catch (\Throwable $th) {
-            Log::error('Failed to Fetch :' . $th->getMessage());
-            return response()->json(['status' => false, 'message' => $th->getMessage()]);
+            Log::error('Failed to Fetch Booking Details: ' . $th->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'Internal Server Error',
+            ], 500);
         }
     }
+
 
     public function updateBiddetails(Request $request)
     {
@@ -662,7 +683,7 @@ class BidderController extends Controller
 
             $bookingSlot->bidding_price = $price;
             $bookingSlot->save();
-            return response()->json(['status' => true, 'message' => 'Details Updated']);
+            return response()->json(['status' => true, 'message' => 'Price Updated']);
         } catch (\Throwable $th) {
             Log::error('Fails to update:' . $th->getMessage());
             return response()->json(['status' => false, 'message' => $th->getMessage()]);
