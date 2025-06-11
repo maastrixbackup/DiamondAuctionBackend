@@ -63,8 +63,8 @@
                                     <!-- KYC Status -->
                                     <td>
                                         <span class="badge rounded-pill
-                                            {{ $seller->kyc_status == 1 ? 'bg-success-subtle text-success-emphasis' :
-                                                ($seller->kyc_status == 2 ? 'bg-danger-subtle text-danger-emphasis' : 'bg-warning-subtle text-warning-emphasis') }}">
+                                            {{ $seller->kyc_status == 1 ? 'px-3 py-2 border border-success bg-success-subtle text-success-emphasis' :
+                                                ($seller->kyc_status == 2 ? 'px-3 py-2 border border-danger bg-danger-subtle text-danger-emphasis' : 'px-3 py-2 border border-warning bg-warning-subtle text-warning-emphasis') }}">
                                             {{ $seller->kyc_status == 1 ? 'Approved' :
                                                 ($seller->kyc_status == 2 ? 'Rejected' : 'Pending') }}
                                         </span>
@@ -73,8 +73,8 @@
                                     <!-- Account Status -->
                                     <td>
                                         <span class="badge rounded-pill
-                                            {{ $seller->account_status == 1 ? 'bg-success-subtle text-success-emphasis' :
-                                                ($seller->account_status == 2 ? 'bg-danger-subtle text-danger-emphasis' : 'bg-warning-subtle text-warning-emphasis') }}">
+                                            {{ $seller->account_status == 1 ? 'px-3 py-2 border border-success bg-success-subtle text-success-emphasis' :
+                                                ($seller->account_status == 2 ? 'px-3 py-2 border border-danger bg-danger-subtle text-danger-emphasis' : 'px-3 py-2 border border-warning bg-warning-subtle text-warning-emphasis') }}">
                                             {{ $seller->account_status == 1 ? 'Active' :
                                                 ($seller->account_status == 2 ? 'Suspended' : 'Pending') }}
                                         </span>
