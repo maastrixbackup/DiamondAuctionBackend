@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Lot;
 use App\Models\Seller;
+use App\Models\SlotBooking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
@@ -192,7 +193,6 @@ class SellerController extends Controller
                 1 => 'Approved',
                 2 => 'Rejected',
             ];
-
             $kycStatus = [
                 0 => 'Pending',
                 1 => 'Approved',
@@ -204,7 +204,6 @@ class SellerController extends Controller
                 1 => 'Active',
                 2 => 'Suspended',
             ];
-
             $dashboardData = [
                 'full_name' => $seller->full_name,
                 'email_address' => $seller->email_address,
@@ -222,6 +221,7 @@ class SellerController extends Controller
                 'proof_of_ownership_status' => $documentStatus[$seller->proof_of_ownership_status],
                 'kyc_status' => $kycStatus[$seller->kyc_status],
                 'account_status' => $accountStatus[$seller->account_status],
+
 
             ];
 
@@ -390,6 +390,31 @@ class SellerController extends Controller
 
     //     return response()->json(['message' => 'Reset token sent to your email.'], 200);
     // }
+
+
+    public function getLotsBidDetails(Request $request)
+    {
+        $sellerId = $request->user()->id;
+        $lots = Lot::where('seller_id', $sellerId)->get();
+
+        if ($lots->count() > 0) {
+            $lots = $lots->map(function ($lot) {
+                return [
+                    'id' => $lot->id,
+                    'lot_name' => $lot->title,
+                    'total_bids' => SlotBooking::where('lot_id', $lot->id)->whereNotNull('bidding_price')->count(),
+                    'highest_bid' => SlotBooking::where('lot_id', $lot->id)
+                        ->whereNotNull('bidding_price')
+                        ->max('bidding_price') ?? 0,
+                    'status' => $lot->status,
+                ];
+            });
+            return response()->json(['status' => true, 'message' => 'Data Fetched', 'data' => $lots]);
+        } else {
+            return response()->json(['status' => false, 'message' => 'Lots Details Not Found']);
+        }
+    }
+
 
     public function sellerLogout(Request $request)
     {

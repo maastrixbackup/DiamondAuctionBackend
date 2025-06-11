@@ -633,6 +633,7 @@ class BidderController extends Controller
             $slotBookings = SlotBooking::whereIn('lot_id', $lotIds)
                 ->where('booking_id', $booking->booking_id)
                 ->where('bidder_id', $bidderId)
+                ->where('status', 1)
                 ->get()
                 ->keyBy('lot_id'); // Map by lot_id
 
@@ -721,6 +722,62 @@ class BidderController extends Controller
             return response()->json(['status' => false, 'message' => $th->getMessage()]);
         }
     }
+
+    public function requestedLots(Request $request)
+    {
+        $bidderId = $request->user()->id;
+        $bidder = Bidder::find($bidderId);
+        $lotIds = is_array($request->requested_lot_ids)
+            ? $request->requested_lot_ids
+            : explode(',', $request->requested_lot_ids);
+
+        $lotIds = array_filter(array_map('trim', $lotIds));
+        $bookingId = $request->booking_id;
+        $bookingNumber = $request->booking_no;
+
+        DB::beginTransaction();
+        try {
+            // Update booking record
+            $booking = Booking::find($bookingId);
+            if (!$booking) {
+                DB::rollBack();
+                return response()->json(['status' => false, 'message' => 'Booking not found']);
+            }
+
+            $booking->update([
+                'requested_lot_id' => $lotIds,
+                'lot_requested_flag' => count($lotIds) >= 6 ? 1 : 0,
+            ]);
+
+
+
+            $insertData = [];
+            foreach ($lotIds as $lotId) {
+                $insertData[] = [
+                    'lot_id' => $lotId,
+                    'booking_id' => $bookingNumber,
+                    'start_time' => $request->time,
+                    'date_for_reservation' => $request->date,
+                    'bidder_id' => $bidder->id,
+                    'bidder_name' => $bidder->full_name,
+                    'room_type' => $request->room_type,
+                    'room_name' => $request->room_name,
+                    'status' => 0,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+
+            SlotBooking::insert($insertData);
+
+            DB::commit();
+            return response()->json(['status' => true, 'message' => 'Request Created Successfully']);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json(['status' => false, 'message' => $th->getMessage()]);
+        }
+    }
+    
     public function bidderLogout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
