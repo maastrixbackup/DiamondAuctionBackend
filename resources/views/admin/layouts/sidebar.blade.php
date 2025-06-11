@@ -33,7 +33,7 @@
         </a>
 
         <a href="{{ route('admin.viewingRequest') }}"
-            class="flex items-center px-4 py-3 hover:bg-[#3B4756] transition rounded-r-full {{ request()->routeIs('admin.viewingRequest') ? 'bg-[#3B4756]' : '' }}">
+            class="flex items-center px-4 py-3 hover:bg-[#3B4756] transition rounded-r-full {{ request()->routeIs(['admin.viewingRequest', 'admin.reschedule-booking']) ? 'bg-[#3B4756]' : '' }}">
             <i class="fa fa-envelope me-2"></i> Viewing Requests
         </a>
         <a href="{{ route('admin.viewing-slots.index') }}"

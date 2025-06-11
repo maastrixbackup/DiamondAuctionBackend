@@ -311,6 +311,7 @@ class LotController extends Controller
         //     ->get();
         $currDate = date('Y-m-d');
         $groupedSlots = SlotBooking::selectRaw('
+                booking_id,
                 bidder_id,
                 MAX(room_name) as room_name,
                 bidder_name,
@@ -320,6 +321,7 @@ class LotController extends Controller
                 MAX(status) as status
             ')
             ->groupBy(
+                'booking_id',
                 'bidder_id',
                 'bidder_name',
                 'room_type',
@@ -334,6 +336,31 @@ class LotController extends Controller
 
         return view('admin.lots.viewSlotRequest', compact('groupedSlots'));
     }
+
+    public function rescheduleBooking(Request $request, $id)
+    {
+        $reqDay = '';
+        $timeFrame = '';
+        $roomIds = [];
+
+        if ($request->filled('day') && $request->filled('time')) {
+            $reqDay = $request->day;
+            $timeFrame = $request->time;
+            $roomIds = Slot::where('slot_status', 1)
+                ->where('date_for_reservation', $request->day)
+                ->where('start_time', $request->time . ':00')
+                ->pluck('room_id')
+                ->unique()
+                ->values()
+                ->toArray();
+        }
+
+        $booking = Booking::where('booking_id', $id)->first();
+        // dd($roomIds);
+        return view('admin.lots.reschedule', compact('booking', 'reqDay', 'timeFrame', 'roomIds'));
+    }
+
+
 
     public function viewingRequestLots(Request $request)
     {

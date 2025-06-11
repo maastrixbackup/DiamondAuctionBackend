@@ -56,6 +56,8 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'site_url' => env('SITE_URL', 'https://maastrixdemo.com/diamond_auction'),
+
     'asset_url' => env('ASSET_URL', '/'),
 
     /*
