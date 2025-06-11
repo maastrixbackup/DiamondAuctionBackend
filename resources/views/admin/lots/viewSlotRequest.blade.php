@@ -188,6 +188,7 @@
         function submitAssignedRoom() {
             const form = document.getElementById('assignRoomForm');
             const formData = new FormData(form);
+            const messageDiv = document.getElementById('successMessage');
 
             fetch("{{ route('admin.assignRoomToSlot') }}", {
                     method: "POST",
@@ -198,16 +199,19 @@
                 })
                 .then(response => response.json())
                 .then(data => {
+                    messageDiv.classList.remove('d-none', 'alert-success', 'alert-danger');
+                    messageDiv.classList.add(data.status ? 'alert-success' : 'alert-danger');
+                    messageDiv.textContent = data.message;
+
                     if (data.status) {
-                        alert("Room assigned successfully!");
-                        window.location.reload();
-                    } else {
-                        alert("Failed to assign room.");
+                        setTimeout(() => window.location.reload(), 1500);
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert("An error occurred while assigning the room.");
+                    messageDiv.classList.remove('d-none', 'alert-success');
+                    messageDiv.classList.add('alert-danger');
+                    messageDiv.textContent = 'An error occurred while assigning the room.';
                 });
         }
     </script>

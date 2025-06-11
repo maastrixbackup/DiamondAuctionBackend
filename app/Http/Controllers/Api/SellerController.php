@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class SellerController extends Controller
 {
@@ -192,7 +193,17 @@ class SellerController extends Controller
                 1 => 'Approved',
                 2 => 'Rejected',
             ];
+            $kycStatus = [
+                0 => 'Pending',
+                1 => 'Approved',
+                2 => 'Rejected',
+            ];
 
+            $accountStatus = [
+                0 => 'Pending',
+                1 => 'Active',
+                2 => 'Suspended',
+            ];
             $dashboardData = [
                 'full_name' => $seller->full_name,
                 'email_address' => $seller->email_address,
@@ -208,6 +219,9 @@ class SellerController extends Controller
                 'passport_copy_status' => $documentStatus[$seller->passport_copy_status],
                 'proof_of_ownership' => $docUrl($seller->proof_of_ownership),
                 'proof_of_ownership_status' => $documentStatus[$seller->proof_of_ownership_status],
+                'kyc_status' => $kycStatus[$seller->kyc_status],
+                'account_status' => $accountStatus[$seller->account_status],
+
 
             ];
 
@@ -226,6 +240,7 @@ class SellerController extends Controller
             ], 500);
         }
     }
+
 
     public function reuploadSellerDocument(Request $request)
     {
@@ -350,6 +365,32 @@ class SellerController extends Controller
         ]);
     }
 
+    // public function forgotPassword(Request $request)
+    // {
+    //     $request->validate([
+    //         'email' => 'required|email|exists:sellers,email_address',
+    //     ]);
+
+    //     $token = Str::random(64);
+    //     $email = $request->email;
+
+    //     DB::table('password_resets')->updateOrInsert(
+    //         ['email' => $email],
+    //         [
+    //             'token' => Hash::make($token),
+    //             'created_at' => now()
+    //         ]
+    //     );
+
+    //     // Send email
+    //     Mail::raw("Use this token to reset your password: $token", function ($message) use ($email) {
+    //         $message->to($email)
+    //             ->subject('Seller Password Reset');
+    //     });
+
+    //     return response()->json(['message' => 'Reset token sent to your email.'], 200);
+    // }
+
 
     public function getLotsBidDetails(Request $request)
     {
@@ -373,6 +414,7 @@ class SellerController extends Controller
             return response()->json(['status' => false, 'message' => 'Lots Details Not Found']);
         }
     }
+
 
     public function sellerLogout(Request $request)
     {
