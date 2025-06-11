@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class BidderController extends Controller
 {
@@ -781,6 +783,116 @@ class BidderController extends Controller
             return response()->json(['status' => false, 'message' => $th->getMessage()]);
         }
     }
+
+
+    public function forgotPassword(Request $request)
+    {
+        $email = $request->email;
+
+        if (!$email) {
+            return response()->json(['status' => false, 'message' => 'The email is required']);
+        }
+
+        // Check if seller exists
+        $sellerExists = DB::table('bidders')
+            ->where('email_address', $email)
+            ->exists();
+
+        if (!$sellerExists) {
+            return response()->json(['status' => false, 'message' => 'Email not found'], 404);
+        }
+
+        $token = Str::random(64);
+
+        try {
+            DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+            DB::table('password_reset_tokens')->updateOrInsert(
+                ['email' => $email],
+                [
+                    'token' => Hash::make($token),
+                    'created_at' => now()
+                ]
+            );
+
+            // Build reset URL (optional)
+            $resetUrl = config('app.site_url') . "/bidder/reset-password?token=$token&email=$email";
+
+            // Send email
+            Mail::raw("Click here to reset your password: $resetUrl", function ($message) use ($email) {
+                $message->to($email)
+                    ->subject('Reset Your Bidder Account Password');
+            });
+
+            return response()->json(['status' => true, 'message' => 'Reset token sent to your email.'], 200);
+        } catch (\Throwable $th) {
+            return response()->json(['status' => false, 'message' => $th->getMessage()]);
+        }
+    }
+
+    public function resetPassword(Request $request)
+    {
+        if (!$request->input('email')) {
+            return response()->json(['status' => false, 'message' => 'The email is required']);
+        }
+
+        if (!$request->input('token')) {
+            return response()->json(['status' => false, 'message' => 'The token is required']);
+        }
+
+        if (!$request->input('password')) {
+            return response()->json(['status' => false, 'message' => 'The password is required']);
+        }
+
+        if (strlen($request->input('password')) < 6) {
+            return response()->json(['status' => false, 'message' => 'The password must be at least 6 characters']);
+        }
+
+        $record = DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->first();
+
+        if (!$record) {
+            return response()->json(['status' => false, 'message' => 'Invalid reset request.'], 404);
+        }
+
+        // Check token expiry
+        $tokenLifetime = 60; // minutes
+        if (Carbon::parse($record->created_at)->addMinutes($tokenLifetime)->isPast()) {
+            Log::warning('Password reset token expired', [
+                'email' => $request->email,
+                'expired_at' => $record->created_at,
+                'current_time' => now(),
+            ]);
+
+            DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+            return response()->json(['status' => false, 'message' => 'Reset token has expired.'], 403);
+        }
+
+        // Token invalid
+        if (!Hash::check($request->token, $record->token)) {
+            Log::notice('Invalid password reset token attempt', [
+                'email' => $request->email,
+                'attempted_token' => $request->token,
+                'created_at' => $record->created_at,
+            ]);
+
+            DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+            return response()->json(['status' => false, 'message' => 'Invalid token.'], 403);
+        }
+
+        // Update password
+        Bidder::where('email_address', $request->email)
+            ->update(['password' => Hash::make($request->password)]);
+
+        // Cleanup
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+        return response()->json(['status' => true, 'message' => 'Password reset successful.'], 200);
+    }
+
 
     public function bidderLogout(Request $request)
     {

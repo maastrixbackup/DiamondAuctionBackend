@@ -21,11 +21,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-
-Route::post('/createSeller', [SellerController::class, 'createSeller']);
+// Bidder
 Route::post('/createBidder', [BidderController::class, 'createBidder']);
-Route::post('/sellerlogin', [SellerController::class, 'sellerLogin']);
 Route::post('/bidderlogin', [BidderController::class, 'bidderLogin']);
+Route::post('/bidder-password-reset', [BidderController::class, 'forgotPassword']);
+Route::post('/bidder-reset-password', [BidderController::class, 'resetPassword']);
+
+// Seller
+Route::post('/createSeller', [SellerController::class, 'createSeller']);
+Route::post('/sellerlogin', [SellerController::class, 'sellerLogin']);
+Route::post('/seller-password-reset', [SellerController::class, 'forgotPassword']);
+Route::post('/seller-reset-password', [SellerController::class, 'resetPassword']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
