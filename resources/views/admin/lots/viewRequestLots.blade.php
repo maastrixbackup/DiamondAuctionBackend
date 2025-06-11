@@ -8,26 +8,58 @@
         <input type="hidden" name="start_time" value="{{ $startTime }}">
         <input type="hidden" name="date" value="{{ $date }}">
 
-        <div class="mb-3 d-flex">
-            @foreach ($rooms as $room)
-                <div class="form-check">
+        {{-- <div class="mb-3 d-flex"> --}}
+        {{-- @foreach ($rooms as $room) --}}
+        {{-- <div class="form-check">
                     <input class="form-check-input" type="radio" name="rooms[]" value="{{ $room->id }}"
                         id="room_{{ $room->id }}" {{ $room->is_available ? '' : 'disabled' }}
                         onclick="toggleMeetingLink()">
                     <label class="form-check-label" for="room_{{ $room->id }}">
                         {{ $room->room_name }} - {{ $room->is_available ? 'Available' : 'Unavailable' }}
                     </label>
-                </div>
-            @endforeach
-        </div>
-        @if ($roomType === 'Virtual' && $room->is_available)
-            {{-- Initially hidden; only shown when a virtual room is selected --}}
-            <div id="meetingLinkContainer" class="mt-2 d-none">
+                </div> --}}
+        {{-- @endforeach --}}
+        {{-- </div> --}}
+        {{-- @if ($roomType === 'Virtual' && $room->is_available) --}}
+        {{-- Initially hidden; only shown when a virtual room is selected --}}
+        {{-- <div id="meetingLinkContainer" class="mt-2 d-none">
                 <label for="meeting_link" class="form-label">Meeting Link :</label>
                 <input type="url" name="meeting_link" id="meeting_link" class="form-control"
                     placeholder="https://example.com/meeting-link" required>
-            </div>
-        @endif
+            </div> --}}
+        {{-- @endif --}}
+
+        <div class="mb-3 d-flex flex-wrap">
+            @foreach ($rooms as $room)
+                @php
+                    $disabled = $room->room_type !== $roomType || !$room->is_available;
+                @endphp
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="rooms[]" value="{{ $room->id }}"
+                        id="room_{{ $room->id }}" {{ $disabled ? 'disabled' : '' }}
+                        data-is-virtual="{{ $room->room_type === 'Virtual' ? '1' : '0' }}"
+                        onclick="toggleMeetingLink(this)" required>
+                    <label class="form-check-label text-sm" for="room_{{ $room->id }}">
+                        {{ $room->room_name }}
+                        <br>
+                        (@if ($disabled && $room->room_type !== $roomType)
+                            Disabled
+                        @else
+                            {{ $room->is_available ? 'Available' : 'Unavailable' }}
+                        @endif)
+                    </label>
+                </div>
+            @endforeach
+        </div>
+
+        {{-- meeting‑link field --}}
+        <div id="meetingLinkContainer" class="mt-2 d-none">
+            <label for="meeting_link" class="form-label">Meeting Link :</label>
+            <input type="url" name="meeting_link" id="meeting_link" class="form-control"
+                placeholder="https://example.com/meeting-link">
+        </div>
+
         <div class="text-start">
             <button type="submit" class="btn btn-primary mb-2 mt-2">Assign Room</button>
         </div>

@@ -10,7 +10,9 @@ class AdminController extends Controller
 {
     public function adminList(Request $request)
     {
-        $admins = Admin::where('role', 'admin')->get();
+        $admins = Admin::where('role', 'admin')
+            ->orderBy('id', 'desc')
+            ->get();
         return view('admin.admin.admin_list', compact('admins'));
     }
 

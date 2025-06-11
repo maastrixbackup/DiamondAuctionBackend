@@ -14,7 +14,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::latest()->get();
+        $categories = Category::orderBy('id', 'desc')->get();
         return view('admin.category.list', compact('categories'));
     }
 
@@ -101,7 +101,7 @@ class CategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        try{
+        try {
             $category = Category::FindorFail($id);
             $category->delete();
 

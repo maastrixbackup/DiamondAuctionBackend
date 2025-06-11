@@ -79,9 +79,9 @@
                                             <button name="status" value="2" class="btn btn-sm btn-danger">Reject</button>
                                         </form>
                                     @elseif ($bidder->$statusField === 1)
-                                        <span class="badge bg-success ms-2">Approved</span>
+                                        <span class="badge bg-success ms-2 px-3 py-2">Approved</span>
                                     @elseif ($bidder->$statusField === 2)
-                                        <span class="badge bg-danger ms-2">Rejected</span>
+                                        <span class="badge bg-danger ms-2 px-3 py-2">Rejected</span>
                                     @endif
                                 @else
                                     <span class="text-muted">Not uploaded</span>
@@ -118,9 +118,9 @@
                                             <button name="status" value="2" class="btn btn-sm btn-danger">Reject</button>
                                         </form>
                                     @elseif ($bidder->$statusField === 1)
-                                        <span class="badge bg-success ms-2">Approved</span>
+                                        <span class="badge bg-success ms-2 px-3 py-2">Approved</span>
                                     @elseif ($bidder->$statusField === 2)
-                                        <span class="badge bg-danger ms-2">Rejected</span>
+                                        <span class="badge bg-danger ms-2 px-3 py-2">Rejected</span>
                                     @endif
                                 @else
                                     <span class="text-muted">Not uploaded</span>
@@ -135,8 +135,8 @@
                     <th>KYC Status</th>
                     <td>
                         <span class="badge
-                            {{ $bidder->kyc_status == 1 ? 'bg-success' :
-                               ($bidder->kyc_status == 2 ? 'bg-danger' : 'bg-warning') }}">
+                            {{ $bidder->kyc_status == 1 ? 'bg-success px-3 py-2' :
+                               ($bidder->kyc_status == 2 ? 'bg-danger px-3 py-2' : 'bg-warning px-3 py-2') }}">
                             {{ $bidder->kyc_status == 1 ? 'Approved' :
                                ($bidder->kyc_status == 2 ? 'Rejected' : 'Pending') }}
                         </span>
@@ -146,8 +146,8 @@
                     <th>Account Status</th>
                     <td>
                         <span class="badge
-                            {{ $bidder->account_status == 1 ? 'bg-success' :
-                               ($bidder->account_status == 2 ? 'bg-danger' : 'bg-warning') }} me-3">
+                            {{ $bidder->account_status == 1 ? 'bg-success px-3 py-2' :
+                               ($bidder->account_status == 2 ? 'bg-danger px-3 py-2' : 'bg-warning px-3 py-2') }} me-3">
                             {{ $bidder->account_status == 1 ? 'Active' :
                                ($bidder->account_status == 2 ? 'Suspended' : 'Pending') }}
                         </span>

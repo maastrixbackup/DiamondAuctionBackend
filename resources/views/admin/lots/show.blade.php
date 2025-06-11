@@ -204,7 +204,7 @@
                         thumbnailUrl = hqUrl;
                     }
                     previewContainer.innerHTML = `
-                        <img src="${thumbnailUrl}" alt="YouTube Preview" style="width: 200px; cursor: pointer;" onclick="playVideo('${videoId}')">
+                        <img src="${thumbnailUrl}" alt="YouTube Preview" style="width: 475px; cursor: pointer;" onclick="playVideo('${videoId}')" title="Click to play video">
                     `;
                 });
             });

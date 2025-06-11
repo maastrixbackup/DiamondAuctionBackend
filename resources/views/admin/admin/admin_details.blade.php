@@ -42,7 +42,7 @@
                             </tr>
                             <tr>
                                 <th>Role</th>
-                                <td><span class="badge bg-info">{{ ucfirst($admin->role) }}</span></td>
+                                <td><span class="badge bg-info px-3 py-2">{{ ucfirst($admin->role) }}</span></td>
                             </tr>
                             <tr>
                                 <th>Created At</th>

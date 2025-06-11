@@ -196,17 +196,19 @@ class BidderController extends Controller
                 1 => 'Approved',
                 2 => 'Rejected',
             ];
-
             $kycStatus = [
                 0 => 'Pending',
                 1 => 'Approved',
                 2 => 'Rejected',
             ];
-
             $accountStatus = [
                 0 => 'Pending',
                 1 => 'Active',
                 2 => 'Suspended',
+            ];
+            $typeStatus = [
+                1 => 'Company',
+                2 => 'Individual',
             ];
 
             $dashboardData = [
@@ -226,6 +228,8 @@ class BidderController extends Controller
                 'proof_of_address_status' => $documentStatus[$bidder->proof_of_address_status],
                 'kyc_status' => $kycStatus[$bidder->kyc_status],
                 'account_status' => $accountStatus[$bidder->account_status],
+                'type' => $bidder->type,
+                'type_name' => $typeStatus[$bidder->type],
             ];
 
             return response()->json([
@@ -777,7 +781,7 @@ class BidderController extends Controller
             return response()->json(['status' => false, 'message' => $th->getMessage()]);
         }
     }
-    
+
     public function bidderLogout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
