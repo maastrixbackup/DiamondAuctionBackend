@@ -62,16 +62,25 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
-                                                onclick="viewLots(
+                                            <div class="btn-group">
+                                                <button
+                                                    class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
+                                                    onclick="viewLots(
                                                     '{{ $slot->bidder_id }}',
                                                     '{{ $slot->room_type }}',
                                                     '{{ $slot->start_time }}',
                                                     '{{ $slot->date_for_reservation }}'
                                                 )">
-                                                <i class="icon-eye"></i>
-                                                <span>View</span>
-                                            </button>
+                                                    <i class="icon-eye"></i>
+                                                    <span>View</span>
+                                                </button>
+                                                <a href="{{ route('admin.reschedule-booking', $slot->booking_id) }}"
+                                                    class="btn btn-sm btn-outline-success d-flex align-items-center gap-1">
+                                                    <i class="fa fa-repeat"></i>
+
+                                                    <span>Reschedule</span>
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 @empty

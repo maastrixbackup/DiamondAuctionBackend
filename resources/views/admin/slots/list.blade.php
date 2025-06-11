@@ -93,7 +93,8 @@
                                             <th>Timing</th>
                                             @foreach ($days as $dayObj)
                                                 @if (empty($reqDay) || $reqDay == $dayObj['date'])
-                                                    <th>{{ $dayObj['name'] }}</th>
+                                                    <th>{{ $dayObj['name'] }} -
+                                                        {{ \Carbon\Carbon::parse($dayObj['date'])->format('d-m-Y') }}</th>
                                                 @endif
                                             @endforeach
                                         </tr>
@@ -146,18 +147,28 @@
                                                                                         ? 'bg-[#f8d7da]' // light red
                                                                                         : 'bg-[#ebf1f5]');
                                                                         }
+
+                                                                        if ($rk == 6) {
+                                                                            $brdr = 'border:1px dashed #f00';
+                                                                            $bgClass = 'bg-[#f8d7da]';
+                                                                        } else {
+                                                                            $brdr = 'border:1px dashed #d0d5d9';
+                                                                            $bgClass = 'bg-[#ebf1f5]';
+                                                                        }
                                                                     @endphp
 
                                                                     @if (empty($roomName) || $roomName == $room)
                                                                         <div
-                                                                            class="col card m-1"@if ($booking) style="min-width: 80px; height:90px;" @else style="width: 30px; height:90px; border:1px dashed #d0d5d9" @endif>
-                                                                            <div class="card-body p-1 text-center {{ $bgClass }}"
+                                                                            class="col card m-1"@if ($booking) style="min-width: 80px; height:90px;" @else style="width: 30px; height:90px; {{ $brdr }}" @endif>
+                                                                            <div class="card-body p-1 text-center {{ $bgClass }} text-sm"
                                                                                 style="color:#065f46;">
                                                                                 @if ($booking)
-                                                                                    {{ $booking->bidder_name }}<br>
+                                                                                    {{ $booking->bidder_name }}<br />
 
                                                                                     Lot:
                                                                                     {{ implode(', ', $booking->lot_ids) }}
+                                                                                    <br />
+                                                                                    (R-{{ $rk + 1 }})
                                                                                 @endif
 
                                                                             </div>
