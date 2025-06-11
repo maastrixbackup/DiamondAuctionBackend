@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
+
 class SellerController extends Controller
 {
     public function createSeller(Request $request)
@@ -193,6 +194,7 @@ class SellerController extends Controller
                 1 => 'Approved',
                 2 => 'Rejected',
             ];
+
             $kycStatus = [
                 0 => 'Pending',
                 1 => 'Approved',
@@ -204,6 +206,7 @@ class SellerController extends Controller
                 1 => 'Active',
                 2 => 'Suspended',
             ];
+
             $dashboardData = [
                 'full_name' => $seller->full_name,
                 'email_address' => $seller->email_address,
@@ -219,8 +222,10 @@ class SellerController extends Controller
                 'passport_copy_status' => $documentStatus[$seller->passport_copy_status],
                 'proof_of_ownership' => $docUrl($seller->proof_of_ownership),
                 'proof_of_ownership_status' => $documentStatus[$seller->proof_of_ownership_status],
+
                 'kyc_status' => $kycStatus[$seller->kyc_status],
                 'account_status' => $accountStatus[$seller->account_status],
+
 
 
             ];
@@ -365,6 +370,7 @@ class SellerController extends Controller
         ]);
     }
 
+
     // public function forgotPassword(Request $request)
     // {
     //     $request->validate([
@@ -390,6 +396,7 @@ class SellerController extends Controller
 
     //     return response()->json(['message' => 'Reset token sent to your email.'], 200);
     // }
+
 
 
     public function getLotsBidDetails(Request $request)
