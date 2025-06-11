@@ -216,10 +216,10 @@
                                     <thead class="table-light align-middle">
                                         <tr>
                                             <th>SL</th>
-                                            <th>Seller</th>
                                             <th>Title</th>
                                             <th>Type</th>
                                             <th>Weight</th>
+                                            <th>Seller</th>
                                             <th>Status</th>
                                             <th>Action</th>
                                         </tr>
@@ -228,10 +228,10 @@
                                         @foreach ($lots as $lot)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $lot->seller ? $lot->seller->full_name : 'N/A' }}</td>
                                                 <td>{{ $lot->title }}</td>
                                                 <td>{{ $lot->type }}</td>
                                                 <td>{{ $lot->weight }}</td>
+                                                <td>{{ $lot->seller ? $lot->seller->full_name : 'N/A' }}</td>
                                                 <td>
                                                     @if ($lot->status == 0)
                                                         <span
@@ -305,10 +305,11 @@
             var table = $('#lotsTable').DataTable({
                 lengthChange: false,
                 searching: false,
-                'columnDefs': [{
-                    'targets': [4], // column index (start from 0)
-                    'orderable': false, // set orderable false for selected columns
-                }]
+                ordering: false
+                // 'columnDefs': [{
+                //     'targets': [4], // column index (start from 0)
+                //     'orderable': false, // set orderable false for selected columns
+                // }]
             });
         });
     </script>

@@ -40,7 +40,7 @@ class LotController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
-        $lots = $query->latest()->get();
+        $lots = $query->orderBy('id', 'desc')->get();
         $categories = Category::orderBy('name')->get();
 
         return view('admin.lots.list', compact('lots', 'categories'));
@@ -407,6 +407,7 @@ class LotController extends Controller
         // Update Slot table status
         Slot::where('start_time', $request->start_time)
             ->where('date_for_reservation', $request->date)
+            ->where('room_id', $roomId)
             ->update([
                 'slot_status' => 2, // 2 = reserved
             ]);
