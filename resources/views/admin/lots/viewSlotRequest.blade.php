@@ -105,7 +105,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="lotsModalLabel">Lots for Slot</h5>
+                    <h5 class="modal-title" id="lotsModalLabel">Requested Room Type - <span id="roomTypeLabel"></span></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="lotsModalBody">
@@ -128,6 +128,8 @@
 
             const fullUrl = "{{ url('/admin/viewingRequestLots') }}" + '?' + params.toString();
 
+            document.getElementById('roomTypeLabel').textContent = roomType;
+
             fetch(fullUrl)
                 .then(response => response.text())
                 .then(data => {
@@ -139,60 +141,6 @@
                     console.error(error);
                 });
         };
-
-        // function submitLotStatuses() {
-        //     const form = document.getElementById('updateSlotForm');
-        //     const formData = new FormData(form);
-
-        //     fetch("{{ route('admin.updateLotsStatus') }}", {
-        //             method: "POST",
-        //             headers: {
-        //                 'X-CSRF-TOKEN': "{{ csrf_token() }}"
-        //             },
-        //             body: formData
-        //         })
-        //         .then(response => response.json())
-        //         .then(data => {
-        //             if (data.success) {
-        //                 const selects = form.querySelectorAll('select[name^="lot_status"]');
-        //                 selects.forEach(select => {
-        //                     const lotIdMatch = select.name.match(/lot_status\[(\d+)\]/);
-        //                     if (!lotIdMatch) return;
-
-        //                     const lotId = lotIdMatch[1];
-        //                     const status = select.value;
-
-        //                     const row = document.getElementById(`lot-row-${lotId}`);
-        //                     if (!row) return;
-
-        //                     const statusCell = row.children[6];
-        //                     const actionCell = row.children[7];
-
-        //                     if (status == 1) {
-        //                         statusCell.innerHTML = '<span class="badge bg-success">Approved</span>';
-        //                     } else if (status == 2) {
-        //                         statusCell.innerHTML = '<span class="badge bg-danger">Rejected</span>';
-        //                     }
-
-        //                     actionCell.innerHTML = '<span class="text-muted"></span>';
-        //                 });
-
-        //                 const messageDiv = document.getElementById('successMessage');
-        //                 messageDiv.textContent = "Lots updated successfully!";
-        //                 messageDiv.classList.remove('d-none');
-
-        //                 setTimeout(() => {
-        //                     window.location.href = "{{ route('admin.viewingRequest') }}";
-        //                 }, 1000);
-        //             } else {
-        //                 alert("Something went wrong.");
-        //             }
-        //         })
-        //         .catch(error => {
-        //             console.error('Error:', error);
-        //             alert("An error occurred.");
-        //         });
-        // }
 
         function submitAssignedRoom() {
             const form = document.getElementById('assignRoomForm');
@@ -225,9 +173,21 @@
         }
     </script>
     <script>
-        function toggleMeetingLink() {
-            const container = document.getElementById('meetingLinkContainer');
-            container.classList.remove('d-none');
+        // function toggleMeetingLink() {
+        //     const container = document.getElementById('meetingLinkContainer');
+        //     container.classList.remove('d-none');
+        // }
+
+        function toggleMeetingLink(radio) {
+            const isVirtualRoom = radio.dataset.isVirtual === '1';
+            const box = document.getElementById('meetingLinkContainer');
+            if (isVirtualRoom && !radio.disabled) {
+                box.classList.remove('d-none');
+                box.querySelector('input').required = true;
+            } else {
+                box.classList.add('d-none');
+                box.querySelector('input').required = false;
+            }
         }
     </script>
     <script>

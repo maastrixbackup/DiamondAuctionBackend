@@ -332,10 +332,43 @@ class LotController extends Controller
             ->orderBy('date_for_reservation', 'desc')
             ->get();
 
-
-
         return view('admin.lots.viewSlotRequest', compact('groupedSlots'));
     }
+
+
+    // public function viewingRequestLots(Request $request)
+    // {
+    //     $bidderId = $request->bidder_id;
+    //     $roomType = $request->room_type;
+    //     $startTime = $request->start_time;
+    //     $date = $request->date;
+
+    //     $roomIds = Room::where('room_type', $roomType)->pluck('id');
+    //     $rooms = Room::whereIn('id', $roomIds)->get();
+
+    //     $bookedRoomIds = Slot::whereIn('room_id', $roomIds)
+    //         ->where('date_for_reservation', $date)
+    //         ->where('start_time', $startTime)
+    //         ->where('slot_status', 2)
+    //         ->pluck('room_id')
+    //         ->toArray();
+    //     foreach ($rooms as $room) {
+    //         $room->is_available = !in_array($room->id, $bookedRoomIds);
+    //     }
+
+    //     $lots = SlotBooking::where('bidder_id', $request->bidder_id)
+    //         ->where('room_type', $request->room_type)
+    //         ->where('start_time', $request->start_time)
+    //         ->where('date_for_reservation', $request->date)
+    //         ->get();
+
+    //     $isRoomAlreadyAssigned = $lots->contains(function ($lot) {
+    //         return !empty($lot->room_name);
+    //     });
+
+    //     // return view('admin.lots.viewRequestLots', compact('rooms', 'startTime', 'date'));
+    //     return view('admin.lots.viewRequestLots', compact('rooms', 'startTime', 'date', 'roomType', 'lots', 'isRoomAlreadyAssigned'));
+    // }
 
     public function rescheduleBooking(Request $request, $id)
     {
@@ -362,38 +395,44 @@ class LotController extends Controller
 
 
 
+
     public function viewingRequestLots(Request $request)
     {
-        $bidderId = $request->bidder_id;
-        $roomType = $request->room_type;
+        $roomType  = $request->room_type;
         $startTime = $request->start_time;
-        $date = $request->date;
+        $date      = $request->date;
 
-        $roomIds = Room::where('room_type', $roomType)->pluck('id');
-        $rooms = Room::whereIn('id', $roomIds)->get();
+        $rooms = Room::all();
 
-        $bookedRoomIds = Slot::whereIn('room_id', $roomIds)
+        $sameTypeRoomIds = $rooms->where('room_type', $roomType)->pluck('id');
+
+        $bookedRoomIds = Slot::whereIn('room_id', $sameTypeRoomIds)
             ->where('date_for_reservation', $date)
             ->where('start_time', $startTime)
-            ->where('slot_status', 2)
+            ->where('slot_status', 2)          // 2 = reserved
             ->pluck('room_id')
             ->toArray();
+
         foreach ($rooms as $room) {
-            $room->is_available = !in_array($room->id, $bookedRoomIds);
+            if ($room->room_type === $roomType) {
+                $room->is_available = !in_array($room->id, $bookedRoomIds);
+            } else {
+                $room->is_available = false;
+            }
         }
 
         $lots = SlotBooking::where('bidder_id', $request->bidder_id)
-            ->where('room_type', $request->room_type)
-            ->where('start_time', $request->start_time)
-            ->where('date_for_reservation', $request->date)
+            ->where('room_type', $roomType)
+            ->where('start_time', $startTime)
+            ->where('date_for_reservation', $date)
             ->get();
 
-        $isRoomAlreadyAssigned = $lots->contains(function ($lot) {
-            return !empty($lot->room_name);
-        });
+        $isRoomAlreadyAssigned = $lots->contains(fn($lot) => !empty($lot->room_name));
 
-        // return view('admin.lots.viewRequestLots', compact('rooms', 'startTime', 'date'));
-        return view('admin.lots.viewRequestLots', compact('rooms', 'startTime', 'date', 'roomType', 'lots', 'isRoomAlreadyAssigned'));
+        return view(
+            'admin.lots.viewRequestLots',
+            compact('rooms', 'startTime', 'date', 'roomType', 'lots', 'isRoomAlreadyAssigned')
+        );
     }
 
     public function assignRoomToSlot(Request $request)

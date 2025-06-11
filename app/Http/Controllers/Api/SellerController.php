@@ -199,17 +199,19 @@ class SellerController extends Controller
                 1 => 'Approved',
                 2 => 'Rejected',
             ];
-
             $kycStatus = [
                 0 => 'Pending',
                 1 => 'Approved',
                 2 => 'Rejected',
             ];
-
             $accountStatus = [
                 0 => 'Pending',
                 1 => 'Active',
                 2 => 'Suspended',
+            ];
+            $typeStatus = [
+                1 => 'Company',
+                2 => 'Individual',
             ];
 
             $dashboardData = [
@@ -227,12 +229,10 @@ class SellerController extends Controller
                 'passport_copy_status' => $documentStatus[$seller->passport_copy_status],
                 'proof_of_ownership' => $docUrl($seller->proof_of_ownership),
                 'proof_of_ownership_status' => $documentStatus[$seller->proof_of_ownership_status],
-
                 'kyc_status' => $kycStatus[$seller->kyc_status],
                 'account_status' => $accountStatus[$seller->account_status],
-
-
-
+                'type' => $seller->type,
+                'type_name' => $typeStatus[$seller->type],
             ];
 
             return response()->json([
