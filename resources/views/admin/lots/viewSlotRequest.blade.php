@@ -28,6 +28,16 @@
                     <h4 class="card-title mb-0">Viewing Requests</h4>
                 </div>
 
+                @if (session('success'))
+                    <div class="alert alert-success m-4" id="success-alert">
+                        {{ session('success') }}
+                    </div>
+                @endif
+                @if (session('error'))
+                    <div class="alert alert-danger m-4" id="success-alert">
+                        {{ session('error') }}
+                    </div>
+                @endif
                 <div class="card-body px-4">
                     <div class="table-responsive">
                         <table id="viewingRequestTable" class="table table-striped table-hover align-middle">
@@ -40,14 +50,20 @@
                                     <th>Date</th>
                                     <th>Start Time</th>
                                     <th>Status</th>
+                                    <th>Flagged</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($groupedSlots as $index => $slot)
+                                    @php
+                                        $booking = \App\Models\Booking::where('booking_id', $slot->booking_id)->first();
+                                    @endphp
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
-                                        <td>{{ $slot->bidder_name }}</td>
+                                        <td>
+                                            {{ $slot->bidder_name }}
+                                        </td>
                                         <td>{{ $slot->room_name ?? 'N/A' }}</td>
                                         <td>{{ $slot->room_type }}</td>
                                         <td>{{ $slot->date_for_reservation }}</td>
@@ -60,9 +76,25 @@
                                             @else
                                                 <span class="badge bg-danger">Rejected</span>
                                             @endif
+
+                                        </td>
+                                        <td class="text-center">
+                                            @if ($booking->lot_booking_flag === 1)
+                                                <i class= "fa fa-exclamation-triangle text-danger "></i>
+                                            @else
+                                                <i class="fa fa-check-circle" style="color: #b1dfbb;"></i>
+                                            @endif
                                         </td>
                                         <td>
                                             <div class="btn-group">
+                                                @php
+                                                    if ($slot->status === 2) {
+                                                        $dsbl = 'disabled';
+                                                    } else {
+                                                        $dsbl = '';
+                                                    }
+                                                @endphp
+
                                                 <button
                                                     class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
                                                     onclick="viewLots(
@@ -75,11 +107,18 @@
                                                     <span>View</span>
                                                 </button>
                                                 <a href="{{ route('admin.reschedule-booking', $slot->booking_id) }}"
-                                                    class="btn btn-sm btn-outline-success d-flex align-items-center gap-1">
+                                                    class="btn btn-sm btn-outline-success d-flex align-items-center gap-1 {{ $dsbl }}">
                                                     <i class="fa fa-repeat"></i>
 
                                                     <span>Reschedule</span>
                                                 </a>
+                                                <a href="{{ route('admin.cancel-booking', $slot->booking_id) }}"
+                                                    class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 {{ $dsbl }}"
+                                                    onclick="return confirm('Are you sure you want to cancel this bid?')">
+                                                    <i class="fa fa-ban"></i>
+                                                    <span>Cancel</span>
+                                                </a>
+
                                             </div>
                                         </td>
                                     </tr>
@@ -118,6 +157,46 @@
 @endsection
 @push('scripts')
     <script>
+        const cancelBid = async (bookingId, bidderId, roomType, roomName, startTime, date) => {
+            const confirmed = confirm("Are you sure you want to cancel this bid?");
+            if (!confirmed) return;
+
+            const params = {
+                booking_id: bookingId,
+                bidder_id: bidderId,
+                room_name: roomName,
+                room_type: roomType,
+                start_time: startTime,
+                date: date
+            };
+
+            console.log("Cancel Bid Params:", params);
+            return false;
+
+            try {
+                const response = await fetch('/api/cancel-bid', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify(params)
+                });
+
+                const result = await response.json();
+
+                if (result.status) {
+                    alert("Bid cancelled successfully.");
+                    location.reload(); // or update UI accordingly
+                } else {
+                    alert("Failed to cancel bid: " + result.message);
+                }
+            } catch (error) {
+                console.error("Error cancelling bid:", error);
+                alert("Something went wrong. Please try again.");
+            }
+        };
+
         const viewLots = (bidderId, roomType, startTime, date) => {
             const params = new URLSearchParams({
                 bidder_id: bidderId,

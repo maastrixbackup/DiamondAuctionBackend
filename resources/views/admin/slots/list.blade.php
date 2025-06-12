@@ -160,13 +160,27 @@
                                                                     @if (empty($roomName) || $roomName == $room)
                                                                         <div
                                                                             class="col card m-1"@if ($booking) style="min-width: 80px; height:90px;" @else style="width: 30px; height:90px; {{ $brdr }}" @endif>
-                                                                            <div class="card-body p-1 text-center {{ $bgClass }} text-sm"
-                                                                                style="color:#065f46;">
+                                                                            <div class="card-body p-0 text-center {{ $bgClass }} text-sm"
+                                                                                style="color:#065f46; line-height:17px;"@if ($booking) title="Lot: {{ implode(', ', $booking->lot_ids) }}" @endif>
                                                                                 @if ($booking)
                                                                                     {{ $booking->bidder_name }}<br />
 
-                                                                                    Lot:
-                                                                                    {{ implode(', ', $booking->lot_ids) }}
+                                                                                    @php
+                                                                                        $lotIds = $booking->lot_ids; // Assuming this is an array
+                                                                                        $visibleLots = array_slice(
+                                                                                            $lotIds,
+                                                                                            0,
+                                                                                            2,
+                                                                                        );
+                                                                                        $remainingCount =
+                                                                                            count($lotIds) -
+                                                                                            count($visibleLots);
+                                                                                    @endphp
+
+                                                                                    Lot: {{ implode(', ', $visibleLots) }}
+                                                                                    @if ($remainingCount > 0)
+                                                                                        +{{ $remainingCount }} more
+                                                                                    @endif
                                                                                     <br />
                                                                                     (R-{{ $rk + 1 }})
                                                                                 @endif

@@ -110,7 +110,9 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <form action="" method="post" id="reAssignRoomForm">
+                                            <form action="{{ route('admin.re-assign-room', $booking->id) }}" method="post"
+                                                id="reAssignRoomForm">
+                                                @csrf
                                                 <tr>
                                                     @if (!empty($timeFrame))
                                                         <td>

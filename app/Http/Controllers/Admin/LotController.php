@@ -13,6 +13,7 @@ use App\Models\SlotBooking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class LotController extends Controller
 {
@@ -392,6 +393,101 @@ class LotController extends Controller
         // dd($roomIds);
         return view('admin.lots.reschedule', compact('booking', 'reqDay', 'timeFrame', 'roomIds'));
     }
+
+    public function reAssignRoom(Request $request, $id)
+    {
+        $newDate = $request->re_date;
+        $newTime = $request->re_time;
+        $newRoom = $request->room;
+
+        DB::beginTransaction();
+        try {
+            $booking = Booking::findOrFail($id);
+
+            // Fetch the previous room
+            $previousRoom = Room::where('room_name', $booking->room_name)->first();
+            if (!$previousRoom) {
+                throw new \Exception("Previous room not found.");
+            }
+
+            // Mark previous slot as available
+            Slot::where('start_time', $booking->start_time)
+                ->where('date_for_reservation', $booking->date_for_reservation)
+                ->where('room_id', $previousRoom->id)
+                ->update(['slot_status' => 1]);
+
+            // Update booking with new values
+            $booking->room_name = $newRoom;
+            $booking->start_time = $newTime;
+            $booking->date_for_reservation = $newDate;
+            $booking->save();
+
+            // Update all related slot bookings
+            SlotBooking::where('booking_id', $booking->booking_id)
+                ->each(function ($slotBooking) use ($newRoom, $newTime, $newDate) {
+                    $slotBooking->update([
+                        'room_name' => $newRoom,
+                        'start_time' => $newTime,
+                        'date_for_reservation' => $newDate
+                    ]);
+                });
+
+            // Fetch new room and mark its slot as reserved
+            $newRoomObj = Room::where('room_name', $newRoom)->first();
+            if (!$newRoomObj) {
+                throw new \Exception("New room not found.");
+            }
+
+            Slot::where('start_time', $newTime)
+                ->where('date_for_reservation', $newDate)
+                ->where('room_id', $newRoomObj->id)
+                ->update(['slot_status' => 2]);
+
+            DB::commit();
+            return redirect()->route('admin.viewingRequest')->with('success', 'Rescheduled Successfully.');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return back()->with('error', $th->getMessage());
+        }
+    }
+
+    public function cancelBidBooking($id)
+    {
+        DB::beginTransaction();
+        try {
+            $booking = Booking::where('booking_id', $id)->first();
+
+            if (!$booking) {
+                return back()->with('error', 'Booking Not Found');
+            }
+
+            if (!empty($booking->room_name)) {
+                $room = Room::where('room_name', $booking->room_name)->first();
+
+                if ($room) {
+                    Slot::where('room_id', $room->id)
+                        ->where('start_time', $booking->start_time)
+                        ->where('date_for_reservation', $booking->date_for_reservation)
+                        ->update(['slot_status' => 1]);
+                } else {
+                    DB::rollBack();
+                    return back()->with('error', 'Room associated with booking not found.');
+                }
+            }
+
+            SlotBooking::where('booking_id', $id)->update(['status' => 2]);
+
+            DB::commit();
+            return back()->with('success', 'Bidding Canceled Successfully.');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            // You might want to log the error here as well:
+            Log::error('Bid cancellation failed', ['error' => $th]);
+            return back()->with('error', 'Something went wrong: ' . $th->getMessage());
+        }
+    }
+
+
 
 
 
