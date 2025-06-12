@@ -131,6 +131,12 @@
                                     {!! nl2br(e($lot->notes)) !!}
                                 </div>
                             </div>
+                            <div class="mt-1">
+                                <strong>Description:</strong>
+                                <div class="bg-light rounded-3 p-3 mt-1">
+                                    {!! nl2br(e($lot->description)) !!}
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -148,6 +154,15 @@
                                         <div><strong>Colour Grade:</strong> {{ $lot->colour_grade }}</div>
                                         <div><strong>Origin:</strong> {{ $lot->colour_origin }}</div>
                                         <div><strong>Distribution:</strong> {{ $lot->colour_distribution }}</div>
+                                        <div class="mt-2">
+                                            <strong>Report Document:</strong>
+                                            @if ($lot->report_document)
+                                                <a href="{{ asset('storage/document/lots/' . $lot->report_document) }}"
+                                                    target="_blank" class="btn btn-sm btn-primary">View</a>
+                                            @else
+                                                N/A
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
 

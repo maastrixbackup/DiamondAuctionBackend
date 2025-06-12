@@ -81,58 +81,33 @@
                 <th>Room Type</th>
                 <th>Date</th>
                 <th>Start Time</th>
-                <th>Status</th>
-                {{-- <th>Assign Room</th>
-                <th>Action</th> --}}
+                {{-- <th>Status</th> --}}
             </tr>
         </thead>
         <tbody>
-            @foreach ($lots as $lot)
-                <tr id="lot-row-{{ $lot->id }}">
-                    <td>{{ $lot->lot_id }}</td>
-                    <td>{{ $lot->bidder_name }}</td>
-                    <td>{{ $lot->room_name ?? 'N/A' }}</td>
-                    <td>{{ $lot->room_type }}</td>
-                    <td>{{ $lot->date_for_reservation }}</td>
-                    <td>{{ \Carbon\Carbon::parse($lot->start_time)->format('h:i A') }}</td>
-                    <td>
-                        @if ($lot->status == 0)
+            @php
+                $groupedLots = $lots->groupBy('bidder_id');
+            @endphp
+
+            @foreach ($groupedLots as $bidderId => $bidderLots)
+                @php
+                    $firstLot = $bidderLots->first();
+                    $lotIds = $bidderLots->pluck('lot_id')->join(', ');
+                @endphp
+                <tr>
+                    <td>{{ $lotIds }}</td>
+                    <td>{{ $firstLot->bidder_name }}</td>
+                    <td>{{ $firstLot->room_name ?? 'N/A' }}</td>
+                    <td>{{ $firstLot->room_type }}</td>
+                    <td>{{ $firstLot->date_for_reservation }}</td>
+                    <td>{{ \Carbon\Carbon::parse($firstLot->start_time)->format('h:i A') }}</td>
+                    {{-- <td>
+                        @if ($firstLot->status == 0)
                             <span class="badge bg-warning">Pending</span>
-                        @elseif ($lot->status == 1)
+                        @elseif ($firstLot->status == 1)
                             <span class="badge bg-success">Approved</span>
                         @else
                             <span class="badge bg-danger">Rejected</span>
-                        @endif
-                    </td>
-                    {{-- <td>
-                        @if ($lot->status == 0)
-                            <div class="d-flex flex-column gap-1">
-                                @foreach ($allRooms as $room)
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio"
-                                            name="assigned_room[{{ $lot->id }}]"
-                                            id="room_{{ $lot->id }}_{{ $room->id }}"
-                                            value="{{ $room->id }}">
-                                        <label class="form-check-label"
-                                            for="room_{{ $lot->id }}_{{ $room->id }}">
-                                            {{ $room->name }} ({{ ucfirst($room->type) }})
-                                        </label>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <span class="text-muted">-</span>
-                        @endif
-                    </td>
-                    <td>
-                        @if ($lot->status == 0)
-                            <select name="lot_status[{{ $lot->id }}]" class="form-select form-select-sm">
-                                <option value="">-- Select --</option>
-                                <option value="1">Approve</option>
-                                <option value="2">Reject</option>
-                            </select>
-                        @else
-                            <span class="text-muted"></span>
                         @endif
                     </td> --}}
                 </tr>

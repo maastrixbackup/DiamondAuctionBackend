@@ -77,6 +77,7 @@ class LotController extends Controller
             'batch_code' => 'nullable|string|max:255',
             'status' => 'required|in:0,1,2',
             'report_number' => 'nullable|string|max:255',
+            'report_document' => 'nullable|mimes:pdf|max:5120',
             'colour_grade' => 'nullable|string|max:255',
             'colour_origin' => 'nullable|string|max:255',
             'colour_distribution' => 'nullable|string|max:255',
@@ -139,6 +140,18 @@ class LotController extends Controller
             // $lot->images = json_encode($imageNames);
             $lot->images = $imageNames;
 
+            $reportDocPath = public_path('storage/document/lots/');
+            if (!is_dir($reportDocPath)) {
+                mkdir($reportDocPath, 0777, true);
+            }
+
+            if ($request->hasFile('report_document')) {
+                $file = $request->file('report_document');
+                $filename = 'report_document_' . time() . '.' . $file->getClientOriginalExtension();
+                $file->move($reportDocPath, $filename);
+                $lot->report_document = $filename;
+            }
+
             $lot->save();
 
             return redirect()->route('admin.lots.index')->with('success', 'Lot created successfully.');
@@ -189,6 +202,7 @@ class LotController extends Controller
             'batch_code' => 'nullable|string|max:255',
             'status' => 'required|in:0,1,2',
             'report_number' => 'nullable|string|max:255',
+            'report_document' => 'nullable|mimes:pdf|max:5120',
             'colour_grade' => 'nullable|string|max:255',
             'colour_origin' => 'nullable|string|max:255',
             'colour_distribution' => 'nullable|string|max:255',
@@ -204,63 +218,88 @@ class LotController extends Controller
                 ->withErrors($validator)
                 ->withInput();
         }
+        try {
+            $lot = Lot::findOrFail($id);
+            $lot->seller_id = $request->seller_id;
+            $lot->category_id = $request->category_id;
+            $lot->title = $request->title;
+            $lot->description = $request->description;
+            $lot->video = $request->video;
+            $lot->type = $request->type;
+            $lot->color = $request->color;
+            $lot->weight = $request->weight;
+            $lot->size = $request->size;
+            $lot->stone = $request->stone;
+            $lot->shape = $request->shape;
+            $lot->notes = $request->notes;
+            $lot->batch_code = $request->batch_code;
+            $lot->status = $request->status;
+            $lot->report_number = $request->report_number;
+            $lot->colour_grade = $request->colour_grade;
+            $lot->colour_origin = $request->colour_origin;
+            $lot->colour_distribution = $request->colour_distribution;
+            $lot->polish = $request->polish;
+            $lot->symmetry = $request->symmetry;
+            $lot->fluorescence = $request->fluorescence;
 
-        $lot = Lot::findOrFail($id);
-        $lot->seller_id = $request->seller_id;
-        $lot->category_id = $request->category_id;
-        $lot->title = $request->title;
-        $lot->description = $request->description;
-        $lot->video = $request->video;
-        $lot->type = $request->type;
-        $lot->color = $request->color;
-        $lot->weight = $request->weight;
-        $lot->size = $request->size;
-        $lot->stone = $request->stone;
-        $lot->shape = $request->shape;
-        $lot->notes = $request->notes;
-        $lot->batch_code = $request->batch_code;
-        $lot->status = $request->status;
-        $lot->report_number = $request->report_number;
-        $lot->colour_grade = $request->colour_grade;
-        $lot->colour_origin = $request->colour_origin;
-        $lot->colour_distribution = $request->colour_distribution;
-        $lot->polish = $request->polish;
-        $lot->symmetry = $request->symmetry;
-        $lot->fluorescence = $request->fluorescence;
+            $destinationPath = public_path('storage/images/lots/');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0777, true);
+            }
 
-        $destinationPath = public_path('storage/images/lots/');
-        if (!file_exists($destinationPath)) {
-            mkdir($destinationPath, 0777, true);
-        }
+            $existingImages = $request->input('existing_images', []);
+            $storedImages = $lot->images ?? [];
+            $newImages = [];
 
-        $existingImages = $request->input('existing_images', []);
-        $storedImages = $lot->images ?? [];
-        $newImages = [];
-
-        // Handle new uploads
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                if ($image) {
-                    $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                    $image->move($destinationPath, $imageName);
-                    $newImages[] = $imageName;
+            // Handle new uploads
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    if ($image) {
+                        // $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                        $imageName = 'lot_image_' . time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                        $image->move($destinationPath, $imageName);
+                        $newImages[] = $imageName;
+                    }
                 }
             }
-        }
 
-        // Delete removed images from disk
-        $removedImages = array_diff($storedImages, $existingImages);
-        foreach ($removedImages as $img) {
-            $imgPath = $destinationPath . $img;
-            if (file_exists($imgPath)) {
-                unlink($imgPath);
+            // Delete removed images from disk
+            $removedImages = array_diff($storedImages, $existingImages);
+            foreach ($removedImages as $img) {
+                $imgPath = $destinationPath . $img;
+                if (file_exists($imgPath)) {
+                    unlink($imgPath);
+                }
             }
+
+            $lot->images = array_values(array_merge($existingImages, $newImages));
+
+            $documentPath = public_path('storage/document/lots/');
+            if (!file_exists($documentPath)) {
+                mkdir($documentPath, 0777, true);
+            }
+
+            if ($request->hasFile('report_document')) {
+                if (!empty($lot->report_document)) {
+                    $oldDoc = $documentPath . $lot->report_document;
+                    if (file_exists($oldDoc)) {
+                        unlink($oldDoc);
+                    }
+                }
+
+                $docFile = $request->file('report_document');
+                $docFilename = 'report_document_' . time() . '.' . $docFile->getClientOriginalExtension();
+                $docFile->move($documentPath, $docFilename);
+                $lot->report_document = $docFilename;
+            }
+
+            $lot->save();
+
+            return redirect()->route('admin.lots.index')->with('success', 'Lot updated successfully.');
+        } catch (\Throwable $th) {
+            Log::error('Lot update failed', ['error' => $th->getMessage(), 'trace' => $th->getTraceAsString()]);
+            return back()->with('error', 'Something went wrong while updating the lot. Please try again.');
         }
-
-        $lot->images = array_values(array_merge($existingImages, $newImages));
-        $lot->save();
-
-        return redirect()->route('admin.lots.index')->with('success', 'Lot updated successfully.');
     }
 
 
@@ -280,6 +319,13 @@ class LotController extends Controller
                 if (file_exists($imagePath)) {
                     @unlink($imagePath);
                 }
+            }
+        }
+
+        if ($lot->report_document) {
+            $documentPath = public_path('storage/document/lots/' . $lot->report_document);
+            if (file_exists($documentPath)) {
+                @unlink($documentPath);
             }
         }
 
