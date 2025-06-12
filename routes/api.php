@@ -51,7 +51,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Bibhu
     Route::get('/get-booking-details/{booking_id}', [BidderController::class, 'getBookingDetails']);
-    Route::post('/update-bid-details', [BidderController::class, 'updateBiddetails']);
     Route::post('/store-requested-lots', [BidderController::class, 'requestedLots']);
     Route::get('/lots-bid-details', [SellerController::class, 'getLotsBidDetails']);
+    Route::post('/update-bid-details', [BidderController::class, 'updateBiddetails']);
+    Route::post('/get-bidding-history', [BidderController::class, 'getBiddingHistory']);
 });

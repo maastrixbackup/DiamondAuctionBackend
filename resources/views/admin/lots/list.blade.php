@@ -207,6 +207,16 @@
                             <div class="alert alert-success m-4 rounded-3 shadow-sm" id="success-alert">
                                 {{ session('success') }}
                             </div>
+                            {{-- <script>
+                                // Check if the page has already been reloaded
+                                if (!sessionStorage.getItem('reloaded')) {
+                                    sessionStorage.setItem('reloaded', 'true');
+                                    location.reload();
+                                } else {
+                                    // Clear the flag after reload
+                                    sessionStorage.removeItem('reloaded');
+                                }
+                            </script> --}}
                         @endif
 
                         <div class="card-body p-4">

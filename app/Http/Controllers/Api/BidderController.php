@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bidder;
+use App\Models\BiddingPrice;
 use App\Models\Booking;
 use App\Models\Lot;
 use App\Models\Room;
@@ -702,30 +703,83 @@ class BidderController extends Controller
         }
     }
 
-
     public function updateBiddetails(Request $request)
     {
-        $bidderId = $request->user()->id;
-        $bookingId = $request->booking_id;
-        $lotId = $request->lot_id;
-        $price = $request->bidding_price;
+        $validator = Validator::make($request->all(), [
+            'booking_id' => 'required',
+            'lot_id' => 'required|integer',
+            'bidding_price' => 'required|numeric|min:0',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
         try {
-            $bookingSlot = SlotBooking::where('booking_id', $bookingId)
-                ->where('lot_id', $lotId)
-                ->where('bidder_id', $bidderId)
-                ->first();
+            $bidding = BiddingPrice::create([
+                'booking_id' => $request->booking_id,
+                'lot_id' => $request->lot_id,
+                'price' => $request->bidding_price,
+                'bidding_time' => Carbon::now(),
+            ]);
 
-            if (!$bookingSlot) {
-                return response()->json(['status' => false, 'message' => 'Lot Details not found'], 404);
-            }
+            DB::table('slot_bookings')
+                ->where('booking_id', $request->booking_id)
+                ->where('lot_id', $request->lot_id)
+                ->update(['bidding_price' => $request->bidding_price]);
 
-            $bookingSlot->bidding_price = $price;
-            $bookingSlot->save();
-            return response()->json(['status' => true, 'message' => 'Price Updated']);
+            return response()->json([
+                'status' => true,
+                'message' => 'Bidding price updated successfully',
+                'data' => $bidding
+            ]);
         } catch (\Throwable $th) {
-            Log::error('Fails to update:' . $th->getMessage());
-            return response()->json(['status' => false, 'message' => $th->getMessage()]);
+            Log::error('Failed to insert bidding price: ' . $th->getMessage());
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong: ' . $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getBiddingHistory(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'booking_id' => 'required',
+            'lot_id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            $biddingHistory = BiddingPrice::where('booking_id', $request->booking_id)
+                ->where('lot_id', $request->lot_id)
+                ->orderBy('bidding_time', 'desc')
+                ->get();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Bidding history fetched successfully',
+                'data' => $biddingHistory
+            ]);
+        } catch (\Throwable $th) {
+            Log::error('Failed to fetch bidding history: ' . $th->getMessage());
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong: ' . $th->getMessage()
+            ], 500);
         }
     }
 

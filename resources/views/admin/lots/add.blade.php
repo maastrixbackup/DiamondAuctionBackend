@@ -348,6 +348,12 @@
                                         </div>
 
                                         <div class="mb-3">
+                                            <label for="report_document" class="form-label">Report Document(PDF)</label>
+                                            <input type="file" name="report_document" id="report_document"
+                                                class="form-control" accept="application/pdf">
+                                        </div>
+
+                                        <div class="mb-3">
                                             <label for="fluorescence" class="form-label">Fluorescence</label>
                                             <input type="text" name="fluorescence" id="fluorescence"
                                                 class="form-control" placeholder="Enter Fluorescence">
@@ -497,7 +503,7 @@
 
         function playVideo(videoId) {
             document.getElementById("previewContainer").innerHTML = `
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        <iframe width="315" height="215" src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
     `;
         }
 
