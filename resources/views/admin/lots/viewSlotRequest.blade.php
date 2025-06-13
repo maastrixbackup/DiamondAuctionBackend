@@ -51,6 +51,7 @@
                                     <th>Start Time</th>
                                     <th>Status</th>
                                     <th>Flagged</th>
+                                    <th>Additional Request</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -69,26 +70,42 @@
                                         <td>{{ $slot->date_for_reservation }}</td>
                                         <td>{{ \Carbon\Carbon::parse($slot->start_time)->format('h:i A') }}</td>
                                         <td>
-                                            @if ($slot->status == 0)
-                                                <span class="badge bg-warning">Pending</span>
-                                            @elseif($slot->status == 1)
-                                                <span class="badge bg-success">Approved</span>
-                                            @else
-                                                <span class="badge bg-danger">Rejected</span>
-                                            @endif
+                                            @php
+                                                $statusClasses = [
+                                                    0 => ['text' => 'Pending', 'class' => 'bg-warning'],
+                                                    1 => ['text' => 'Approved', 'class' => 'bg-success'],
+                                                    3 => ['text' => 'Approved', 'class' => 'bg-success'],
+                                                    4 => ['text' => 'Cancelled', 'class' => 'bg-danger'],
+                                                ];
+                                                $status = $statusClasses[$slot->status] ?? [
+                                                    'text' => 'Approved',
+                                                    'class' => 'bg-success',
+                                                ];
+                                            @endphp
+                                            <span class="badge {{ $status['class'] }}">{{ $status['text'] }}</span>
 
                                         </td>
                                         <td class="text-center">
                                             @if ($booking->lot_booking_flag === 1)
-                                                <i class= "fa fa-exclamation-triangle text-danger "></i>
+                                                <i class= "fa fa-exclamation-triangle text-danger "
+                                                    title="Total Lots: {{ count($booking->booking_lot_id) }}"></i>
                                             @else
                                                 <i class="fa fa-check-circle" style="color: #b1dfbb;"></i>
                                             @endif
                                         </td>
                                         <td>
+                                            @if (!empty($booking->requested_lot_id) && count($booking->requested_lot_id) > 0)
+                                                <i class="fa fa-check-circle text-success"></i>
+                                                @if ($booking->lot_requested_flag === 1)
+                                                    <i class= "fa fa-exclamation-triangle text-danger "
+                                                        title="Total Lots: {{ count($booking->requested_lot_id) }}"></i>
+                                                @endif
+                                            @endif
+                                        </td>
+                                        <td>
                                             <div class="btn-group">
                                                 @php
-                                                    if ($slot->status === 2) {
+                                                    if ($slot->status === 4) {
                                                         $dsbl = 'disabled';
                                                     } else {
                                                         $dsbl = '';
@@ -98,6 +115,7 @@
                                                 <button
                                                     class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
                                                     onclick="viewLots(
+                                                    '{{ $slot->booking_id }}',
                                                     '{{ $slot->bidder_id }}',
                                                     '{{ $slot->room_type }}',
                                                     '{{ $slot->start_time }}',
@@ -157,48 +175,9 @@
 @endsection
 @push('scripts')
     <script>
-        const cancelBid = async (bookingId, bidderId, roomType, roomName, startTime, date) => {
-            const confirmed = confirm("Are you sure you want to cancel this bid?");
-            if (!confirmed) return;
-
-            const params = {
-                booking_id: bookingId,
-                bidder_id: bidderId,
-                room_name: roomName,
-                room_type: roomType,
-                start_time: startTime,
-                date: date
-            };
-
-            console.log("Cancel Bid Params:", params);
-            return false;
-
-            try {
-                const response = await fetch('/api/cancel-bid', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify(params)
-                });
-
-                const result = await response.json();
-
-                if (result.status) {
-                    alert("Bid cancelled successfully.");
-                    location.reload(); // or update UI accordingly
-                } else {
-                    alert("Failed to cancel bid: " + result.message);
-                }
-            } catch (error) {
-                console.error("Error cancelling bid:", error);
-                alert("Something went wrong. Please try again.");
-            }
-        };
-
-        const viewLots = (bidderId, roomType, startTime, date) => {
+        const viewLots = (bookingId, bidderId, roomType, startTime, date) => {
             const params = new URLSearchParams({
+                booking_id: bookingId,
                 bidder_id: bidderId,
                 room_type: roomType,
                 start_time: startTime,
@@ -249,6 +228,49 @@
                     messageDiv.classList.add('alert-danger');
                     messageDiv.textContent = 'An error occurred while assigning the room.';
                 });
+        }
+
+
+        function setRequestStatus(lotId, bookingId, status, key, time, date) {
+            const appBtn = $('#approve-' + key);
+            const reBtn = $('#reject-' + key);
+
+            const messageDiv = document.getElementById('successMessage');
+
+            $.ajax({
+                url: "{{ route('admin.update-requested-lot-status') }}",
+                method: "POST",
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                },
+                data: {
+                    lot_id: lotId,
+                    booking_id: bookingId,
+                    status: status,
+                    time: time,
+                    date: date
+                },
+                success: function(data) {
+                    console.log(data);
+                    // return false;
+                    // messageDiv.classList.remove('d-none', 'alert-success', 'alert-danger');
+                    // messageDiv.classList.add(data.status ? 'alert-success' : 'alert-danger');
+                    // messageDiv.textContent = data.message;
+
+                    if (data.status) {
+                        if (status === '1') {
+                            appBtn.addClass('disabled', true).text('Approved');
+                            reBtn.css('display', 'none');
+                        } else if (status === '2') {
+                            reBtn.addClass('disabled', true).text('Rejected');
+                            appBtn.css('display', 'none');
+                        }
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Failed to update status:', xhr.responseText);
+                }
+            });
         }
     </script>
     <script>

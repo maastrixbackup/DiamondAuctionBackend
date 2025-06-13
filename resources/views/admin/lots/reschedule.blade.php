@@ -79,9 +79,15 @@
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <div class="card-title mb-0">Available Rooms</div>
                             </div>
+
                             @if (session('success'))
-                                <div class="alert alert-success" id="success-alert">
+                                <div class="alert alert-success m-4" id="success-alert">
                                     {{ session('success') }}
+                                </div>
+                            @endif
+                            @if (session('error'))
+                                <div class="alert alert-danger m-4" id="success-alert">
+                                    {{ session('error') }}
                                 </div>
                             @endif
 

@@ -99,7 +99,9 @@
                     <td>{{ $firstLot->bidder_name }}</td>
                     <td>{{ $firstLot->room_name ?? 'N/A' }}</td>
                     <td>{{ $firstLot->room_type }}</td>
-                    <td>{{ $firstLot->date_for_reservation }}</td>
+                    <td>
+                        {{ \Carbon\Carbon::parse($firstLot->date_for_reservation)->format('d-m-Y') }}
+                    </td>
                     <td>{{ \Carbon\Carbon::parse($firstLot->start_time)->format('h:i A') }}</td>
                     {{-- <td>
                         @if ($firstLot->status == 0)
@@ -119,3 +121,79 @@
         <button type="button" class="btn btn-primary" onclick="submitLotStatuses()">Update Slot</button>
     </div> --}}
 </form>
+@php
+    dd(array_values($booking->requested_lot_id));
+    if (!empty($booking) && is_array($booking->requested_lot_id) && count($booking->requested_lot_id) > 0) {
+        dd(array_values($booking->requested_lot_id));
+        // $requestedLots = SlotBooking::whereIn('lot_id', $booking->requested_lot_id)->where('status', 3)->get();
+    }
+@endphp
+@if (!empty($requestedLots))
+    <hr />
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th colspan="3">
+                    Requested Lots
+                </th>
+            </tr>
+            <tr>
+                <th>Lot ID</th>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Color</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($requestedLots as $req)
+                @php
+                    $lot = \App\Models\Lot::find($req->lot_id);
+                    $bookingSlot = \App\Models\SlotBooking::where('booking_id', $req->booking_id)
+                        ->where('lot_id', $req->lot_id)
+                        ->first();
+                @endphp
+                <tr class="text-capitalize">
+                    <td>{{ $req->lot_id }}</td>
+                    <td class="text-capitalize">{{ $lot->title }}</td>
+                    <td class="text-capitalize">{{ $lot->type }}</td>
+                    <td class="text-capitalize">{{ $lot->color }}</td>
+                    <td>
+                        <div class="btn-group">
+                            @if ($req->status === 3)
+                                <a href="javascript:;"
+                                    onclick="setRequestStatus(
+                                    '{{ $req->lot_id }}',
+                                    '{{ $req->booking_id }}',
+                                    '1',
+                                    '{{ $loop->iteration }}',
+                                    '{{ $req->start_time }}',
+                                    '{{ $req->date_for_reservation }}'
+                                    )"
+                                    class="btn btn-success btn-sm" id="approve-{{ $loop->iteration }}">
+                                    Approve
+                                </a>
+                                <a href="javascript:;"
+                                    onclick="setRequestStatus(
+                                    '{{ $req->lot_id }}',
+                                    '{{ $req->booking_id }}',
+                                    '2',
+                                    '{{ $loop->iteration }}',
+                                    '{{ $req->start_time }}',
+                                    '{{ $req->date_for_reservation }}'
+                                    )"
+                                    class="btn btn-danger btn-sm mx-1" id="reject-{{ $loop->iteration }}">
+                                    Reject
+                                </a>
+                            @elseif ($req->status === 1)
+                                <a href="javascript:;" class="btn btn-sm btn-success disabled">Approved</a>
+                            @elseif ($req->status === 2)
+                                <a href="javascript:;" class="btn btn-sm btn-danger disabled">Rejected</a>
+                            @endif
+                        </div>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+@endif

@@ -76,6 +76,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/cancel-booking/{id}', [LotController::class, 'cancelBidBooking'])->name('admin.cancel-booking');
         Route::get('/viewingRequestLots', [LotController::class, 'viewingRequestLots'])->name('admin.viewingRequestLots');
         Route::post('/assign-room', [LotController::class, 'assignRoomToSlot'])->name('admin.assignRoomToSlot');
+        Route::post('/update-requested-lot-status', [LotController::class, 'updateRequestedLotStatus'])->name('admin.update-requested-lot-status');
 
         // Route::post('/update-request-lots-status/{bookingId}', [LotController::class, 'updateRequestLotStatus'])->name('admin.update-request-lots-status');
         Route::post('/updateLotsStatus', [LotController::class, 'updateLotsStatus'])->name('admin.updateLotsStatus');

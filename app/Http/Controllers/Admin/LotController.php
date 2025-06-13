@@ -375,47 +375,106 @@ class LotController extends Controller
                 'start_time',
                 'date_for_reservation'
             )
-            ->where('date_for_reservation', '>=', $currDate)
+            // ->where('date_for_reservation', '>=', $currDate)
             ->orderBy('date_for_reservation', 'desc')
+            ->orderBy('start_time', 'desc')
             ->get();
 
         return view('admin.lots.viewSlotRequest', compact('groupedSlots'));
     }
 
+    public function viewingRequestLots(Request $request)
+    {
+        $roomType  = $request->room_type;
+        $startTime = $request->start_time;
+        $date      = $request->date;
+        $bookingId = $request->booking_id;
 
-    // public function viewingRequestLots(Request $request)
-    // {
-    //     $bidderId = $request->bidder_id;
-    //     $roomType = $request->room_type;
-    //     $startTime = $request->start_time;
-    //     $date = $request->date;
+        $rooms = Room::all();
 
-    //     $roomIds = Room::where('room_type', $roomType)->pluck('id');
-    //     $rooms = Room::whereIn('id', $roomIds)->get();
+        $sameTypeRoomIds = $rooms->where('room_type', $roomType)->pluck('id');
 
-    //     $bookedRoomIds = Slot::whereIn('room_id', $roomIds)
-    //         ->where('date_for_reservation', $date)
-    //         ->where('start_time', $startTime)
-    //         ->where('slot_status', 2)
-    //         ->pluck('room_id')
-    //         ->toArray();
-    //     foreach ($rooms as $room) {
-    //         $room->is_available = !in_array($room->id, $bookedRoomIds);
-    //     }
+        $bookedRoomIds = Slot::whereIn('room_id', $sameTypeRoomIds)
+            ->where('date_for_reservation', $date)
+            ->where('start_time', $startTime)
+            ->where('slot_status', 2)          // 2 = reserved
+            ->pluck('room_id')
+            ->toArray();
 
-    //     $lots = SlotBooking::where('bidder_id', $request->bidder_id)
-    //         ->where('room_type', $request->room_type)
-    //         ->where('start_time', $request->start_time)
-    //         ->where('date_for_reservation', $request->date)
-    //         ->get();
+        foreach ($rooms as $room) {
+            if ($room->room_type === $roomType) {
+                $room->is_available = !in_array($room->id, $bookedRoomIds);
+            } else {
+                $room->is_available = false;
+            }
+        }
 
-    //     $isRoomAlreadyAssigned = $lots->contains(function ($lot) {
-    //         return !empty($lot->room_name);
-    //     });
+        $lots = SlotBooking::where('bidder_id', $request->bidder_id)
+            ->where('room_type', $roomType)
+            ->where('start_time', $startTime)
+            ->where('date_for_reservation', $date)
+            ->where('status', '!=', 3)
+            ->get();
 
-    //     // return view('admin.lots.viewRequestLots', compact('rooms', 'startTime', 'date'));
-    //     return view('admin.lots.viewRequestLots', compact('rooms', 'startTime', 'date', 'roomType', 'lots', 'isRoomAlreadyAssigned'));
-    // }
+        $isRoomAlreadyAssigned = $lots->contains(fn($lot) => !empty($lot->room_name));
+
+        // Fetch booking and related requested lots
+        $requestedLots = [];
+        $booking = Booking::where('booking_id', $bookingId)->first();
+
+        if (!empty($booking) && is_array($booking->requested_lot_id) && count($booking->requested_lot_id) > 0) {
+            $requestedLots = SlotBooking::whereIn('lot_id', $booking->requested_lot_id)
+                ->where('booking_id', $booking->booking_id)
+                ->get();
+        }
+
+        return view(
+            'admin.lots.viewRequestLots',
+            compact('rooms', 'startTime', 'date', 'roomType', 'lots', 'isRoomAlreadyAssigned', 'requestedLots', 'booking')
+        );
+    }
+
+    public function updateRequestedLotStatus(Request $request)
+    {
+        $bookingId = $request->booking_id;
+        $lotId = (string) $request->lot_id; // ensure it's a string to match existing data
+        $status = (int) $request->status;
+
+        DB::beginTransaction();
+        try {
+            $booking = Booking::where('booking_id', $bookingId)->firstOrFail();
+
+            $slotBooking = SlotBooking::where('lot_id', $lotId)
+                ->where('booking_id', $bookingId)
+                ->firstOrFail();
+
+            $slotBooking->update(['status' => $status]);
+
+            if ($status === 1) {
+                $currentLots = $booking->booking_lot_id ?? [];
+
+                // Avoid duplication
+                if (!in_array($lotId, $currentLots)) {
+                    $currentLots[] = $lotId;
+                    $booking->booking_lot_id = $currentLots;
+                    $booking->save();
+                }
+            }
+
+            DB::commit();
+            return response()->json([
+                'status' => true,
+                'message' => $status === 1 ? 'Approved' : 'Rejected',
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage(),
+            ]);
+        }
+    }
+
 
     public function rescheduleBooking(Request $request, $id)
     {
@@ -452,15 +511,13 @@ class LotController extends Controller
 
             // Fetch the previous room
             $previousRoom = Room::where('room_name', $booking->room_name)->first();
-            if (!$previousRoom) {
-                throw new \Exception("Previous room not found.");
+            if ($previousRoom) {
+                // Mark previous slot as available
+                Slot::where('start_time', $booking->start_time)
+                    ->where('date_for_reservation', $booking->date_for_reservation)
+                    ->where('room_id', $previousRoom->id)
+                    ->update(['slot_status' => 1]);
             }
-
-            // Mark previous slot as available
-            Slot::where('start_time', $booking->start_time)
-                ->where('date_for_reservation', $booking->date_for_reservation)
-                ->where('room_id', $previousRoom->id)
-                ->update(['slot_status' => 1]);
 
             // Update booking with new values
             $booking->room_name = $newRoom;
@@ -474,7 +531,8 @@ class LotController extends Controller
                     $slotBooking->update([
                         'room_name' => $newRoom,
                         'start_time' => $newTime,
-                        'date_for_reservation' => $newDate
+                        'date_for_reservation' => $newDate,
+                        'status' => 1
                     ]);
                 });
 
@@ -521,7 +579,7 @@ class LotController extends Controller
                 }
             }
 
-            SlotBooking::where('booking_id', $id)->update(['status' => 2]);
+            SlotBooking::where('booking_id', $id)->update(['status' => 4]);
 
             DB::commit();
             return back()->with('success', 'Bidding Canceled Successfully.');
@@ -533,49 +591,6 @@ class LotController extends Controller
         }
     }
 
-
-
-
-
-
-    public function viewingRequestLots(Request $request)
-    {
-        $roomType  = $request->room_type;
-        $startTime = $request->start_time;
-        $date      = $request->date;
-
-        $rooms = Room::all();
-
-        $sameTypeRoomIds = $rooms->where('room_type', $roomType)->pluck('id');
-
-        $bookedRoomIds = Slot::whereIn('room_id', $sameTypeRoomIds)
-            ->where('date_for_reservation', $date)
-            ->where('start_time', $startTime)
-            ->where('slot_status', 2)          // 2 = reserved
-            ->pluck('room_id')
-            ->toArray();
-
-        foreach ($rooms as $room) {
-            if ($room->room_type === $roomType) {
-                $room->is_available = !in_array($room->id, $bookedRoomIds);
-            } else {
-                $room->is_available = false;
-            }
-        }
-
-        $lots = SlotBooking::where('bidder_id', $request->bidder_id)
-            ->where('room_type', $roomType)
-            ->where('start_time', $startTime)
-            ->where('date_for_reservation', $date)
-            ->get();
-
-        $isRoomAlreadyAssigned = $lots->contains(fn($lot) => !empty($lot->room_name));
-
-        return view(
-            'admin.lots.viewRequestLots',
-            compact('rooms', 'startTime', 'date', 'roomType', 'lots', 'isRoomAlreadyAssigned')
-        );
-    }
 
     public function assignRoomToSlot(Request $request)
     {

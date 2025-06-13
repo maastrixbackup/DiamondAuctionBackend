@@ -18,10 +18,10 @@ class Booking extends Model
         'date_for_reservation',
         'booking_lot_id',
         'lot_booking_flag',
-        // 'requested_lot_id',
-        // 'lot_requested_flag',
-        // 'timer',
-        // 'timer_status',
+        'requested_lot_id',
+        'lot_requested_flag',
+        'timer',
+        'timer_status',
     ];
 
     protected $casts = [
