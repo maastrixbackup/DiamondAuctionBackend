@@ -210,7 +210,8 @@
                                             <select name="seller_id" id="seller_id" class="form-select" required>
                                                 <option value="">-- Select Seller --</option>
                                                 @foreach ($sellers as $seller)
-                                                    <option value="{{ $seller->id }}">{{ $seller->full_name }}</option>
+                                                    <option value="{{ $seller->id }}">
+                                                        {{ $seller->full_name }} ({{ $seller->id }})</option>
                                                 @endforeach
                                             </select>
                                         </div>

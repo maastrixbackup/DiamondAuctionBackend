@@ -476,12 +476,11 @@ class BidderController extends Controller
 
             DB::beginTransaction();
             // Generate dynamic booking_id
-            $latestBooking = SlotBooking::whereNotNull('booking_id')
-                ->where('booking_id', 'like', 'DA-%')
+            $latestBooking = Booking::whereNotNull('booking_id')
                 ->orderByDesc('id')
-                ->first();
+                ->value('booking_id');
 
-            if ($latestBooking && preg_match('/DA-(\d+)/', $latestBooking->booking_id, $matches)) {
+            if ($latestBooking && preg_match('/DA-(\d+)/', $latestBooking, $matches)) {
                 $nextNumber = str_pad(((int) $matches[1]) + 1, 4, '0', STR_PAD_LEFT);
             } else {
                 $nextNumber = '0001';
@@ -813,6 +812,7 @@ class BidderController extends Controller
 
             $insertData = [];
             foreach ($lotIds as $lotId) {
+                // If duplicate entry restrict
                 $insertData[] = [
                     'lot_id' => $lotId,
                     'booking_id' => $bookingNumber,
@@ -822,7 +822,7 @@ class BidderController extends Controller
                     'bidder_name' => $bidder->full_name,
                     'room_type' => $request->room_type,
                     'room_name' => $request->room_name,
-                    'status' => 0,
+                    'status' => 3,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];

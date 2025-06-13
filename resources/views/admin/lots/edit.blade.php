@@ -46,7 +46,7 @@
                                                 @foreach ($sellers as $seller)
                                                     <option value="{{ $seller->id }}"
                                                         {{ $lot->seller_id == $seller->id ? 'selected' : '' }}>
-                                                        {{ $seller->full_name }}
+                                                        {{ $seller->full_name }} ({{ $seller->id }})
                                                     </option>
                                                 @endforeach
                                             </select>
