@@ -154,7 +154,7 @@
                                         <div><strong>Colour Grade:</strong> {{ $lot->colour_grade }}</div>
                                         <div><strong>Origin:</strong> {{ $lot->colour_origin }}</div>
                                         <div><strong>Distribution:</strong> {{ $lot->colour_distribution }}</div>
-                                        <div class="mt-2">
+                                        <div>
                                             <strong>Report Document:</strong>
                                             @if ($lot->report_document)
                                                 <a href="{{ asset('storage/document/lots/' . $lot->report_document) }}"

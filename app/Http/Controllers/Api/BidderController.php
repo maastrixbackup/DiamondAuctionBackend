@@ -157,6 +157,13 @@ class BidderController extends Controller
             ], 401);
         }
 
+        // if ($bidder->account_status !== 1) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => 'Account is not active.'
+        //     ], 403); // 403 Forbidden
+        // }
+
         $token = $bidder->createToken('bidder_token')->plainTextToken;
 
         return response()->json([
