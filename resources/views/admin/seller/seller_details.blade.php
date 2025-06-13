@@ -72,6 +72,8 @@
                             ['valid_trade_license', 'Valid Trade License'],
                             ['passport_copy_authorised', 'Passport Copy (Authorised)'],
                             ['ubo_declaration', 'UBO Declaration'],
+                            ['kyc_document', 'Kyc Document'],
+
                         ];
                     @endphp
 
@@ -111,6 +113,7 @@
                         $individualDocs = [
                             ['passport_copy', 'Passport Copy'],
                             ['proof_of_ownership', 'Proof of Ownership'],
+                            ['kyc_document', 'Kyc Document'],
                         ];
                     @endphp
 

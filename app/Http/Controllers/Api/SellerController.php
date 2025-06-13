@@ -52,6 +52,9 @@ class SellerController extends Controller
             'passport_ind' => 'required_if:type,individual|file',
             'ownership_proof' => 'required_if:type,individual|file',
             'source_goods' => 'required_if:type,individual|string',
+
+            //Kyc document for both
+            'kyc_document' => 'required|file',
         ]);
 
         if ($validator->fails()) {
@@ -102,6 +105,9 @@ class SellerController extends Controller
 
                 $seller->ubo_declaration = $handleUpload('ubo_declaration');
                 $seller->ubo_declaration_status = 0;
+
+                $seller->kyc_document = $handleUpload('kyc_document');
+                $seller->kyc_document_status = 0;
             } else {
                 //Individual
                 $seller->full_name = $request->name;
@@ -117,6 +123,9 @@ class SellerController extends Controller
 
                 $seller->proof_of_ownership = $handleUpload('ownership_proof');
                 $seller->proof_of_ownership_status = 0;
+
+                $seller->kyc_document = $handleUpload('kyc_document');
+                $seller->kyc_document_status = 0;
             }
 
             $seller->save();
@@ -156,6 +165,13 @@ class SellerController extends Controller
                 'message' => 'Invalid credentials.'
             ], 401);
         }
+
+        // if ($seller->account_status !== 1) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => 'Account is not active.'
+        //     ], 403); // 403 Forbidden
+        // }
 
         $token = $seller->createToken('seller_token')->plainTextToken;
 
@@ -214,6 +230,17 @@ class SellerController extends Controller
                 2 => 'Individual',
             ];
 
+            $total_lots = Lot::where('seller_id', $seller->id)
+                ->selectRaw('status, COUNT(*) as count')
+                ->groupBy('status')
+                ->pluck('count', 'status')
+                ->toArray();
+
+            $lotIds = Lot::where('seller_id', $seller->id)->pluck('id');
+            $totalBidsReceived = SlotBooking::whereIn('lot_id', $lotIds)
+                ->whereNotNull('bidding_price')
+                ->count();
+
             $dashboardData = [
                 'full_name' => $seller->full_name,
                 'email_address' => $seller->email_address,
@@ -229,10 +256,19 @@ class SellerController extends Controller
                 'passport_copy_status' => $documentStatus[$seller->passport_copy_status],
                 'proof_of_ownership' => $docUrl($seller->proof_of_ownership),
                 'proof_of_ownership_status' => $documentStatus[$seller->proof_of_ownership_status],
+                'kyc_document' => $docUrl($seller->kyc_document),
+                'kyc_document_status' => $documentStatus[$seller->kyc_document_status],
                 'kyc_status' => $kycStatus[$seller->kyc_status],
                 'account_status' => $accountStatus[$seller->account_status],
                 'type' => $seller->type,
                 'type_name' => $typeStatus[$seller->type],
+                'total_lots_listed' => [
+                    'pending' => $total_lots[0] ?? 0,
+                    'live' => $total_lots[1] ?? 0,
+                    'sold' => $total_lots[2] ?? 0,
+                ],
+                'bids_received' => $totalBidsReceived,
+
             ];
 
             return response()->json([
@@ -251,12 +287,11 @@ class SellerController extends Controller
         }
     }
 
-
     public function reuploadSellerDocument(Request $request)
     {
         $request->validate([
             'seller_id' => 'required|exists:sellers,id',
-            'field' => 'required|string|in:certificate_of_incorporation,valid_trade_license,passport_copy_authorised,ubo_declaration,passport_copy,proof_of_ownership',
+            'field' => 'required|string|in:certificate_of_incorporation,valid_trade_license,passport_copy_authorised,ubo_declaration,passport_copy,proof_of_ownership,kyc_document',
             'document' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
