@@ -376,8 +376,9 @@ class LotController extends Controller
                 'date_for_reservation'
             )
             // ->where('date_for_reservation', '>=', $currDate)
-            ->orderBy('date_for_reservation', 'desc')
-            ->orderBy('start_time', 'desc')
+            // ->orderBy('date_for_reservation', 'desc')
+            // ->orderBy('start_time', 'desc')
+            ->orderByDesc('booking_id', 'desc')
             ->get();
 
         return view('admin.lots.viewSlotRequest', compact('groupedSlots'));
@@ -418,15 +419,19 @@ class LotController extends Controller
 
         $isRoomAlreadyAssigned = $lots->contains(fn($lot) => !empty($lot->room_name));
 
-        // Fetch booking and related requested lots
         $requestedLots = [];
         $booking = Booking::where('booking_id', $bookingId)->first();
 
-        if (!empty($booking) && is_array($booking->requested_lot_id) && count($booking->requested_lot_id) > 0) {
-            $requestedLots = SlotBooking::whereIn('lot_id', $booking->requested_lot_id)
-                ->where('booking_id', $booking->booking_id)
-                ->get();
+        if (!empty($booking) && !empty($booking->requested_lot_id)) {
+            $lotIds = json_decode($booking->requested_lot_id, true); // Decode JSON to array
+
+            if (is_array($lotIds) && count($lotIds) > 0) {
+                $requestedLots = SlotBooking::whereIn('lot_id', $lotIds)
+                    ->where('booking_id', $booking->booking_id)
+                    ->get();
+            }
         }
+
 
         return view(
             'admin.lots.viewRequestLots',
@@ -527,6 +532,7 @@ class LotController extends Controller
 
             // Update all related slot bookings
             SlotBooking::where('booking_id', $booking->booking_id)
+                ->whereNotIn('status', [3, 2])
                 ->each(function ($slotBooking) use ($newRoom, $newTime, $newDate) {
                     $slotBooking->update([
                         'room_name' => $newRoom,

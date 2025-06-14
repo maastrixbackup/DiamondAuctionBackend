@@ -59,8 +59,18 @@
             <input type="url" name="meeting_link" id="meeting_link" class="form-control"
                 placeholder="https://example.com/meeting-link">
         </div>
+        @php
+            $bookingStatus = \App\Models\SlotBooking::where('booking_id', $booking->booking_id)
+                ->orderByDesc('id')
+                ->first();
+            if ($bookingStatus->status === 4) {
+                $dpl = 'd-none';
+            } else {
+                $dpl = '';
+            }
+        @endphp
 
-        <div class="text-start">
+        <div class="text-start {{ $dpl }}">
             <button type="submit" class="btn btn-primary mb-2 mt-2">Assign Room</button>
         </div>
     </form>
@@ -121,13 +131,7 @@
         <button type="button" class="btn btn-primary" onclick="submitLotStatuses()">Update Slot</button>
     </div> --}}
 </form>
-@php
-    dd(array_values($booking->requested_lot_id));
-    if (!empty($booking) && is_array($booking->requested_lot_id) && count($booking->requested_lot_id) > 0) {
-        dd(array_values($booking->requested_lot_id));
-        // $requestedLots = SlotBooking::whereIn('lot_id', $booking->requested_lot_id)->where('status', 3)->get();
-    }
-@endphp
+
 @if (!empty($requestedLots))
     <hr />
     <table class="table table-bordered mt-3">

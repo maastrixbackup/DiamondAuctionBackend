@@ -62,6 +62,35 @@
         .sidebar-show {
             left: 0;
         }
+
+        /* Works in Chrome, Edge, Safari */
+        ::-webkit-scrollbar {
+            width: 5px;
+            /* Scrollbar width */
+            height: 5px;
+            /* For horizontal scroll */
+        }
+
+        /* Track (the background) */
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            /* Light grey or transparent */
+        }
+
+        /* Thumb (the draggable part) */
+        ::-webkit-scrollbar-thumb {
+            background-color: #c8ee41;
+            /* Corporate green */
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+        }
+
+        /* On hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #388E3C;
+            /* Darker green */
+        }
     </style>
     <script>
         WebFont.load({
@@ -88,53 +117,12 @@
 
     @include('admin.layouts.header')
     @include('admin.layouts.sidebar')
-    {{-- <div class="wrapper"> --}}
-
-
-    {{-- <div class="main-panel"> --}}
 
     <!-- Page Content -->
     <main class="lg:ml-64 pt-24 px-4 sm:px-8 max-w-7xl ">
-        {{-- <div class="container">
-                    <div class="page-inner"> --}}
         @yield('content')
-        {{-- </div>
-                </div> --}}
     </main>
-    {{-- </div> --}}
-    {{-- </div> --}}
-
-    {{-- @stack('scripts') --}}
-
-    <script>
-        $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {
-            type: "line",
-            height: "70",
-            width: "100%",
-            lineWidth: "2",
-            lineColor: "#177dff",
-            fillColor: "rgba(23, 125, 255, 0.14)",
-        });
-
-        $("#lineChart2").sparkline([99, 125, 122, 105, 110, 124, 115], {
-            type: "line",
-            height: "70",
-            width: "100%",
-            lineWidth: "2",
-            lineColor: "#f3545d",
-            fillColor: "rgba(243, 84, 93, .14)",
-        });
-
-        $("#lineChart3").sparkline([105, 103, 123, 100, 95, 105, 115], {
-            type: "line",
-            height: "70",
-            width: "100%",
-            lineWidth: "2",
-            lineColor: "#ffa534",
-            fillColor: "rgba(255, 165, 52, .14)",
-        });
-    </script>
-
+    <!-- Page Content -->
 
     <!--   Core JS Files   -->
     <script src="{{ asset('assets/js/core/jquery-3.7.1.min.js') }}"></script>
@@ -194,6 +182,37 @@
             });
         });
     </script>
+
+
+    <script>
+        $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {
+            type: "line",
+            height: "70",
+            width: "100%",
+            lineWidth: "2",
+            lineColor: "#177dff",
+            fillColor: "rgba(23, 125, 255, 0.14)",
+        });
+
+        $("#lineChart2").sparkline([99, 125, 122, 105, 110, 124, 115], {
+            type: "line",
+            height: "70",
+            width: "100%",
+            lineWidth: "2",
+            lineColor: "#f3545d",
+            fillColor: "rgba(243, 84, 93, .14)",
+        });
+
+        $("#lineChart3").sparkline([105, 103, 123, 100, 95, 105, 115], {
+            type: "line",
+            height: "70",
+            width: "100%",
+            lineWidth: "2",
+            lineColor: "#ffa534",
+            fillColor: "rgba(255, 165, 52, .14)",
+        });
+    </script>
+
 
 </body>
 

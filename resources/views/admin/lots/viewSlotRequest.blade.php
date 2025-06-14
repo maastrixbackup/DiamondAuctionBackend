@@ -38,12 +38,13 @@
                         {{ session('error') }}
                     </div>
                 @endif
-                <div class="card-body px-4">
+                <div class="card-body px-1">
                     <div class="table-responsive">
                         <table id="viewingRequestTable" class="table table-striped table-hover align-middle">
                             <thead class="table-light">
                                 <tr>
                                     <th>SL</th>
+                                    <th>Booking ID</th>
                                     <th>Bidder Name</th>
                                     <th>Room Name</th>
                                     <th>Room Type</th>
@@ -51,7 +52,7 @@
                                     <th>Start Time</th>
                                     <th>Status</th>
                                     <th>Flagged</th>
-                                    <th>Additional Request</th>
+                                    <th>Add. Req.</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -62,6 +63,9 @@
                                     @endphp
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
+                                        <td>
+                                            {{ $slot->booking_id }}
+                                        </td>
                                         <td>
                                             {{ $slot->bidder_name }}
                                         </td>
@@ -93,14 +97,22 @@
                                                 <i class="fa fa-check-circle" style="color: #b1dfbb;"></i>
                                             @endif
                                         </td>
-                                        <td>
-                                            @if (!empty($booking->requested_lot_id) && count($booking->requested_lot_id) > 0)
+                                        <td class="text-center">
+                                            @php
+                                                $requestedLotIds = !empty($booking->requested_lot_id)
+                                                    ? explode(',', $booking->requested_lot_id)
+                                                    : [];
+                                            @endphp
+
+                                            @if (count($requestedLotIds) > 0)
                                                 <i class="fa fa-check-circle text-success"></i>
+
                                                 @if ($booking->lot_requested_flag === 1)
-                                                    <i class= "fa fa-exclamation-triangle text-danger "
-                                                        title="Total Lots: {{ count($booking->requested_lot_id) }}"></i>
+                                                    <i class="fa fa-exclamation-triangle text-danger"
+                                                        title="Total Lots: {{ count($requestedLotIds) }}"></i>
                                                 @endif
                                             @endif
+
                                         </td>
                                         <td>
                                             <div class="btn-group">
@@ -142,9 +154,9 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8">
+                                        <td colspan="10">
                                             <div class="text-center py-3 text-muted">
-                                                No pending slot booking requests found.
+                                                No pending  requests found.
                                             </div>
                                         </td>
                                     </tr>

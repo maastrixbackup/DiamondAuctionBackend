@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\BidderController;
 use App\Http\Controllers\Api\SellerController;
+use App\Http\Controllers\Api\ZoomController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -55,4 +56,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/lots-bid-details', [SellerController::class, 'getLotsBidDetails']);
     Route::post('/update-bid-details', [BidderController::class, 'updateBiddetails']);
     Route::post('/get-bidding-history', [BidderController::class, 'getBiddingHistory']);
+    Route::post('/zoom-signature', [ZoomController::class, 'generateSignature']);
 });

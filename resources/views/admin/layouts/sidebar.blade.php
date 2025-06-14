@@ -1,5 +1,5 @@
 <aside id="sidebar"
-    class="fixed top-0 h-screen w-64 bg-[#2E3744] text-white shadow-lg pt-24 z-30 flex flex-col justify-between">
+    class="fixed top-0 h-screen w-64 bg-[#2E3744] text-white shadow-lg pt-24 z-30 flex flex-col justify-between" style="overflow:auto">
 
     <nav class="flex flex-col space-y-1 px-0 text-lg font-medium">
         <a href="{{ route('admin.dashboard') }}"

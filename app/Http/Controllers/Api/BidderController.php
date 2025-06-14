@@ -594,7 +594,9 @@ class BidderController extends Controller
     {
         try {
             $bidderId = $request->user()->id;
-            $currentDateTime = now();
+            $currentDate = now()->format('Y-m-d');
+            // $currentTime = now()->format('H:i:s');
+            $currentTime = now()->addMinutes(21)->format('H:i:s');
 
             $bidderExists = DB::table('bidders')->where('id', $bidderId)->exists();
             if (!$bidderExists) {
@@ -605,9 +607,11 @@ class BidderController extends Controller
             }
 
             $bookings = Booking::where('bidder_id', $bidderId)
-                ->whereRaw("STR_TO_DATE(CONCAT(date_for_reservation, ' ', start_time), '%Y-%m-%d %H:%i:%s') >= ?", [$currentDateTime])
-                ->orderBy('date_for_reservation')
-                ->orderBy('start_time')
+                ->where('date_for_reservation', '>=', $currentDate)
+                // ->where('start_time', '<=', $currentTime)
+                // ->orderBy('date_for_reservation')
+                // ->orderBy('start_time')
+                ->orderByDesc('booking_id')
                 ->get();
 
             return response()->json([
@@ -810,16 +814,32 @@ class BidderController extends Controller
                 return response()->json(['status' => false, 'message' => 'Booking not found']);
             }
 
+            // Decode existing requested lot IDs (if cast in model, this is auto-array)
+            $currentLots = is_array($booking->requested_lot_id)
+                ? $booking->requested_lot_id
+                : json_decode($booking->requested_lot_id, true);
+
+            $currentLots = is_array($currentLots) ? $currentLots : [];
+
+            // Merge existing with new and remove duplicates
+            $updatedLots = array_unique(array_merge($currentLots, $lotIds));
+
+            // Update booking with merged requested_lot_id
             $booking->update([
-                'requested_lot_id' => $lotIds,
-                'lot_requested_flag' => count($lotIds) >= 6 ? 1 : 0,
+                'requested_lot_id' => $updatedLots,
+                'lot_requested_flag' => count($updatedLots) >= 6 ? 1 : 0,
             ]);
 
+            // Fetch already inserted slot lots for this booking to avoid duplicates
+            $existingLotIds = SlotBooking::where('booking_id', $bookingNumber)
+                ->pluck('lot_id')
+                ->toArray();
 
+            // Only insert new lot IDs
+            $newLotIds = array_diff($lotIds, $existingLotIds);
 
             $insertData = [];
-            foreach ($lotIds as $lotId) {
-                // If duplicate entry restrict
+            foreach ($newLotIds as $lotId) {
                 $insertData[] = [
                     'lot_id' => $lotId,
                     'booking_id' => $bookingNumber,
@@ -829,14 +849,15 @@ class BidderController extends Controller
                     'bidder_name' => $bidder->full_name,
                     'room_type' => $request->room_type,
                     'room_name' => $request->room_name,
-                    'status' => 3,
+                    'status' => 3, // 3 = Requested
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
             }
 
-            SlotBooking::insert($insertData);
-
+            if (!empty($insertData)) {
+                SlotBooking::insert($insertData);
+            }
             DB::commit();
             return response()->json(['status' => true, 'message' => 'Request Created Successfully']);
         } catch (\Throwable $th) {

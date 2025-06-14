@@ -1,7 +1,7 @@
-    {{-- <div class="main-header">
-        <div class="main-header-logo"> --}}
-    <!-- Logo Header -->
-    {{-- <div class="logo-header" data-background-color="dark">
+<!-- <div class="main-header">
+        <div class="main-header-logo"> -->
+<!-- Logo Header -->
+<!--  <div class="logo-header" data-background-color="dark">
                 <a href="index.html" class="logo">
                     <img src="{{ asset('assets/img/kaiadmin/logo_light.svg') }}" alt="navbar brand" class="navbar-brand"
                         height="20" />
@@ -17,13 +17,12 @@
                 <button class="topbar-toggler more">
                     <i class="gg-more-vertical-alt"></i>
                 </button>
-            </div> --}}
-    <!-- End Logo Header -->
-    {{-- </div> --}}
-    <!-- Navbar Header -->
-    {{-- <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
+            </div> -->
+<!-- End Logo Header -->
+<!-- </div> -->
+<!-- Navbar Header -->
+<!-- <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
             <div class="container-fluid">
-
 
                 <div class="mx-auto text-center position-absolute start-50 translate-middle-x">
                     <span class="fw-semibold fs-5 text-dark">Welcome, Admin</span>
@@ -117,7 +116,7 @@
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="{{ route('admin.logout') }}"
                                         onclick="event.preventDefault();
-                                                    document.getElementById('logout-form').submit();">
+                                                document.getElementById('logout-form').submit();">
                                         <i class="align-middle" data-feather="log-out"></i>
                                         Logout
                                     </a>
@@ -132,44 +131,55 @@
                     </li>
                 </ul>
             </div>
-        </nav> --}}
-    <!-- End Navbar -->
-    {{-- </div> --}}
+        </nav> -->
+<!-- End Navbar -->
+<!-- </div> -->
 
 
 
-    <!-- HEADER -->
-    <header class="fixed top-0 left-0 right-0 h-20 bg-white shadow flex items-center justify-between px-6 z-40">
-        <div class="flex items-center space-x-4">
-            <svg viewBox="0 0 576 512" fill="#d4af37" class="h-10 w-10">
-                <path
-                    d="M485.5 0L576 160H474.9L405.7 0h79.8zm-128 0l69.2 160H149.3L218.5 0h139zm-267 0h79.8l-69.2 160H0L90.5 0zM0 192h100.7l123 251.7c1.5 3.1-2.7 5.9-5 3.3L0 192zm148.2 0h279.6l-137 318.2c-1 2.4-4.5 2.4-5.5 0L148.2 192zm204.1 251.7l123-251.7H576L357.3 446.9c-2.3 2.7-6.5-.1-5-3.2z">
-                </path>
-            </svg>
-            <span class="ml-2 text-3xl font-normal font-aleo text-black">DexGems DMCC</span>
-        </div>
-        <div class="flex-1 flex items-center justify-center">
-            <span class="font-bold text-gray-700 text-xl font-aleo">Welcome, Admin</span>
-        </div>
-        {{-- <div class="flex items-center space-x-4">
-            <button class="relative focus:outline-none">
-                <i class="fa fa-bell-o w-6 h-6"></i>
+<!-- HEADER -->
+<header class="fixed top-0 left-0 right-0 h-20 bg-white shadow flex items-center justify-between px-6 z-40">
+    <div class="flex items-center space-x-4">
+        <!-- <svg viewBox="0 0 576 512" fill="#d4af37" class="h-10 w-10">
+            <path
+                d="M485.5 0L576 160H474.9L405.7 0h79.8zm-128 0l69.2 160H149.3L218.5 0h139zm-267 0h79.8l-69.2 160H0L90.5 0zM0 192h100.7l123 251.7c1.5 3.1-2.7 5.9-5 3.3L0 192zm148.2 0h279.6l-137 318.2c-1 2.4-4.5 2.4-5.5 0L148.2 192zm204.1 251.7l123-251.7H576L357.3 446.9c-2.3 2.7-6.5-.1-5-3.2z">
+            </path>
+        </svg> -->
+        <img src="{{ asset('assets/img/diamond-with-gold.png') }}" alt="Logo" height="100" width="80"
+            srcset="">
+        <span class="ml-2 text-3xl font-normal font-aleo text-black">DexGems DMCC</span>
+    </div>
+    <div class="flex-1 flex items-center justify-center">
+        <span class="font-bold text-gray-700 text-xl font-aleo">Welcome, Admin</span>
+    </div>
+    {{-- <div class="flex items-center space-x-4">
+        <button class="relative focus:outline-none">
+            <i class="fa fa-bell-o w-6 h-6"></i>
 
-                <span class="absolute top-0 right-0 block h-2 w-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+            <span class="absolute top-0 right-0 block h-2 w-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+        </button>
+        <img src="https://randomuser.me/api/portraits/men/44.jpg" alt="Profile"
+            class="h-10 w-10 rounded-full border-2 border-brand-gold">
+        <button id="sidebar-toggle"
+            class="lg:hidden ml-2 p-2 rounded hover:bg-gray-100 focus:outline-none transition">
+            <i data-lucide="menu" class="w-7 h-7 text-gray-500"></i>
+        </button>
+    </div> --}}
+    <div class="flex items-center space-x-4">
+        <!-- Notification Icon -->
+        <button class="relative focus:outline-none">
+            <i class="fa fa-bell w-6 h-6"></i>
+            <span class="absolute top-0 right-0 block h-2 w-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+        </button>
+
+        <!-- Profile Picture and Dropdown -->
+        <div class="relative">
+            <!-- Profile Image Button -->
+            <button id="profileDropdownBtn" class="focus:outline-none">
+                <img src="https://randomuser.me/api/portraits/men/44.jpg" alt="Profile"
+                    class="h-10 w-10 rounded-full border-2 border-brand-gold">
             </button>
-            <img src="https://randomuser.me/api/portraits/men/44.jpg" alt="Profile"
-                class="h-10 w-10 rounded-full border-2 border-brand-gold">
-            <button id="sidebar-toggle"
-                class="lg:hidden ml-2 p-2 rounded hover:bg-gray-100 focus:outline-none transition">
-                <i data-lucide="menu" class="w-7 h-7 text-gray-500"></i>
-            </button>
-        </div> --}}
-        <div class="flex items-center space-x-4">
-            <!-- Notification Icon -->
-            <button class="relative focus:outline-none">
-                <i class="fa fa-bell w-6 h-6"></i>
-                <span class="absolute top-0 right-0 block h-2 w-2 bg-red-500 rounded-full ring-2 ring-white"></span>
-            </button>
+
 
             <!-- Profile Picture and Dropdown -->
             <div class="relative">
@@ -192,14 +202,29 @@
                         </button>
                     </form>
                 </div>
-            </div>
 
-            <!-- Sidebar Toggle -->
-            <button id="sidebar-toggle"
-                class="lg:hidden ml-2 p-2 rounded hover:bg-gray-100 focus:outline-none transition">
-                <i data-lucide="menu" class="w-7 h-7 text-gray-500"></i>
-            </button>
+            <!-- Dropdown Menu -->
+            <div id="profileDropdown"
+                class="hidden absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-50">
+                <a href="{{ route('admin.profile') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                    View Profile
+                </a>
+                <form method="POST" action="{{ route('admin.logout') }}">
+                    @csrf
+                    <button type="submit" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        Logout
+                    </button>
+                </form>
+
+            </div>
         </div>
 
+        <!-- Sidebar Toggle -->
+        <button id="sidebar-toggle"
+            class="lg:hidden ml-2 p-2 rounded hover:bg-gray-100 focus:outline-none transition">
+            <i data-lucide="menu" class="w-7 h-7 text-gray-500"></i>
+        </button>
+    </div>
 
-    </header>
+
+</header>
