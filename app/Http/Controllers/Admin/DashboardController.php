@@ -41,6 +41,12 @@ class DashboardController extends Controller
             ->orderByDesc('id')
             ->get(['bidder_name', 'room_name', 'room_type', 'start_time', 'date_for_reservation']);
 
+        $recentBids = SlotBooking::whereNotNull('bidding_price')
+            ->orderByDesc('date_for_reservation')
+            ->take(3)
+            ->get(['lot_id', 'bidder_name', 'bidding_price']);
+
+
         return view('admin.dashboard', compact(
             'totalSellers',
             'totalBidders',
@@ -48,7 +54,8 @@ class DashboardController extends Controller
             'pendingSlotRequests',
             'recentSellers',
             'recentBidders',
-            'recentSlotBookings'
+            'recentSlotBookings',
+            'recentBids'
         ));
     }
 
