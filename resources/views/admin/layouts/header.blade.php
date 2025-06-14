@@ -175,7 +175,7 @@
             <div class="relative">
                 <!-- Profile Image Button -->
                 <button id="profileDropdownBtn" class="focus:outline-none">
-                    <img src="https://randomuser.me/api/portraits/men/44.jpg" alt="Profile"
+                    <img src="{{ asset('assets/img/diamond-with-gold.png') }}" alt="Profile"
                         class="h-10 w-10 rounded-full border-2 border-brand-gold">
                 </button>
 
