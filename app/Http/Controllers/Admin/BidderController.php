@@ -48,7 +48,7 @@ class BidderController extends Controller
         } elseif ($bidder->type == 2) {
             $docStatusFields = [
                 'passport_copy_status',
-                'proof_of_ownership_status',
+                'proof_of_address_status',
             ];
         }
 

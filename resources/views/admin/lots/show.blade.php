@@ -134,7 +134,8 @@
                             <div class="mt-1">
                                 <strong>Description:</strong>
                                 <div class="bg-light rounded-3 p-3 mt-1">
-                                    {!! nl2br(e($lot->description)) !!}
+                                    {{-- {!! nl2br(e($lot->description)) !!} --}}
+                                    {!! $lot->description ? nl2br(e($lot->description)) : 'N/A' !!}
                                 </div>
                             </div>
                         </div>

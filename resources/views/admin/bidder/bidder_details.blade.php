@@ -95,7 +95,7 @@
                     @php
                         $individualDocs = [
                             ['passport_copy', 'Passport Copy'],
-                            ['proof_of_ownership', 'Proof of Ownership'],
+                            ['proof_of_address', 'Proof of Address'],
                         ];
                     @endphp
 

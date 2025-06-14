@@ -75,13 +75,19 @@
                     <div class="card-body">
                         <ul class="list-group list-group-flush">
                             @foreach ($recentSlotBookings as $booking)
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <li class="list-group-item d-flex justify-content-between align-items-start">
                                     <div>
-                                        <strong>{{ $booking->bidder_name }}</strong><br><small
-                                            class="text-muted">{{ $booking->room_name }}</small>
+                                        <strong>{{ $booking->bidder_name }}</strong><br>
+                                        <small class="text-muted">{{ $booking->room_name }}</small>
                                     </div>
-                                    <span
-                                        class="badge bg-outline-dark">{{ \Carbon\Carbon::parse($booking->date_for_reservation . ' ' . $booking->start_time)->format('d M, h:i A') }}</span>
+                                    <div class="text-end">
+                                        <small class="text-muted d-block">
+                                            📅 {{ \Carbon\Carbon::parse($booking->date_for_reservation)->format('d M Y') }}
+                                        </small>
+                                        <small class="text-muted d-block">
+                                            🕒 {{ \Carbon\Carbon::parse($booking->start_time)->format('h:i A') }}
+                                        </small>
+                                    </div>
                                 </li>
                             @endforeach
                         </ul>
@@ -126,24 +132,17 @@
                     </div>
                     <div class="card-body">
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    <strong>LOT-1007</strong><br><small class="text-muted">Neha Patel</small>
-                                </div>
-                                <span class="badge bg-success">₹ 12,50,000</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    <strong>LOT-1005</strong><br><small class="text-muted">Rohit Sen</small>
-                                </div>
-                                <span class="badge bg-success">₹ 9,80,000</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <div>
-                                    <strong>LOT-1003</strong><br><small class="text-muted">Ajay Mehra</small>
-                                </div>
-                                <span class="badge bg-success">₹ 7,60,000</span>
-                            </li>
+                            @forelse($recentBids as $bid)
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>LOT-{{ $bid->lot_id }}</strong><br><small
+                                            class="text-muted">{{ $bid->bidder_name }}</small>
+                                    </div>
+                                    <span class="badge bg-success">₹ {{ number_format($bid->bidding_price, 2) }}</span>
+                                </li>
+                            @empty
+                                <li class="list-group-item text-muted">No recent bids available.</li>
+                            @endforelse
                         </ul>
                     </div>
                 </div>
