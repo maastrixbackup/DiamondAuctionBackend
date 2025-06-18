@@ -509,6 +509,7 @@ class LotController extends Controller
         $newDate = $request->re_date;
         $newTime = $request->re_time;
         $newRoom = $request->room;
+        $meetingLink = $request->meeting_link;
 
         DB::beginTransaction();
         try {
@@ -533,11 +534,12 @@ class LotController extends Controller
             // Update all related slot bookings
             SlotBooking::where('booking_id', $booking->booking_id)
                 ->whereNotIn('status', [3, 2])
-                ->each(function ($slotBooking) use ($newRoom, $newTime, $newDate) {
+                ->each(function ($slotBooking) use ($newRoom, $newTime, $newDate, $meetingLink) {
                     $slotBooking->update([
                         'room_name' => $newRoom,
                         'start_time' => $newTime,
                         'date_for_reservation' => $newDate,
+                        'meeting_link' => $meetingLink,
                         'status' => 1
                     ]);
                 });

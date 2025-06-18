@@ -642,17 +642,69 @@ class BidderController extends Controller
                 return response()->json(['status' => false, 'message' => 'Booking Not Found'], 404);
             }
 
-            // Get lots
-            $lotIds = $booking->booking_lot_id ?? [];
+            // Decode JSON array from DB
+            $lotIds = is_array($booking->booking_lot_id)
+                ? $booking->booking_lot_id
+                : json_decode($booking->booking_lot_id, true) ?? [];
+
             $lots = Lot::whereIn('id', $lotIds)->get();
 
-            // Pre-fetch all slot bookings for performance (avoid N+1)
+            $requestlotIds = is_array($booking->requested_lot_id)
+                ? $booking->requested_lot_id
+                : json_decode($booking->requested_lot_id, true) ?? [];
+
+
+            // // Ensure booking_lot_id is an array
+            // $lotIds = is_array($booking->booking_lot_id)
+            //     ? $booking->booking_lot_id
+            //     : explode(',', $booking->booking_lot_id ?? '');
+
+            // $lots = Lot::whereIn('id', $lotIds)->get();
+
+            // // Ensure requested_lot_id is an array
+            // $requestlotIds = is_array($booking->requested_lot_id)
+            //     ? $booking->requested_lot_id
+            //     : explode(',', $booking->requested_lot_id ?? '');
+
+            $requestedLotDetails = Lot::whereIn('id', $requestlotIds)->get()->map(function ($rlot) {
+                $images = is_array($rlot->images) ? $rlot->images : [];
+                $imageUrls = array_map(fn($img) => asset('storage/images/lots/' . $img), $images);
+
+                return [
+                    "id" => $rlot->id,
+                    "seller_id" => $rlot->seller_id,
+                    "category_id" => $rlot->category_id,
+                    "title" => $rlot->title,
+                    "description" => $rlot->description,
+                    "type" => $rlot->type,
+                    "color" => $rlot->color,
+                    "weight" => $rlot->weight,
+                    "size" => $rlot->size,
+                    "stone" => $rlot->stone,
+                    "shape" => $rlot->shape,
+                    "notes" => $rlot->notes,
+                    "batch_code" => $rlot->batch_code,
+                    "bidding_price" => 0,
+                    "status" => $rlot->status,
+                    "report_number" => $rlot->report_number,
+                    "colour_grade" => $rlot->colour_grade,
+                    "colour_origin" => $rlot->colour_origin,
+                    "colour_distribution" => $rlot->colour_distribution,
+                    "polish" => $rlot->polish,
+                    "symmetry" => $rlot->symmetry,
+                    "fluorescence" => $rlot->fluorescence,
+                    "images" => $imageUrls,
+                    "video" => $rlot->video,
+                ];
+            });
+
+            // Pre-fetch all slot bookings for performance
             $slotBookings = SlotBooking::whereIn('lot_id', $lotIds)
                 ->where('booking_id', $booking->booking_id)
                 ->where('bidder_id', $bidderId)
                 ->where('status', 1)
                 ->get()
-                ->keyBy('lot_id'); // Map by lot_id
+                ->keyBy('lot_id');
 
             $lotDetails = $lots->map(function ($lot) use ($slotBookings) {
                 $images = is_array($lot->images) ? $lot->images : [];
@@ -697,7 +749,16 @@ class BidderController extends Controller
                 'start_time' => $booking->start_time,
                 'date_for_reservation' => $booking->date_for_reservation,
                 'lot_details' => $lotDetails,
+                'requested_lots' => $requestedLotDetails
             ];
+
+            if ($booking->room_type === 'Virtual') {
+                $meetingLink = SlotBooking::where('booking_id', $booking->booking_id)
+                    ->where('status', 1)
+                    ->latest('id')
+                    ->first();
+                $bookingDetails['meeting_link'] = $meetingLink->meeting_link ?? '';
+            }
 
             return response()->json([
                 'status' => true,
@@ -804,6 +865,7 @@ class BidderController extends Controller
         $lotIds = array_filter(array_map('trim', $lotIds));
         $bookingId = $request->booking_id;
         $bookingNumber = $request->booking_no;
+        $meetingLink = $request->meeting_link;
 
         DB::beginTransaction();
         try {
@@ -822,7 +884,7 @@ class BidderController extends Controller
             $currentLots = is_array($currentLots) ? $currentLots : [];
 
             // Merge existing with new and remove duplicates
-            $updatedLots = array_unique(array_merge($currentLots, $lotIds));
+            $updatedLots = array_values(array_unique(array_merge($currentLots, $lotIds)));
 
             // Update booking with merged requested_lot_id
             $booking->update([
@@ -850,6 +912,7 @@ class BidderController extends Controller
                     'room_type' => $request->room_type,
                     'room_name' => $request->room_name,
                     'status' => 3, // 3 = Requested
+                    'meeting_link' => $meetingLink,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
@@ -983,5 +1046,26 @@ class BidderController extends Controller
             'status' => true,
             'message' => 'Logged out successfully',
         ]);
+    }
+
+
+    private function getEnvData()
+    {
+        $envLines = file(base_path('.env'), FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+        $envVars = [];
+        foreach ($envLines as $line) {
+            // Ignore comments
+            if (strpos(trim($line), '#') === 0) {
+                continue;
+            }
+
+            // Parse key=value
+            [$key, $value] = array_pad(explode('=', $line, 2), 2, null);
+            $envVars[trim($key)] = trim($value);
+        }
+        return $envVars;
+        // Now you can access the value like this:
+        // dd($envVars['ZOOM_CLIENT_ID'] ?? 'Not found');
     }
 }
