@@ -60,6 +60,10 @@
                                 @forelse ($groupedSlots as $index => $slot)
                                     @php
                                         $booking = \App\Models\Booking::where('booking_id', $slot->booking_id)->first();
+                                        $meetingLink = \App\Models\SlotBooking::where('booking_id', $slot->booking_id)
+                                            ->where('status', 1)
+                                            ->latest('id')
+                                            ->first();
                                     @endphp
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
@@ -71,7 +75,7 @@
                                         </td>
                                         <td>{{ $slot->room_name ?? 'N/A' }}</td>
                                         <td>{{ $slot->room_type }}</td>
-                                        <td>{{ $slot->date_for_reservation }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($slot->date_for_reservation)->format('d-m-Y') }}</td>
                                         <td>{{ \Carbon\Carbon::parse($slot->start_time)->format('h:i A') }}</td>
                                         <td>
                                             @php
@@ -148,6 +152,15 @@
                                                     <i class="fa fa-ban"></i>
                                                     <span>Cancel</span>
                                                 </a>
+                                                @if ($meetingLink && $meetingLink->room_type === 'Virtual' && !empty($meetingLink->meeting_link))
+                                                    <a href="{{ $meetingLink->meeting_link }}" target="_blank"
+                                                        class="btn btn-sm btn-outline-info d-flex align-items-center gap-1 ">
+                                                        <i class="fa fa-thumb-tack"></i>
+                                                        <span>
+                                                            Enter
+                                                        </span>
+                                                    </a>
+                                                @endif
 
                                             </div>
                                         </td>
@@ -156,7 +169,7 @@
                                     <tr>
                                         <td colspan="10">
                                             <div class="text-center py-3 text-muted">
-                                                No pending  requests found.
+                                                No pending requests found.
                                             </div>
                                         </td>
                                     </tr>

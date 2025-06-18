@@ -19,7 +19,8 @@ class SlotBooking extends Model
         'room_name',
         'room_type',
         'status',
-        'bidding_price'
+        'bidding_price',
+        'meeting_link'
     ];
 
     public function slot()

@@ -20,7 +20,10 @@ class DashboardController extends Controller
         $totalSellers = Seller::where('account_status', 1)->count();
         $totalBidders = Bidder::where('account_status', 1)->count();
         $totalLots = Lot::where('status', 1)->count();
-        $pendingSlotRequests = SlotBooking::where('status', 0)->count();
+        // $pendingSlotRequests = SlotBooking::where('status', 0)->count();
+        $pendingSlotRequests = SlotBooking::where('status', 0)
+            ->distinct('booking_id')
+            ->count('booking_id');
         $recentSellers = Seller::where('account_status', 1)
             ->select('full_name', 'type', 'created_at')
             ->orderBy('created_at', 'desc')

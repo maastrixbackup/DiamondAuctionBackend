@@ -116,86 +116,124 @@
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            @php
+                                                // Fetch meeting link only if room type is Virtual
+                                                $meetingLink = null;
+                                                if ($booking->room_type === 'Virtual') {
+                                                    $meetingLink = \App\Models\SlotBooking::where(
+                                                        'booking_id',
+                                                        $booking->booking_id,
+                                                    )
+                                                        ->where('status', 1)
+                                                        ->orderByDesc('id')
+                                                        ->first();
+                                                }
+                                            @endphp
                                             <form action="{{ route('admin.re-assign-room', $booking->id) }}" method="post"
                                                 id="reAssignRoomForm">
                                                 @csrf
-                                                <tr>
-                                                    @if (!empty($timeFrame))
-                                                        <td>
-                                                            {{ $timeFrame }}
+                                                <table class="table">
+                                                    <tbody>
+                                                        <tr>
+                                                            @if (!empty($timeFrame))
+                                                                <td><b>{{ $timeFrame }}</b></td>
+                                                            @endif
+                                                            <td>
+                                                                <input type="hidden" name="re_date"
+                                                                    value="{{ $reqDay }}">
+                                                                <input type="hidden" name="re_time"
+                                                                    value="{{ $timeFrame }}">
 
-                                                        </td>
-                                                    @endif
-                                                    <td>
-                                                        <input type="hidden" name="re_date" value="{{ $reqDay }}">
-                                                        <input type="hidden" name="re_time" value="{{ $timeFrame }}">
-                                                        <div class="d-flex justify-content-center align-items-center">
-                                                            @foreach ($rooms as $rk => $room)
-                                                                @php
-                                                                    $roomNumber = str_replace('Room ', '', $room);
-                                                                    $isVisible = in_array($roomNumber, $roomIds);
+                                                                <div
+                                                                    class="d-flex justify-content-center align-items-center flex-wrap">
+                                                                    @foreach ($rooms as $rk => $room)
+                                                                        @php
+                                                                            $roomNumber = str_replace(
+                                                                                'Room ',
+                                                                                '',
+                                                                                $room,
+                                                                            );
+                                                                            $isVisible = in_array(
+                                                                                $roomNumber,
+                                                                                $roomIds,
+                                                                            );
 
-                                                                    // ✅ Condition to control room visibility based on booking type
-                                                                    $showRoom = true;
-                                                                    if (
-                                                                        $booking->room_type === 'Physical' &&
-                                                                        $roomNumber == 7
-                                                                    ) {
-                                                                        $showRoom = false;
-                                                                    } elseif (
-                                                                        $booking->room_type === 'Virtual' &&
-                                                                        $roomNumber != 7
-                                                                    ) {
-                                                                        $showRoom = false;
-                                                                    }
+                                                                            // Room visibility logic
+                                                                            $showRoom = true;
+                                                                            if (
+                                                                                $booking->room_type === 'Physical' &&
+                                                                                $roomNumber == 7
+                                                                            ) {
+                                                                                $showRoom = false;
+                                                                            } elseif (
+                                                                                $booking->room_type === 'Virtual' &&
+                                                                                $roomNumber != 7
+                                                                            ) {
+                                                                                $showRoom = false;
+                                                                            }
 
-                                                                    // Styling
-                                                                    $bgClr = $isVisible
-                                                                        ? 'bg-[#ebf1f5]'
-                                                                        : 'bg-[#f8d7da]';
-                                                                    $textClr = $isVisible
-                                                                        ? 'text-[#065f46]'
-                                                                        : 'text-[#842029]';
-                                                                    $borderClr = $isVisible
-                                                                        ? 'border-[#065f46]'
-                                                                        : 'border-[#842029]';
-                                                                @endphp
+                                                                            // Styles
+                                                                            $bgClr = $isVisible
+                                                                                ? 'bg-[#ebf1f5]'
+                                                                                : 'bg-[#f8d7da]';
+                                                                            $textClr = $isVisible
+                                                                                ? 'text-[#065f46]'
+                                                                                : 'text-[#842029]';
+                                                                            $borderClr = $isVisible
+                                                                                ? 'border-[#065f46]'
+                                                                                : 'border-[#842029]';
+                                                                        @endphp
 
-                                                                @if ($showRoom)
-                                                                    <div class="col card m-1 border {{ $borderClr }} rounded-md shadow-sm"
-                                                                        style="min-width: 60px; height: 70px;">
-                                                                        <div
-                                                                            class="card-body p-2 text-center {{ $bgClr }} {{ $textClr }} text-sm rounded-md">
-                                                                            @if ($isVisible)
-                                                                                <label class="block cursor-pointer">
-                                                                                    <input type="radio" name="room"
-                                                                                        value="{{ $room }}"
-                                                                                        class="accent-[#065f46] mb-1"><br />
-                                                                                    {{ $room }}
-                                                                                </label>
-                                                                            @else
-                                                                                <div class="font-semibold text-xs mt-2">
-                                                                                    Reserved</div>
-                                                                                <div class="text-xs">{{ $room }}
+                                                                        @if ($booking->room_type === 'Virtual' && $roomNumber == 7)
+                                                                            <div class="w-100 mb-2">
+                                                                                <label for="meeting_link">Meeting Link <span
+                                                                                        class="text-danger">*</span></label>
+                                                                                <input type="url" name="meeting_link"
+                                                                                    class="form-control"
+                                                                                    placeholder="Enter meeting link"
+                                                                                    value="{{ $meetingLink->meeting_link ?? '' }}"
+                                                                                    required>
+                                                                            </div>
+                                                                        @endif
+
+                                                                        @if ($showRoom)
+                                                                            <div class="col card m-1 border {{ $borderClr }} rounded-md shadow-sm"
+                                                                                style="min-width: 60px; height: 70px;">
+                                                                                <div
+                                                                                    class="card-body p-2 text-center {{ $bgClr }} {{ $textClr }} text-sm rounded-md">
+                                                                                    @if ($isVisible)
+                                                                                        <label class="block cursor-pointer">
+                                                                                            <input type="radio"
+                                                                                                name="room"
+                                                                                                value="{{ $room }}"
+                                                                                                class="accent-[#065f46] mb-1"><br />
+                                                                                            {{ $room }}
+                                                                                        </label>
+                                                                                    @else
+                                                                                        <div
+                                                                                            class="font-semibold text-xs mt-2">
+                                                                                            Reserved</div>
+                                                                                        <div class="text-xs">
+                                                                                            {{ $room }}</div>
+                                                                                    @endif
                                                                                 </div>
-                                                                            @endif
-                                                                        </div>
-                                                                    </div>
-                                                                @endif
-                                                            @endforeach
+                                                                            </div>
+                                                                        @endif
+                                                                    @endforeach
+                                                                </div>
+                                                            </td>
+                                                        </tr>
 
-
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                @if (!empty($roomIds))
-                                                    <tr>
-                                                        <td colspan="2" class="text-right">
-                                                            <button class="btn btn-primary" type="submit">Re-Assign
-                                                                Room</button>
-                                                        </td>
-                                                    </tr>
-                                                @endif
+                                                        @if (!empty($roomIds))
+                                                            <tr>
+                                                                <td colspan="2" class="text-right">
+                                                                    <button class="btn btn-primary" type="submit">Re-Assign
+                                                                        Room</button>
+                                                                </td>
+                                                            </tr>
+                                                        @endif
+                                                    </tbody>
+                                                </table>
                                             </form>
                                         </tbody>
                                     </table>
