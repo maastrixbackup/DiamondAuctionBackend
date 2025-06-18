@@ -198,7 +198,7 @@
                         <div class="card-header bg-light d-flex justify-content-between align-items-center py-3 px-4">
                             <h4 class="card-title mb-0 fw-semibold">All Lots</h4>
                             <a href="{{ route('admin.lots.create') }}"
-                                class="btn btn-success btn-sm fw-semibold shadow-sm">
+                                class="btn btn-success btn-sm fw-semibold shadow-sm" title="Add Lot">
                                 + Add
                             </a>
                         </div>

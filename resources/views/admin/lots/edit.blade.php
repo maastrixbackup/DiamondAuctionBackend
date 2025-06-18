@@ -337,67 +337,70 @@
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let urlField = document.getElementById("video");
-
-            // If the field has a value on page load, generate preview
+            const urlField = document.getElementById("video");
             if (urlField.value.trim()) {
                 generatePreview(urlField.value.trim());
             }
         });
 
         function generatePreview(url) {
-            let previewContainer = document.getElementById("previewContainer");
+            const previewContainer = document.getElementById('previewContainer');
+            previewContainer.innerHTML = '';
 
-            if (!url.trim()) {
-                previewContainer.innerHTML = `<p style="color:red;">Please enter a YouTube URL</p>`;
-                return;
-            }
+            const youtubeId = extractYouTubeId(url);
+            const vimeoId = extractVimeoId(url);
 
-            let videoId = extractVideoId(url);
-            if (videoId) {
-                // Try fetching the maxresdefault thumbnail first
-                let maxresUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-                let sdUrl = `https://img.youtube.com/vi/${videoId}/sddefault.jpg`;
-                let hqUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-
-                checkImageAvailability(maxresUrl, function(available) {
-                    let thumbnailUrl = available ? maxresUrl : sdUrl;
-                    checkImageAvailability(thumbnailUrl, function(available) {
-                        if (!available) {
-                            thumbnailUrl = hqUrl;
-                        }
+            if (youtubeId) {
+                previewContainer.innerHTML = `
+                <img src="https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg"
+                     alt="YouTube Thumbnail"
+                     style="width: 100px; cursor: pointer;"
+                     onclick="playVideo('${youtubeId}', 'youtube')">
+            `;
+            } else if (vimeoId) {
+                // Vimeo thumbnail via API
+                fetch(`https://vimeo.com/api/v2/video/${vimeoId}.json`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const thumbnail = data[0]?.thumbnail_small || '';
                         previewContainer.innerHTML = `
-                    <img src="${thumbnailUrl}" alt="YouTube Preview" style="width: 100px; cursor: pointer;" onclick="playVideo('${videoId}')">
-                `;
+                        <img src="${thumbnail}"
+                             alt="Vimeo Thumbnail"
+                             style="width: 100px; cursor: pointer;"
+                             onclick="playVideo('${vimeoId}', 'vimeo')">
+                    `;
+                    }).catch(err => {
+                        console.error("Vimeo fetch failed", err);
+                        previewContainer.innerHTML = `<p style="color:red;">Unable to load Vimeo preview</p>`;
                     });
-                });
-            } else {
-                previewContainer.innerHTML = `<p style="color:red;">Invalid YouTube URL</p>`;
+            } else if (url.trim()) {
+                previewContainer.innerHTML = `<p style="color: red;">Invalid or unsupported video URL</p>`;
             }
         }
 
-        function extractVideoId(url) {
-            let match = url.match(
-                /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
-            );
+        function extractYouTubeId(url) {
+            const match = url.match(
+                /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([^"&?\/\s]{11})/);
             return match ? match[1] : null;
         }
 
-        function playVideo(videoId) {
-            document.getElementById("previewContainer").innerHTML = `
-        <iframe width="315" height="215" src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-    `;
+        function extractVimeoId(url) {
+            const match = url.match(/(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(?:.*\/)?(\d+)/);
+            return match ? match[1] : null;
         }
 
-        function checkImageAvailability(url, callback) {
-            let img = new Image();
-            img.src = url;
-            img.onload = function() {
-                callback(true);
-            };
-            img.onerror = function() {
-                callback(false);
-            };
+        function playVideo(videoId, platform) {
+            const container = document.getElementById("previewContainer");
+
+            if (platform === 'youtube') {
+                container.innerHTML = `
+                <iframe width="315" height="215" src="https://www.youtube.com/embed/${videoId}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            `;
+            } else if (platform === 'vimeo') {
+                container.innerHTML = `
+                <iframe width="315" height="215" src="https://player.vimeo.com/video/${videoId}?autoplay=1" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+            `;
+            }
         }
     </script>
 @endpush

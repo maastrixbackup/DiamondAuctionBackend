@@ -26,33 +26,34 @@
             </div>
 
             <div class="row">
-    <div class="col-md-12">
-        <div class="card shadow-sm border-0 rounded-4">
-            <div class="card-header bg-light py-3 px-4">
-                <h4 class="card-title mb-0 fw-semibold">Category Information</h4>
-            </div>
-            <div class="card-body px-4 pb-4">
-                <form action="{{ route('admin.category.update', $category->id) }}" method="POST">
-                    @csrf
-                    @method('PUT')
+                <div class="col-md-12">
+                    <div class="card shadow-sm border-0 rounded-4">
+                        <div class="card-header bg-light py-3 px-4">
+                            <h4 class="card-title mb-0 fw-semibold">Category Information</h4>
+                        </div>
+                        <div class="card-body px-4 pb-4">
+                            <form action="{{ route('admin.category.update', $category->id) }}" method="POST">
+                                @csrf
+                                @method('PUT')
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="name" class="form-label">Category Name</label>
-                            <input type="text" name="name" id="name" class="form-control"
-                                value="{{ old('name', $category->name) }}" required>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="name" class="form-label">Category Name</label>
+                                        <input type="text" name="name" id="name" class="form-control"
+                                            placeholder="Enter category name" value="{{ old('name', $category->name) }}"
+                                            required>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex gap-2 mt-3">
+                                    <button type="submit" class="btn btn-success">Update</button>
+                                    <a href="{{ route('admin.category.index') }}" class="btn btn-secondary">Cancel</a>
+                                </div>
+                            </form>
                         </div>
                     </div>
-
-                    <div class="d-flex gap-2 mt-3">
-                        <button type="submit" class="btn btn-success">Update</button>
-                        <a href="{{ route('admin.category.index') }}" class="btn btn-secondary">Cancel</a>
-                    </div>
-                </form>
+                </div>
             </div>
-        </div>
-    </div>
-</div>
 
         </div>
     </div>

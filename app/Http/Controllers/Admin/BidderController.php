@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Bidder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class BidderController extends Controller
 {
@@ -95,23 +96,26 @@ class BidderController extends Controller
             $bidder->account_status = $status;
             $bidder->save();
 
+            // Send email only when account is set to Active (1)
+            if ($status == 1) {
+                $subject = "Account Activated";
+                $messageText = "Dear {$bidder->full_name},\n\n" .
+                    "Congratulations and thank you for registering with us!\n\n" .
+                    "We're pleased to inform you that your account has been **approved** and activated.\n\n" .
+                    "You can now log in to your dashboard and secure your spot or book a time slot to start using the platform.\n\n" .
+                    "If you have any questions, feel free to reach out to our support team or contact us on WhatsApp.\n\n" .
+                    "We’re excited to have you on board!\n\n" .
+                    "--\nTeam Support";
+
+                Mail::raw($messageText, function ($message) use ($bidder, $subject) {
+                    $message->to($bidder->email_address)
+                        ->subject($subject);
+                });
+            }
+
             return redirect()->route('admin.bidder')->with('success', 'Account status updated successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to update account status: ' . $e->getMessage());
         }
     }
-
-    // public function changeBidderAccountStatus($id)
-    // {
-    //     try {
-    //         $bidder = Bidder::findOrFail($id);
-    //         // Cycle status: 0 → 1 → 2 → 0
-    //         $bidder->account_status = ($bidder->account_status + 1) % 3;
-    //         $bidder->save();
-
-    //         return redirect()->route('admin.bidder')->with('success', 'Account status changed successfully.');
-    //     } catch (\Exception $e) {
-    //         return redirect()->back()->with('error', 'Failed to change Account status: ' . $e->getMessage());
-    //     }
-    // }
 }

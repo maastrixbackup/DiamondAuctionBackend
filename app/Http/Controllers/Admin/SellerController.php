@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Seller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class SellerController extends Controller
 {
@@ -88,11 +89,13 @@ class SellerController extends Controller
                 'valid_trade_license_status',
                 'passport_copy_authorised_status',
                 'ubo_declaration_status',
+                'kyc_document_status',
             ];
         } elseif ($seller->type == 2) {
             $docStatusFields = [
                 'passport_copy_status',
                 'proof_of_ownership_status',
+                'kyc_document_status',
             ];
         }
 
@@ -113,31 +116,17 @@ class SellerController extends Controller
     }
 
 
-    public function changeSellerKycStatus($id)
-    {
-        try {
-            $seller = Seller::findOrFail($id);
-            // Cycle status: 0 → 1 → 2 → 0
-            $seller->kyc_status = ($seller->kyc_status + 1) % 3;
-            $seller->save();
-
-            return redirect()->route('admin.seller')->with('success', 'KYC status changed successfully.');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to change KYC status: ' . $e->getMessage());
-        }
-    }
-
-    // public function changeSellerAccountStatus($id)
+    // public function changeSellerKycStatus($id)
     // {
     //     try {
     //         $seller = Seller::findOrFail($id);
     //         // Cycle status: 0 → 1 → 2 → 0
-    //         $seller->account_status = ($seller->account_status + 1) % 3;
+    //         $seller->kyc_status = ($seller->kyc_status + 1) % 3;
     //         $seller->save();
 
-    //         return redirect()->route('admin.seller')->with('success', 'Account status changed successfully.');
+    //         return redirect()->route('admin.seller')->with('success', 'KYC status changed successfully.');
     //     } catch (\Exception $e) {
-    //         return redirect()->back()->with('error', 'Failed to change Account status: ' . $e->getMessage());
+    //         return redirect()->back()->with('error', 'Failed to change KYC status: ' . $e->getMessage());
     //     }
     // }
 
@@ -152,6 +141,23 @@ class SellerController extends Controller
 
             $seller->account_status = $status;
             $seller->save();
+
+            // Send email only when account is set to Active (1)
+            if ($status == 1) {
+                $subject = "Account Activated";
+                $messageText = "Dear {$seller->full_name},\n\n" .
+                    "Congratulations and thank you for registering with us!\n\n" .
+                    "We're pleased to inform you that your account has been **approved** and activated.\n\n" .
+                    "You can now log in to your dashboard and secure your spot or book a time slot to start using the platform.\n\n" .
+                    "If you have any questions, feel free to reach out to our support team or contact us on WhatsApp.\n\n" .
+                    "We’re excited to have you on board!\n\n" .
+                    "--\nTeam Support";
+
+                Mail::raw($messageText, function ($message) use ($seller, $subject) {
+                    $message->to($seller->email_address)
+                        ->subject($subject);
+                });
+            }
 
             return redirect()->route('admin.seller')->with('success', 'Account status updated successfully.');
         } catch (\Exception $e) {

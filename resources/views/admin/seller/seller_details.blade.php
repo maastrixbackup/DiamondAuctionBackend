@@ -183,7 +183,7 @@
             </tbody>
         </table>
 
-        <a href="{{ route('admin.seller') }}" class="btn btn-secondary mt-3">Back to List</a>
+        <a href="{{ route('admin.seller') }}" class="btn btn-secondary mt-3">Back</a>
     </div>
 </div>
 

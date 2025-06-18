@@ -156,7 +156,7 @@
                                     <tr>
                                         <td colspan="10">
                                             <div class="text-center py-3 text-muted">
-                                                No pending  requests found.
+                                                No pending requests found.
                                             </div>
                                         </td>
                                     </tr>
@@ -286,11 +286,6 @@
         }
     </script>
     <script>
-        // function toggleMeetingLink() {
-        //     const container = document.getElementById('meetingLinkContainer');
-        //     container.classList.remove('d-none');
-        // }
-
         function toggleMeetingLink(radio) {
             const isVirtualRoom = radio.dataset.isVirtual === '1';
             const box = document.getElementById('meetingLinkContainer');
