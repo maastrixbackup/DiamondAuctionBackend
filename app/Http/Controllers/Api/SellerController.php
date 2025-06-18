@@ -62,6 +62,7 @@ class SellerController extends Controller
         }
 
         try {
+            DB::beginTransaction();
             $seller = new Seller();
             $seller->type = $request->type === 'company' ? 1 : 2;   // 1 = company, 2 = individual
             $seller->kyc_status = 0;
@@ -130,12 +131,44 @@ class SellerController extends Controller
 
             $seller->save();
 
+            // Send registration confirmation email
+            $subject = "Thank You for Registering with Dexterous Tender";
+            $messageText = "Hi {$seller->full_name},\n\n" .
+                "Thank you for registering for Dexterous Tender. Please sit tight while we check your documents and approve your account.\n\n" .
+                "You'll be notified via email once your account is activated.\n\n" .
+                "--\nTeam Dexterous";
+
+            Mail::raw($messageText, function ($message) use ($seller, $subject) {
+                $message->to($seller->email_address)
+                    ->subject($subject);
+            });
+
+            // Notify internal team
+            $internalSubject = "New Seller Registration: {$seller->full_name}";
+            $internalMessage = "A new seller has registered on Dexterous Tender.\n\n" .
+                "Name: {$seller->full_name}\n" .
+                "Email: {$seller->email_address}\n" .
+                "Phone: {$seller->phone_number}\n" .
+                "Type: " . ($seller->type == 1 ? 'Company' : 'Individual');
+
+            Mail::raw($internalMessage, function ($message) use ($internalSubject) {
+                $message->to([
+                    'conner@dexterousdmcc.com',
+                    'abdul@dexterousdmcc.com',
+                    // 'diana@dextrousdmcc.com',
+                    'sam.miah@bbndry.com',
+                ])->subject($internalSubject);
+            });
+
+            DB::commit();
+
             return response()->json([
-                'status'  => true,
+                'status' => true,
                 'message' => 'Seller created successfully',
-                'data'    => $seller
+                'data' => $seller
             ], 201);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'status'  => false,
                 'message' => 'Failed to create seller',
@@ -543,6 +576,47 @@ class SellerController extends Controller
         }
     }
 
+    public function sellerChangePassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required|string|min:6',
+            'new_password' => 'required|string|min:6',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $seller = $request->user();
+
+        if (!Hash::check($request->current_password, $seller->password)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Current password is incorrect.',
+            ], 401);
+        }
+
+        if (Hash::check($request->new_password, $seller->password)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'New password must be different from the current password.',
+            ], 422);
+        }
+
+        $seller->password = Hash::make($request->new_password);
+        $seller->save();
+
+        // Revoke old tokens
+        $seller->tokens()->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Password changed successfully. Please log in again.',
+        ], 200);
+    }
 
     public function sellerLogout(Request $request)
     {

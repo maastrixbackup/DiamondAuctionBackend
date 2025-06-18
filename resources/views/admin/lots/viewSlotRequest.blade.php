@@ -299,11 +299,6 @@
         }
     </script>
     <script>
-        // function toggleMeetingLink() {
-        //     const container = document.getElementById('meetingLinkContainer');
-        //     container.classList.remove('d-none');
-        // }
-
         function toggleMeetingLink(radio) {
             const isVirtualRoom = radio.dataset.isVirtual === '1';
             const box = document.getElementById('meetingLinkContainer');

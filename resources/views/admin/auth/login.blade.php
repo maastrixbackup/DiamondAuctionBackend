@@ -1,6 +1,18 @@
 <x-guest-layout>
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
+    @if (session('success'))
+        <div id="session-message" class="mb-4 font-medium text-sm text-green-600">
+            {{ session('success') }}
+        </div>
+
+        <script>
+            setTimeout(() => {
+                const el = document.getElementById('session-message');
+                if (el) el.style.display = 'none';
+            }, 4000);
+        </script>
+    @endif
 
     <form method="POST" action="{{ route('admin.login.submit') }}">
         @csrf

@@ -40,10 +40,16 @@
                                 <th>Role</th>
                                 <td>
                                     @if ($admin->role === 'superadmin')
-                                        <span class="badge bg-success">Superadmin</span>
+                                        <span class="badge bg-success ms-2 px-3 py-2">Superadmin</span>
                                     @else
-                                        <span class="badge bg-primary">Admin</span>
+                                        <span class="badge bg-primary ms-2 px-3 py-2">Admin</span>
                                     @endif
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Password</th>
+                                <td>
+                                    <a href="{{ route('admin.changePasswordForm') }}" class="badge bg-info ms-2 px-3 py-2 text-decoration-underline" title="Change password">Change Password</a>
                                 </td>
                             </tr>
                         </tbody>

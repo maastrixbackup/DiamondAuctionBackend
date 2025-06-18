@@ -49,6 +49,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/bidder-assigned-lots-by-slots/{slotId}', [BidderController::class, 'bidderAssignedLotsBySlot']);
     Route::post('/reupload-bidder-document', [BidderController::class, 'reuploadBidderDocument']);
     Route::post('/reupload-seller-document', [SellerController::class, 'reuploadSellerDocument']);
+    Route::post('/bidder-change-password', [BidderController::class, 'bidderChangePassword']);
+    Route::post('/seller-change-password', [SellerController::class, 'sellerChangePassword']);
 
     // Bibhu
     Route::get('/get-booking-details/{booking_id}', [BidderController::class, 'getBookingDetails']);

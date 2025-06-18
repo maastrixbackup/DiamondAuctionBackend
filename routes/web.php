@@ -55,6 +55,9 @@ Route::prefix('admin')->group(function () {
 
     Route::middleware(['admin', 'admin.role:superadmin'])->group(function () {
         Route::post('/logout', [LoginController::class, 'logout'])->name('admin.logout');
+        Route::get('/change-password', [AdminController::class, 'showChangePasswordForm'])->name('admin.changePasswordForm');
+        Route::post('/change-password', [AdminController::class, 'changePassword'])->name('admin.changePassword');
+
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
         Route::get('/profile', [DashboardController::class, 'profileDetails'])->name('admin.profile');
         Route::resource('lots', LotController::class)->names('admin.lots');

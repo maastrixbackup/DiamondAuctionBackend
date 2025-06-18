@@ -61,6 +61,7 @@ class BidderController extends Controller
         }
 
         try {
+            DB::beginTransaction();
             $bidder = new Bidder();
             $bidder->type = $request->type === 'company' ? 1 : 2;
             $bidder->kyc_status = 0;
@@ -121,12 +122,44 @@ class BidderController extends Controller
 
             $bidder->save();
 
+            // Send registration confirmation email
+            $subject = "Thank You for Registering with Dexterous Tender";
+            $messageText = "Hi {$bidder->full_name},\n\n" .
+                "Thank you for registering for Dexterous Tender. Please sit tight while we check your documents and approve your account.\n\n" .
+                "You'll be notified via email once your account is activated.\n\n" .
+                "--\nTeam Dexterous";
+
+            Mail::raw($messageText, function ($message) use ($bidder, $subject) {
+                $message->to($bidder->email_address)
+                    ->subject($subject);
+            });
+
+            // Notify internal team
+            $internalSubject = "New Bidder Registration: {$bidder->full_name}";
+            $internalMessage = "A new bidder has registered on Dexterous Tender.\n\n" .
+                "Name: {$bidder->full_name}\n" .
+                "Email: {$bidder->email_address}\n" .
+                "Phone: {$bidder->phone_number}\n" .
+                "Type: " . ($bidder->type == 1 ? 'Company' : 'Individual');
+
+            Mail::raw($internalMessage, function ($message) use ($internalSubject) {
+                $message->to([
+                    'conner@dexterousdmcc.com',
+                    'abdul@dexterousdmcc.com',
+                    // 'diana@dextrousdmcc.com',
+                    'sam.miah@bbndry.com',
+                ])->subject($internalSubject);
+            });
+
+            DB::commit();
+
             return response()->json([
                 'status' => true,
                 'message' => 'Bidder created successfully',
                 'data' => $bidder
             ], 201);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'status' => false,
                 'message' => 'Failed to create bidder',
@@ -221,6 +254,21 @@ class BidderController extends Controller
                 2 => 'Individual',
             ];
 
+            $totalLotsListed = SlotBooking::where('bidder_id', $bidder->id)
+                ->distinct('lot_id')
+                ->count('lot_id');
+
+            // $bidsReceived = SlotBooking::where('bidder_id', $bidder->id)
+            //     ->whereNotNull('bidding_price')
+            //     ->count();
+            // $maxBidAmount = SlotBooking::where('bidder_id', $bidder->id)
+            //     ->whereNotNull('bidding_price')
+            //     ->max('bidding_price');
+            $result = SlotBooking::where('bidder_id', $bidder->id)
+                ->whereNotNull('bidding_price')
+                ->selectRaw('COUNT(*) as total_bids, MAX(bidding_price) as max_bid')
+                ->first();
+
             $dashboardData = [
                 'full_name' => $bidder->full_name,
                 'email_address' => $bidder->email_address,
@@ -240,6 +288,9 @@ class BidderController extends Controller
                 'account_status' => $accountStatus[$bidder->account_status],
                 'type' => $bidder->type,
                 'type_name' => $typeStatus[$bidder->type],
+                'total_lots_listed' => $totalLotsListed,
+                'bids_received' => $result->total_bids,
+                'highest_bid_amount' => $result->max_bid,
             ];
 
             return response()->json([
@@ -1038,6 +1089,47 @@ class BidderController extends Controller
         return response()->json(['status' => true, 'message' => 'Password reset successful.'], 200);
     }
 
+    public function bidderChangePassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required|string|min:6',
+            'new_password' => 'required|string|min:6',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $bidder = $request->user();
+
+        if (!Hash::check($request->current_password, $bidder->password)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Current password is incorrect.',
+            ], 401);
+        }
+
+        if (Hash::check($request->new_password, $bidder->password)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'New password must be different from the current password.',
+            ], 422);
+        }
+
+        $bidder->password = Hash::make($request->new_password);
+        $bidder->save();
+
+        // Revoke old tokens
+        $bidder->tokens()->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Password changed successfully. Please log in again.',
+        ], 200);
+    }
 
     public function bidderLogout(Request $request)
     {
