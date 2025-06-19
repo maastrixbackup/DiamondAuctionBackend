@@ -163,21 +163,6 @@
                                 @endforeach
                             @endif
 
-                            {{-- KYC + Account --}}
-                            {{-- <tr>
-                                <th>KYC Status</th>
-                                <td>
-                                    <span
-                                        class="badge
-                            {{ $bidder->kyc_status == 1
-                                ? 'bg-success px-3 py-2'
-                                : ($bidder->kyc_status == 2
-                                    ? 'bg-danger px-3 py-2'
-                                    : 'bg-warning px-3 py-2') }}">
-                                        {{ $bidder->kyc_status == 1 ? 'Approved' : ($bidder->kyc_status == 2 ? 'Rejected' : 'Pending') }}
-                                    </span>
-                                </td>
-                            </tr> --}}
                             <tr>
                                 <th>Account Status</th>
                                 <td>

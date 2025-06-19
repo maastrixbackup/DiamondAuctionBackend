@@ -122,4 +122,18 @@
             }
         };
     </script>
+
+    <script>
+        $(document).ready(function() {
+            var table = $('#basic-datatables').DataTable({
+                lengthChange: false,
+                searching: true,
+                ordering: false
+                // 'columnDefs': [{
+                //     'targets': [4], // column index (start from 0)
+                //     'orderable': false, // set orderable false for selected columns
+                // }]
+            });
+        });
+    </script>
 @endpush

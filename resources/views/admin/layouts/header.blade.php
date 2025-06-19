@@ -147,7 +147,7 @@
         </svg> -->
         <img src="{{ asset('assets/img/diamond-with-gold.png') }}" alt="Logo" height="100" width="80"
             srcset="">
-        <span class="ml-2 text-3xl font-normal font-aleo text-black">DexGems DMCC</span>
+        <span class="ml-2 text-3xl font-normal font-aleo text-black">Dexterous DMCC</span>
     </div>
     <div class="flex-1 flex items-center justify-center">
         <span class="font-bold text-gray-700 text-xl font-aleo">Welcome, Admin</span>
@@ -179,7 +179,7 @@
                 <img src="{{ asset('assets/img/diamond-with-gold.png') }}" alt="Profile"
                         class="h-10 w-10 rounded-full border-2 border-brand-gold">
             </button>
-            
+
             <!-- Dropdown Menu -->
             <div id="profileDropdown"
                 class="hidden absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-50">
