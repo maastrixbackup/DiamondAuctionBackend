@@ -26,7 +26,7 @@
 
         /* Thumb (the draggable part) */
         ::-webkit-scrollbar-thumb {
-            background-color: #c8ee41;
+            background-color: #ad0000;
             /* Corporate green */
             border-radius: 10px;
             border: 2px solid transparent;
@@ -35,7 +35,7 @@
 
         /* On hover */
         ::-webkit-scrollbar-thumb:hover {
-            background-color: #388E3C;
+            background-color: #000;
             /* Darker green */
         }
     </style>
