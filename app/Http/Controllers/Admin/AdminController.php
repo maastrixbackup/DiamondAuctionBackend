@@ -12,15 +12,16 @@ class AdminController extends Controller
 {
     public function adminList(Request $request)
     {
-        $admins = Admin::where('role', 'admin')
+        $admins = Admin::where('role', 'superadmin')
             ->orderBy('id', 'desc')
+            ->where('id', '!=', 1)
             ->get();
         return view('admin.admin.admin_list', compact('admins'));
     }
 
     public function adminDetails($id)
     {
-        $admin = Admin::where('id', $id)->where('role', 'admin')->firstOrFail();
+        $admin = Admin::where('id', $id)->where('role', 'superadmin')->firstOrFail();
 
         return view('admin.admin.admin_details', compact('admin'));
     }
