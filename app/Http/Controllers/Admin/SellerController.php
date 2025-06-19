@@ -145,15 +145,88 @@ class SellerController extends Controller
             // Send email only when account is set to Active (1)
             if ($status == 1) {
                 $subject = "Account Activated";
-                $messageText = "Dear {$seller->full_name},\n\n" .
-                    "Congratulations and thank you for registering with us!\n\n" .
-                    "We're pleased to inform you that your account has been **approved** and activated.\n\n" .
-                    "You can now log in to your dashboard and secure your spot or book a time slot to start using the platform.\n\n" .
-                    "If you have any questions, feel free to reach out to our support team or contact us on WhatsApp.\n\n" .
-                    "We’re excited to have you on board!\n\n" .
-                    "--\nTeam Support";
+               $messageText = '
+            <html>
+              <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+                <table align="center" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; padding: 20px; border: 1px solid #ddd;">
+                  <tr>
+                    <td style="text-align: center; padding-bottom: 20px;">
+                      <img src="https://dexterousdmcc.gemxchange.com/assets/logo-Dhtvyvby.png" alt="Dexterous Tender" style="height: 100px;" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <h2 style="color: #333;">Congratulation!</h2>
+                      <p style="font-size: 16px; color: #555;">
+                        Hi ' . htmlspecialchars($seller->full_name) . ',
+                      </p>
+                      <p style="font-size: 16px; color: #555;">
+                        Congratulations and thank you for registering with us!
+                      </p>
+                      <p style="font-size: 16px; color: #555;">
+                        We are pleased to inform you that your account has been **approved** and activated.
+                      </p>
+            
+                      <div style="background-color: #f9f9f9; padding: 15px; border: 1px solid #ccc; margin: 20px 0;">
+                        <h3 style="color: #444;">Your Login Details</h3>
+                        <p style="font-size: 15px;">
+                          Username: <strong>' . htmlspecialchars($seller->email_address) . '</strong>
+                        </p>
+                        
+                      </div>
+            
+                      <p style="font-size: 16px; color: #555;">
+                        You can now log in to your dashboard and start listing your lots.
+                      </p>
+                      
+                     <p style="font-size: 16px; color: #555;">
+                      We’re excited to have you on board!
+                      </p>
+            
+                      <p style="font-size: 16px; color: #555;">
+                        If you have any questions or require help, please call us on 
+                        <a href="tel:+4400000000" style="color: #007bff;">+44 xxx xxx xxxx</a> or email us at 
+                        <a href="mailto:support@dexteroustender.com" style="color: #007bff;">support@dexteroustender.com</a>.
+                      </p>
+            
+                      <hr style="margin: 30px 0;" />
+            
+                      <h3 style="color: #333;">Buyer\'s Premium</h3>
+                      <p style="font-size: 15px; color: #555;">
+                        On the first £100,000 of the Hammer Price (of any individual lot), the buyer will pay the hammer price and a premium of 
+                        <strong>25% (plus VAT)</strong> or <strong>30% (inclusive of VAT)</strong>.<br />
+                        On the excess over £100,001 of the hammer price (of any individual lot), the buyer will pay the hammer price and a premium of 
+                        <strong>15% (plus VAT)</strong> or <strong>18% (inclusive of VAT)</strong>.
+                      </p>
+            
+                      <h3 style="color: #333;">Seller\'s Commission</h3>
+                      <p style="font-size: 15px; color: #555;">
+                        Our seller’s commission charge is <strong>15% (plus VAT)</strong>. A marketing fee is charged at <strong>£10 (plus VAT)</strong> per lot.<br />
+                        There is also a loss/liability charge of <strong>1.5% (plus VAT)</strong> per lot.<br />
+                        We offer free worldwide shipping subject to our T&Cs.
+                      </p>
+            
+                      <p style="font-size: 14px; color: #999; margin-top: 30px;">--<br />Team Dexterous</p>
+                    </td>
+                  </tr>
+                </table>
+            
+                <table align="center" width="600" style="font-size: 12px; color: #999; text-align: center; margin-top: 20px;">
+                  <tr>
+                    <td>
+                      <p style="margin-bottom: 5px;">
+                        © ' . date('Y') . ' Dexterous Tender. All rights reserved.
+                      </p>
+                      <p>
+                        You are receiving this email at <a href="mailto:' . htmlspecialchars($seller->email_address) . '" style="color: #999;">' . htmlspecialchars($seller->email_address) . '</a>
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </body>
+            </html>';
 
-                Mail::raw($messageText, function ($message) use ($seller, $subject) {
+                Mail::html($messageText, function ($message) use ($seller, $subject) {
                     $message->to($seller->email_address)
                         ->subject($subject);
                 });
