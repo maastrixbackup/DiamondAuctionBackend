@@ -46,7 +46,7 @@
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Phone</th>
-                                <th>KYC Status</th>
+                                <th>Document Status</th>
                                 <th>Account Status</th>
                                 <th>Action</th>
                             </tr>
