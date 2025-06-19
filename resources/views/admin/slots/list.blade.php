@@ -2,6 +2,43 @@
 @section('title', 'Slots List')
 
 @section('content')
+    <style>
+        .card-body {
+            width: 100%;
+            height: 438px;
+            overflow: auto;
+        }
+
+
+        /* Works in Chrome, Edge, Safari */
+        ::-webkit-scrollbar {
+            width: 8px;
+            /* Scrollbar width */
+            height: 10px;
+            /* For horizontal scroll */
+        }
+
+        /* Track (the background) */
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            /* Light grey or transparent */
+        }
+
+        /* Thumb (the draggable part) */
+        ::-webkit-scrollbar-thumb {
+            background-color: #c8ee41;
+            /* Corporate green */
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+        }
+
+        /* On hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #388E3C;
+            /* Darker green */
+        }
+    </style>
     <div class="row mt-lg-4 pt-lg-4">
         <div class="page-inner">
             <div class="page-header d-flex align-items-center justify-content-between flex-wrap mb-3">
@@ -32,8 +69,8 @@
                     }
                 @endphp
                 <div class="col-md-12">
-                    <form method="GET" action="{{ route('admin.viewing-slots.index') }}" class="mb-4">
-                        <div class="bg-light rounded-4 px-4 py-4 d-flex flex-wrap align-items-center gap-3 shadow-sm">
+                    <form method="GET" action="{{ route('admin.viewing-slots.index') }}" class="mb-2">
+                        <div class="bg-light rounded-4 px-4 py-2 d-flex flex-wrap align-items-center gap-3 shadow-sm">
                             <div class="px-2" style="min-width: 200px;">
                                 <input type="date" name="day" id="day"
                                     class="form-control form-control-sm rounded-pill border-0 shadow-none"
@@ -76,7 +113,7 @@
                         @endif
 
                         <div class="card-body">
-                            <div class="table-responsive">
+                            <div class="">
                                 <table id="basic-datatables" class="display  table table-bordered">
                                     <thead>
                                         @php
