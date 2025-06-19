@@ -24,78 +24,86 @@
             </div>
 
             <div class="row">
-    <div class="col-12">
-        <div class="card shadow-sm border-0 rounded-4">
-            <div class="card-header bg-light d-flex justify-content-between align-items-center py-3 px-4">
-                <h4 class="card-title mb-0 fw-semibold">All Bidders</h4>
-            </div>
+                <div class="col-12">
+                    <div class="card shadow-sm border-0 rounded-4">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center py-3 px-4">
+                            <h4 class="card-title mb-0 fw-semibold">All Bidders</h4>
+                        </div>
 
-            @if (session('success'))
-                <div class="alert alert-success mx-4 mt-3 rounded-3 shadow-sm" id="success-alert">
-                    {{ session('success') }}
+                        @if (session('success'))
+                            <div class="alert alert-success mx-4 mt-3 rounded-3 shadow-sm" id="success-alert">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+
+                        <div class="card-body px-4 pb-4">
+                            <div class="table-responsive">
+                                <table id="basic-datatables"
+                                    class="table table-hover align-middle text-nowrap table-bordered rounded-3 overflow-hidden">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>SL</th>
+                                            <th>Type</th>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Phone</th>
+                                            <th>Document Status</th>
+                                            <th>Account Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($bidders as $bidder)
+                                            <tr>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>{{ $bidder->type == 1 ? 'Company' : 'Individual' }}</td>
+                                                <td>{{ $bidder->full_name }}</td>
+                                                <td>{{ $bidder->email_address }}</td>
+                                                <td>{{ $bidder->phone_number }}</td>
+
+                                                <!-- KYC Status -->
+                                                <td>
+                                                    <span
+                                                        class="badge rounded-pill
+                                            {{ $bidder->kyc_status == 1
+                                                ? 'px-3 py-2 border border-success bg-success-subtle text-success-emphasis'
+                                                : ($bidder->kyc_status == 2
+                                                    ? 'px-3 py-2 border border-danger bg-danger-subtle text-danger-emphasis'
+                                                    : 'px-3 py-2 border border-warning bg-warning-subtle text-warning-emphasis') }}">
+                                                        {{ $bidder->kyc_status == 1 ? 'Approved' : ($bidder->kyc_status == 2 ? 'Rejected' : 'Pending') }}
+                                                    </span>
+                                                </td>
+
+                                                <!-- Account Status -->
+                                                <td>
+                                                    <span
+                                                        class="badge rounded-pill
+                                            {{ $bidder->account_status == 1
+                                                ? 'px-3 py-2 border border-success bg-success-subtle text-success-emphasis'
+                                                : ($bidder->account_status == 2
+                                                    ? 'px-3 py-2 border border-danger bg-danger-subtle text-danger-emphasis'
+                                                    : 'px-3 py-2 border border-warning bg-warning-subtle text-warning-emphasis') }}">
+                                                        {{ $bidder->account_status == 1 ? 'Active' : ($bidder->account_status == 2 ? 'Suspended' : 'Pending') }}
+                                                    </span>
+                                                </td>
+
+                                                <!-- View Action -->
+                                                <td>
+                                                    <a href="{{ route('admin.bidderDetails', $bidder->id) }}"
+                                                        class="btn btn-sm btn-outline-primary d-inline-flex align-items-center"
+                                                        title="View">
+                                                        <i class="icon-eye me-1"></i> View
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            @endif
-
-            <div class="card-body px-4 pb-4">
-                <div class="table-responsive">
-                    <table id="basic-datatables" class="table table-hover align-middle text-nowrap table-bordered rounded-3 overflow-hidden">
-                        <thead class="table-light">
-                            <tr>
-                                <th>SL</th>
-                                <th>Type</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Document Status</th>
-                                <th>Account Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($bidders as $bidder)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $bidder->type == 1 ? 'Company' : 'Individual' }}</td>
-                                    <td>{{ $bidder->full_name }}</td>
-                                    <td>{{ $bidder->email_address }}</td>
-                                    <td>{{ $bidder->phone_number }}</td>
-
-                                    <!-- KYC Status -->
-                                    <td>
-                                        <span class="badge rounded-pill
-                                            {{ $bidder->kyc_status == 1 ? 'px-3 py-2 border border-success bg-success-subtle text-success-emphasis' :
-                                                ($bidder->kyc_status == 2 ? 'px-3 py-2 border border-danger bg-danger-subtle text-danger-emphasis' : 'px-3 py-2 border border-warning bg-warning-subtle text-warning-emphasis') }}">
-                                            {{ $bidder->kyc_status == 1 ? 'Approved' :
-                                                ($bidder->kyc_status == 2 ? 'Rejected' : 'Pending') }}
-                                        </span>
-                                    </td>
-
-                                    <!-- Account Status -->
-                                    <td>
-                                        <span class="badge rounded-pill
-                                            {{ $bidder->account_status == 1 ? 'px-3 py-2 border border-success bg-success-subtle text-success-emphasis' :
-                                                ($bidder->account_status == 2 ? 'px-3 py-2 border border-danger bg-danger-subtle text-danger-emphasis' : 'px-3 py-2 border border-warning bg-warning-subtle text-warning-emphasis') }}">
-                                            {{ $bidder->account_status == 1 ? 'Active' :
-                                                ($bidder->account_status == 2 ? 'Suspended' : 'Pending') }}
-                                        </span>
-                                    </td>
-
-                                    <!-- View Action -->
-                                    <td>
-                                        <a href="{{ route('admin.bidderDetails', $bidder->id) }}"
-                                           class="btn btn-sm btn-outline-primary d-inline-flex align-items-center" title="View">
-                                            <i class="icon-eye me-1"></i> View
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
             </div>
-        </div>
-    </div>
-</div>
 
         </div>
     </div>
@@ -113,5 +121,19 @@
                 }, 3000);
             }
         };
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            var table = $('#basic-datatables').DataTable({
+                lengthChange: false,
+                searching: true,
+                ordering: false
+                // 'columnDefs': [{
+                //     'targets': [4], // column index (start from 0)
+                //     'orderable': false, // set orderable false for selected columns
+                // }]
+            });
+        });
     </script>
 @endpush
