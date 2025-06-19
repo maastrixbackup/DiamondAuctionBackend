@@ -21,7 +21,7 @@ return new class extends Migration
             $table->time('start_time');
             $table->date('date_for_reservation');
             $table->unsignedBigInteger('bidder_id');
-            $table->tinyInteger('status')->default(0)->comment('0->pending, 1->approved, 2->rejected');
+            $table->tinyInteger('status')->default(0)->comment('0->pending, 1->approved, 2->rejected, 3-> Requested, 4->Cancelled');
             $table->timestamps();
         });
     }
