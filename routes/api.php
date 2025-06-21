@@ -58,6 +58,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/lots-bid-details', [SellerController::class, 'getLotsBidDetails']);
     Route::post('/update-bid-details', [BidderController::class, 'updateBiddetails']);
     Route::post('/get-bidding-history', [BidderController::class, 'getBiddingHistory']);
+    Route::get('/get-bidding-summary', [BidderController::class, 'getBiddingSummary']);
+
     // Zoom Signature
     // Route::any('/zoom-signature', [ZoomController::class, 'generateSignature']);
 });

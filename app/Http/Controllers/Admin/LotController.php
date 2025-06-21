@@ -73,6 +73,7 @@ class LotController extends Controller
             'size' => 'nullable|string|max:255',
             'stone' => 'nullable|string|max:255',
             'shape' => 'nullable|string|max:255',
+            'clarity' => 'nullable|string|max:255',
             'notes' => 'nullable|string',
             'batch_code' => 'nullable|string|max:255',
             'status' => 'required|in:0,1,2',
@@ -107,6 +108,7 @@ class LotController extends Controller
             $lot->size = $request->size;
             $lot->stone = $request->stone;
             $lot->shape = $request->shape;
+            $lot->clarity = $request->clarity;
             $lot->notes = $request->notes;
             $lot->batch_code = $request->batch_code;
             $lot->status = $request->status;
@@ -198,6 +200,7 @@ class LotController extends Controller
             'size' => 'nullable|string|max:255',
             'stone' => 'nullable|string|max:255',
             'shape' => 'nullable|string|max:255',
+            'clarity' => 'nullable|string|max:255',
             'notes' => 'nullable|string',
             'batch_code' => 'nullable|string|max:255',
             'status' => 'required|in:0,1,2',
@@ -231,6 +234,7 @@ class LotController extends Controller
             $lot->size = $request->size;
             $lot->stone = $request->stone;
             $lot->shape = $request->shape;
+            $lot->clarity = $request->clarity;
             $lot->notes = $request->notes;
             $lot->batch_code = $request->batch_code;
             $lot->status = $request->status;
