@@ -441,6 +441,7 @@ class BidderController extends Controller
                 'room_type' => 'required|in:Physical,Virtual',
                 'date' => 'required|date',
             ]);
+            $bidderId = $request->user()->id;
 
             $roomType = $request->room_type;
             $date = $request->date;
@@ -474,7 +475,16 @@ class BidderController extends Controller
                 if ($queryDate === $now->toDateString() && $slotDateTime->lessThan($now)) {
                     $timeBlocks[$timeStr] = 'Disabled';
                 } else {
-                    $timeBlocks[$timeStr] = in_array($timeStr, $availableSlots) ? 'available' : 'unavailable';
+                    // $date and $startTime
+                    $booking = Booking::where('bidder_id', $bidderId)
+                        ->where('start_time', $startTime)
+                        ->where('date_for_reservation', $date)
+                        ->first();
+                    if ($booking) {
+                        $timeBlocks[$timeStr] = 'Disabled';
+                    } else {
+                        $timeBlocks[$timeStr] = in_array($timeStr, $availableSlots) ? 'available' : 'unavailable';
+                    }
                 }
                 $startTime->addMinutes(30);
             }

@@ -12,9 +12,9 @@
 
         /* Works in Chrome, Edge, Safari */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 12px;
             /* Scrollbar width */
-            height: 10px;
+            height: 12px;
             /* For horizontal scroll */
         }
 

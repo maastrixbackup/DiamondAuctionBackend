@@ -25,19 +25,22 @@ class LotController extends Controller
         // $query = Lot::with('seller');
         $query = Lot::with(['seller', 'category']);
 
-        if ($request->has('status') && $request->status != '') {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        if ($request->has('type') && $request->type != '') {
-            $query->where('type', 'like', '%' . $request->type . '%');
+        if ($request->filled('type')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'like', '%' . $request->type . '%')
+                    ->orWhere('id', $request->type);
+            });
         }
 
-        if ($request->has('weight') && $request->weight != '') {
+        if ($request->filled('weight')) {
             $query->where('weight', 'like', '%' . $request->weight . '%');
         }
 
-        if ($request->has('category_id') && $request->category_id != '') {
+        if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
         }
 

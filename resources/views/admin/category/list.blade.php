@@ -17,7 +17,7 @@
                             <i class="icon-arrow-right"></i>
                         </li>
                         <li class="nav-item">
-                            <a href="#">Categories</a>
+                            <a href="javascript:;">Categories</a>
                         </li>
                     </ul>
                 </div>

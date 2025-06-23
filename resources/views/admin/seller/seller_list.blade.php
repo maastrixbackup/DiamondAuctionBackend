@@ -17,7 +17,7 @@
                             <i class="icon-arrow-right"></i>
                         </li>
                         <li class="nav-item">
-                            <a href="#">Sellers</a>
+                            <a href="javascript:;">Sellers</a>
                         </li>
                     </ul>
                 </div>
@@ -57,7 +57,7 @@
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ $seller->type == 1 ? 'Company' : 'Individual' }}</td>
-                                                <td>{{ $seller->full_name }}</td>
+                                                <td class="text-capitalize">{{ $seller->full_name }}</td>
                                                 <td>{{ $seller->email_address }}</td>
                                                 <td>{{ $seller->phone_number }}</td>
 

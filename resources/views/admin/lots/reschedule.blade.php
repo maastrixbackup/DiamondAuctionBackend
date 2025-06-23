@@ -227,7 +227,8 @@
                                                         @if (!empty($roomIds))
                                                             <tr>
                                                                 <td colspan="2" class="text-right">
-                                                                    <button class="btn btn-primary" type="submit">Re-Assign
+                                                                    <button class="btn btn-primary" type="submit"
+                                                                        id="reAssignRoomBtn">Re-Assign
                                                                         Room</button>
                                                                 </td>
                                                             </tr>
@@ -269,8 +270,17 @@
                 return;
             }
 
-            // ✅ If a room is selected, you can safely submit the form
-            this.submit();
+            const submitBtn = document.getElementById('reAssignRoomBtn');
+            if (!submitBtn) {
+                console.warn("Submit button not found");
+                return;
+            }
+
+            submitBtn.setAttribute("disabled", true);
+            submitBtn.innerText = "Processing...";
+
+            // Let the submit happen in the next tick
+            setTimeout(() => this.submit(), 10);
         });
     </script>
 

@@ -51,7 +51,7 @@
                             @forelse($recentSellers as $seller)
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
-                                        <strong>{{ $seller->full_name }}</strong><br><small
+                                        <strong class="text-capitalize">{{ $seller->full_name }}</strong><br><small
                                             class="text-muted">{{ $seller->type == 1 ? 'Company' : ($seller->type == 2 ? 'Individual' : 'N/A') }}</small>
                                     </div>
                                     <span
@@ -77,7 +77,7 @@
                             @foreach ($recentSlotBookings as $booking)
                                 <li class="list-group-item d-flex justify-content-between align-items-start">
                                     <div>
-                                        <strong>{{ $booking->bidder_name }}</strong><br>
+                                        <strong class="text-capitalize">{{ $booking->bidder_name }}</strong><br>
                                         <small class="text-muted">{{ $booking->room_name }}</small>
                                     </div>
                                     <div class="text-end">
@@ -109,7 +109,7 @@
                             @forelse($recentBidders as $bidder)
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
-                                        <strong>{{ $bidder->full_name }}</strong><br><small
+                                        <strong class="text-capitalize">{{ $bidder->full_name }}</strong><br><small
                                             class="text-muted">{{ $bidder->type == 1 ? 'Company' : ($bidder->type == 2 ? 'Individual' : 'N/A') }}</small>
                                     </div>
                                     <span
@@ -136,7 +136,7 @@
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
                                         <strong>LOT-{{ $bid->lot_id }}</strong><br><small
-                                            class="text-muted">{{ $bid->bidder_name }}</small>
+                                            class="text-muted text-capitalize">{{ $bid->bidder_name }}</small>
                                     </div>
                                     <span class="badge bg-success">₹ {{ number_format($bid->bidding_price, 2) }}</span>
                                 </li>
