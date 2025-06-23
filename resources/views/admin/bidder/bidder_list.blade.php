@@ -17,7 +17,7 @@
                             <i class="icon-arrow-right"></i>
                         </li>
                         <li class="nav-item">
-                            <a href="#">Bidders</a>
+                            <a href="javascript:;">Bidders</a>
                         </li>
                     </ul>
                 </div>
@@ -57,7 +57,7 @@
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ $bidder->type == 1 ? 'Company' : 'Individual' }}</td>
-                                                <td>{{ $bidder->full_name }}</td>
+                                                <td class="text-capitalize">{{ $bidder->full_name }}</td>
                                                 <td>{{ $bidder->email_address }}</td>
                                                 <td>{{ $bidder->phone_number }}</td>
 

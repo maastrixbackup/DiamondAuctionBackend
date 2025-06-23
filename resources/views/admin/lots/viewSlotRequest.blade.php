@@ -17,7 +17,7 @@
                             <i class="icon-arrow-right"></i>
                         </li>
                         <li class="nav-item">
-                            <a href="#">Requests</a>
+                            <a href="javascript:;">Requests</a>
                         </li>
                     </ul>
                 </div>
@@ -70,7 +70,7 @@
                                         <td>
                                             {{ $slot->booking_id }}
                                         </td>
-                                        <td>
+                                        <td class="text-capitalize">
                                             {{ $slot->bidder_name }}
                                         </td>
                                         <td>{{ $slot->room_name ?? 'N/A' }}</td>

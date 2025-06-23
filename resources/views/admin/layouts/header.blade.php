@@ -150,7 +150,8 @@
         <span class="ml-2 text-3xl font-normal font-aleo text-black">Dexterous DMCC</span>
     </div>
     <div class="flex-1 flex items-center justify-center">
-        <span class="font-bold text-gray-700 text-xl font-aleo">Welcome, Admin</span>
+        <span class="font-bold text-gray-700 text-xl font-aleo text-capitalize">Welcome,
+            {{ Auth::guard('admin')->user()->name ?? 'Admin' }}</span>
     </div>
     {{-- <div class="flex items-center space-x-4">
         <button class="relative focus:outline-none">
@@ -177,7 +178,7 @@
             <!-- Profile Image Button -->
             <button id="profileDropdownBtn" class="focus:outline-none">
                 <img src="{{ asset('assets/img/diamond-with-gold.png') }}" alt="Profile"
-                        class="h-10 w-10 rounded-full border-2 border-brand-gold">
+                    class="h-10 w-10 rounded-full border-2 border-brand-gold">
             </button>
 
             <!-- Dropdown Menu -->

@@ -17,7 +17,7 @@
                             <i class="icon-arrow-right"></i>
                         </li>
                         <li class="nav-item">
-                            <a href="#">Admins</a>
+                            <a href="javascript:;">Admins</a>
                         </li>
                     </ul>
                 </div>
