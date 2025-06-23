@@ -542,6 +542,8 @@ class LotController extends Controller
             'https://diamondauction.daily.co/1stroom',
             'https://diamondauction.daily.co/2ndroom',
             'https://diamondauction.daily.co/3rdroom',
+            'https://diamondauction.daily.co/4throom',
+            'https://diamondauction.daily.co/5throom',
         ];
 
         $usedLinks = SlotBooking::where('start_time', $startTime)
@@ -606,6 +608,14 @@ class LotController extends Controller
         $timeFrame = '';
         $roomIds = [];
 
+        $allMeetingLinks = [
+            'https://diamondauction.daily.co/1stroom',
+            'https://diamondauction.daily.co/2ndroom',
+            'https://diamondauction.daily.co/3rdroom',
+            'https://diamondauction.daily.co/4throom',
+            'https://diamondauction.daily.co/5throom',
+        ];
+
         if ($request->filled('day') && $request->filled('time')) {
             $reqDay = $request->day;
             $timeFrame = $request->time;
@@ -616,11 +626,19 @@ class LotController extends Controller
                 ->unique()
                 ->values()
                 ->toArray();
+
+            $usedLinks = SlotBooking::where('date_for_reservation', $reqDay)
+                ->where('start_time', $timeFrame)
+                ->whereNotNull('meeting_link')
+                ->pluck('meeting_link')
+                ->toArray();
         }
 
-        $booking = Booking::where('booking_id', $id)->first();
+        $availableMeetingLinks = array_values(array_diff($allMeetingLinks, $usedLinks));
+
+        $booking = Booking::where('booking_id', $id)->firstOrFail();
         // dd($roomIds);
-        return view('admin.lots.reschedule', compact('booking', 'reqDay', 'timeFrame', 'roomIds'));
+        return view('admin.lots.reschedule', compact('booking', 'reqDay', 'timeFrame', 'roomIds', 'availableMeetingLinks'));
     }
 
     public function reAssignRoom(Request $request, $id)

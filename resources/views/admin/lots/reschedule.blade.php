@@ -188,11 +188,24 @@
                                                                             <div class="w-100 mb-2">
                                                                                 <label for="meeting_link">Meeting Link <span
                                                                                         class="text-danger">*</span></label>
-                                                                                <input type="url" name="meeting_link"
+                                                                                <select name="meeting_link"
+                                                                                    id="meeting_link" class="form-control"
+                                                                                    required>
+                                                                                    <option value="" selected
+                                                                                        disabled>
+                                                                                        Select Link
+                                                                                    </option>
+                                                                                    @foreach ($availableMeetingLinks as $lk => $link)
+                                                                                        <option value="{{ $link }}"
+                                                                                            {{ $link === $meetingLink->meeting_link ? 'selected' : '' }}>
+                                                                                            {{ $link }}</option>
+                                                                                    @endforeach
+                                                                                </select>
+                                                                                {{-- <input type="url" name="meeting_link"
                                                                                     class="form-control"
                                                                                     placeholder="Enter meeting link"
                                                                                     value="{{ $meetingLink->meeting_link ?? '' }}"
-                                                                                    required>
+                                                                                    required> --}}
                                                                             </div>
                                                                         @endif
 
