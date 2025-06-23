@@ -299,15 +299,30 @@
         }
     </script>
     <script>
+        // function toggleMeetingLink(radio) {
+        //     const isVirtualRoom = radio.dataset.isVirtual === '1';
+        //     const box = document.getElementById('meetingLinkContainer');
+        //     if (isVirtualRoom && !radio.disabled) {
+        //         box.classList.remove('d-none');
+        //         box.querySelector('input').required = true;
+        //     } else {
+        //         box.classList.add('d-none');
+        //         box.querySelector('input').required = false;
+        //     }
+        // }
+
         function toggleMeetingLink(radio) {
-            const isVirtualRoom = radio.dataset.isVirtual === '1';
-            const box = document.getElementById('meetingLinkContainer');
-            if (isVirtualRoom && !radio.disabled) {
-                box.classList.remove('d-none');
-                box.querySelector('input').required = true;
+            const isVirtual = radio.dataset.isVirtual === "1";
+            const container = document.getElementById('meetingLinkContainer');
+            const meetingLinkSelect = document.getElementById('meeting_link');
+
+            if (isVirtual) {
+                container.classList.remove('d-none');
+                meetingLinkSelect.setAttribute('required', 'required');
             } else {
-                box.classList.add('d-none');
-                box.querySelector('input').required = false;
+                container.classList.add('d-none');
+                meetingLinkSelect.removeAttribute('required');
+                meetingLinkSelect.value = ""; // reset value
             }
         }
     </script>

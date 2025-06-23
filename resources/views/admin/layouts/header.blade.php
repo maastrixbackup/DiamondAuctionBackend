@@ -150,7 +150,8 @@
         <span class="ml-2 text-3xl font-normal font-aleo text-black">Dexterous DMCC</span>
     </div>
     <div class="flex-1 flex items-center justify-center">
-        <span class="font-bold text-gray-700 text-xl font-aleo">Welcome, Admin</span>
+        {{-- <span class="font-bold text-gray-700 text-xl font-aleo">Welcome, Admin</span> --}}
+        <span class="font-bold text-gray-700 text-xl font-aleo">Welcome, {{ Auth::guard('admin')->user()->name ?? 'Admin' }}</span>
     </div>
     {{-- <div class="flex items-center space-x-4">
         <button class="relative focus:outline-none">

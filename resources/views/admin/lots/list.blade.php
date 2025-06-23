@@ -197,10 +197,16 @@
                     <div class="card shadow-sm border-0 rounded-4">
                         <div class="card-header bg-light d-flex justify-content-between align-items-center py-3 px-4">
                             <h4 class="card-title mb-0 fw-semibold">All Lots</h4>
-                            <a href="{{ route('admin.lots.create') }}"
-                                class="btn btn-success btn-sm fw-semibold shadow-sm" title="Add Lot">
-                                + Add
-                            </a>
+                            <div class="d-flex gap-2">
+                                <a href="{{ route('admin.lotsExport', request()->query()) }}" class="btn btn-outline-primary btn-sm fw-semibold shadow-sm"
+                                    title="Export CSV">
+                                    <i class="bi bi-download me-1"></i> Export CSV
+                                </a>
+                                <a href="{{ route('admin.lots.create') }}"
+                                    class="btn btn-success btn-sm fw-semibold shadow-sm" title="Add Lot">
+                                    + Add
+                                </a>
+                            </div>
                         </div>
 
                         @if (session('success'))
