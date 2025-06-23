@@ -309,6 +309,105 @@ class LotController extends Controller
         }
     }
 
+    public function export(Request $request)
+    {
+        $query = Lot::with(['seller', 'category']);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', 'like', '%' . $request->type . '%');
+        }
+
+        if ($request->filled('weight')) {
+            $query->where('weight', 'like', '%' . $request->weight . '%');
+        }
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        $lots = $query->orderBy('id', 'desc')->get();
+
+        $handle = fopen('php://temp', 'r+');
+        fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF)); // UTF-8 BOM for Excel
+
+        // CSV Headers
+        fputcsv($handle, [
+            'ID',
+            'Seller',
+            'Category',
+            'Title',
+            'Description',
+            'Type',
+            'Color',
+            'Weight',
+            'Size',
+            'Stone',
+            'Shape',
+            'Clarity',
+            'Notes',
+            'Batch Code',
+            'Status',
+            'Report Number',
+            'Report Document',
+            'Colour Grade',
+            'Origin',
+            'Distribution',
+            'Polish',
+            'Symmetry',
+            'Fluorescence',
+            'Images',
+            'Video',
+            'Created At'
+        ]);
+
+        foreach ($lots as $lot) {
+            fputcsv($handle, [
+                $lot->id,
+                optional($lot->seller)->full_name ?? 'N/A',
+                optional($lot->category)->name ?? 'N/A',
+                $lot->title,
+                $lot->description,
+                $lot->type,
+                $lot->color,
+                $lot->weight,
+                $lot->size,
+                $lot->stone,
+                $lot->shape,
+                $lot->clarity,
+                $lot->notes,
+                $lot->batch_code,
+                match ($lot->status) {
+                    0 => 'Pending',
+                    1 => 'Live',
+                    2 => 'Sold',
+                    default => 'Unknown',
+                },
+                $lot->report_number,
+                $lot->report_document,
+                $lot->colour_grade,
+                $lot->colour_origin,
+                $lot->colour_distribution,
+                $lot->polish,
+                $lot->symmetry,
+                $lot->fluorescence,
+                is_array($lot->images) ? implode(', ', $lot->images) : $lot->images,
+                $lot->video,
+                $lot->created_at,
+            ]);
+        }
+
+        rewind($handle);
+        $csvContent = stream_get_contents($handle);
+        fclose($handle);
+
+        return response($csvContent)
+            ->header('Content-Type', 'text/csv; charset=UTF-8')
+            ->header('Content-Disposition', 'attachment; filename="lots_export.csv"');
+    }
 
 
     /**
@@ -439,10 +538,23 @@ class LotController extends Controller
             }
         }
 
+        $allMeetingLinks = [
+            'https://diamondauction.daily.co/1stroom',
+            'https://diamondauction.daily.co/2ndroom',
+            'https://diamondauction.daily.co/3rdroom',
+        ];
+
+        $usedLinks = SlotBooking::where('start_time', $startTime)
+            ->where('date_for_reservation', $date)
+            ->whereNotNull('meeting_link')
+            ->pluck('meeting_link')
+            ->toArray();
+
+        $availableMeetingLinks = array_values(array_diff($allMeetingLinks, $usedLinks));
 
         return view(
             'admin.lots.viewRequestLots',
-            compact('rooms', 'startTime', 'date', 'roomType', 'lots', 'isRoomAlreadyAssigned', 'requestedLots', 'booking')
+            compact('rooms', 'startTime', 'date', 'roomType', 'lots', 'isRoomAlreadyAssigned', 'requestedLots', 'booking', 'availableMeetingLinks')
         );
     }
 

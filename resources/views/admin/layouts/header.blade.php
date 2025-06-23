@@ -152,6 +152,7 @@
     <div class="flex-1 flex items-center justify-center">
         <span class="font-bold text-gray-700 text-xl font-aleo text-capitalize">Welcome,
             {{ Auth::guard('admin')->user()->name ?? 'Admin' }}</span>
+
     </div>
     {{-- <div class="flex items-center space-x-4">
         <button class="relative focus:outline-none">
