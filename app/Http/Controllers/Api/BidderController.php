@@ -544,7 +544,7 @@ class BidderController extends Controller
                         return 'storage/images/lots/' . ltrim($image, '/');
                     }, $lot->images);
                 } else {
-                    $lot->images = [];
+                    $lot->images = ['storage/images/lots/sample.jpg'];
                 }
                 unset($lot->image_urls);
                 return $lot;

@@ -607,7 +607,7 @@ class LotController extends Controller
         $reqDay = '';
         $timeFrame = '';
         $roomIds = [];
-
+        $usedLinks = []; // ✅ Ensure this is always defined
         $allMeetingLinks = [
             'https://diamondauction.daily.co/1stroom',
             'https://diamondauction.daily.co/2ndroom',
