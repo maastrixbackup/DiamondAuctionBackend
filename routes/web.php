@@ -61,6 +61,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
         Route::get('/profile', [DashboardController::class, 'profileDetails'])->name('admin.profile');
         Route::resource('lots', LotController::class)->names('admin.lots');
+        Route::get('lotsExport', [LotController::class, 'export'])->name('admin.lotsExport');
         Route::get('/seller', [SellerController::class, 'sellerList'])->name('admin.seller');
         Route::get('/sellerDetails/{id}', [SellerController::class, 'sellerDetails'])->name('admin.sellerDetails');
         // Route::get('change-seller-status/{id}', [SellerController::class, 'changeSellerStatus'])->name('admin.change-seller-status');

@@ -65,28 +65,39 @@
                                             </select>
                                         </div>
 
-                                        <div class="mb-3">
-                                            <label for="title" class="form-label">Title</label>
-                                            <input type="text" name="title" id="title" class="form-control"
-                                                placeholder="Enter Title" value="{{ $lot->title }}" required>
-                                        </div>
+                                        <!-- Highlighted Grouped Section -->
+                                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 shadow-sm mb-4">
 
-                                        <div class="mb-3">
-                                            <label for="type" class="form-label">Type</label>
-                                            <input type="text" name="type" id="type" class="form-control"
-                                                placeholder="Enter Type" value="{{ $lot->type }}" required>
-                                        </div>
+                                            <div class="mb-3">
+                                                <label for="weight" class="form-label">Weight</label>
+                                                <input type="text" name="weight" id="weight" class="form-control"
+                                                    placeholder="Enter Weight" value="{{ $lot->weight }}" required>
+                                            </div>
 
-                                        <div class="mb-3">
-                                            <label for="color" class="form-label">Color</label>
-                                            <input type="text" name="color" id="color" class="form-control"
-                                                placeholder="Enter Color" value="{{ $lot->color }}">
-                                        </div>
+                                            <div class="mb-3">
+                                                <label for="color" class="form-label">Color</label>
+                                                <input type="text" name="color" id="color" class="form-control"
+                                                    placeholder="Enter Color" value="{{ $lot->color }}">
+                                            </div>
 
-                                        <div class="mb-3">
-                                            <label for="weight" class="form-label">Weight</label>
-                                            <input type="text" name="weight" id="weight" class="form-control"
-                                                placeholder="Enter Weight" value="{{ $lot->weight }}" required>
+                                            <div class="mb-3">
+                                                <label for="clarity" class="form-label">Clarity</label>
+                                                <input type="text" name="clarity" id="clarity" class="form-control"
+                                                    placeholder="Enter clarity" value="{{ $lot->clarity }}">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="colour_grade" class="form-label">Colour Grade</label>
+                                                <input type="text" name="colour_grade" id="colour_grade"
+                                                    class="form-control" placeholder="Enter Colour Grade"
+                                                    value="{{ $lot->colour_grade }}">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="shape" class="form-label">Shape</label>
+                                                <input type="text" name="shape" id="shape" class="form-control"
+                                                    placeholder="Enter Shape" value="{{ $lot->shape }}">
+                                            </div>
                                         </div>
 
                                         <div class="mb-3">
@@ -95,7 +106,7 @@
                                                 placeholder="Enter Size" value="{{ $lot->size }}">
                                         </div>
 
-                                        {{-- <div class="mb-3">
+                                        <div class="mb-3">
                                             <label for="status" class="form-label">Status</label>
                                             <select name="status" id="status" class="form-select">
                                                 <option value="0" {{ $lot->status == 0 ? 'selected' : '' }}>Pending
@@ -105,7 +116,53 @@
                                                 <option value="2" {{ $lot->status == 2 ? 'selected' : '' }}>Sold
                                                 </option>
                                             </select>
-                                        </div> --}}
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Column 2 -->
+                                    <div class="col-md-6 col-lg-4">
+
+                                        <div class="mb-3">
+                                            <label for="title" class="form-label">Title</label>
+                                            <input type="text" name="title" id="title" class="form-control"
+                                                placeholder="Enter Title" value="{{ $lot->title }}" required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="batch_code" class="form-label">Batch Code</label>
+                                            <input type="text" name="batch_code" id="batch_code" class="form-control"
+                                                placeholder="Enter Batch Code" value="{{ $lot->batch_code }}">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="report_number" class="form-label">Report Number</label>
+                                            <input type="text" name="report_number" id="report_number"
+                                                class="form-control" placeholder="Enter Report Number"
+                                                value="{{ $lot->report_number }}">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="colour_origin" class="form-label">Origin</label>
+                                            <input type="text" name="colour_origin" id="colour_origin"
+                                                class="form-control" placeholder="Enter Origin"
+                                                value="{{ $lot->colour_origin }}">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="colour_distribution" class="form-label">Distribution</label>
+                                            <input type="text" name="colour_distribution" id="colour_distribution"
+                                                class="form-control" placeholder="Enter Distribution"
+                                                value="{{ $lot->colour_distribution }}">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="video" class="form-label">Video Link</label>
+                                            <input type="text" name="video" id="video" class="form-control"
+                                                placeholder="Enter Video link" value="{{ $lot->video }}"
+                                                onkeyup="generatePreview(this.value)">
+                                            <div class="my-2" id="previewContainer"></div>
+                                        </div>
 
                                         <div class="mb-3">
                                             <label class="form-label">Upload Images</label>
@@ -131,8 +188,8 @@
 
                                                 {{-- Add new image input --}}
                                                 <div class="input-group mb-2">
-                                                    <input type="file" name="images[]"
-                                                        class="form-control image-input" accept="image/*">
+                                                    <input id="imageUpload" type="file" name="images[]"
+                                                        class="form-control image-input" accept=".jpg,.png,.jpeg">
                                                     <button type="button"
                                                         class="btn btn-outline-success btn-sm add-more-image">+</button>
                                                 </div>
@@ -141,71 +198,14 @@
                                         </div>
                                     </div>
 
-                                    <!-- Column 2 -->
-                                    <div class="col-md-6 col-lg-4">
-                                        <div class="mb-3">
-                                            <label for="shape" class="form-label">Shape</label>
-                                            <input type="text" name="shape" id="shape" class="form-control"
-                                                placeholder="Enter Shape" value="{{ $lot->shape }}">
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label for="batch_code" class="form-label">Batch Code</label>
-                                            <input type="text" name="batch_code" id="batch_code" class="form-control"
-                                                placeholder="Enter Batch Code" value="{{ $lot->batch_code }}">
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label for="report_number" class="form-label">Report Number</label>
-                                            <input type="text" name="report_number" id="report_number"
-                                                class="form-control" placeholder="Enter Report Number"
-                                                value="{{ $lot->report_number }}">
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label for="colour_grade" class="form-label">Colour Grade</label>
-                                            <input type="text" name="colour_grade" id="colour_grade"
-                                                class="form-control" placeholder="Enter Colour Grade"
-                                                value="{{ $lot->colour_grade }}">
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label for="colour_origin" class="form-label">Origin</label>
-                                            <input type="text" name="colour_origin" id="colour_origin"
-                                                class="form-control" placeholder="Enter Origin"
-                                                value="{{ $lot->colour_origin }}">
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label for="colour_distribution" class="form-label">Distribution</label>
-                                            <input type="text" name="colour_distribution" id="colour_distribution"
-                                                class="form-control" placeholder="Enter Distribution"
-                                                value="{{ $lot->colour_distribution }}">
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label for="status" class="form-label">Status</label>
-                                            <select name="status" id="status" class="form-select">
-                                                <option value="0" {{ $lot->status == 0 ? 'selected' : '' }}>Pending
-                                                </option>
-                                                <option value="1" {{ $lot->status == 1 ? 'selected' : '' }}>Live
-                                                </option>
-                                                <option value="2" {{ $lot->status == 2 ? 'selected' : '' }}>Sold
-                                                </option>
-                                            </select>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label for="video" class="form-label">Video Link</label>
-                                            <input type="text" name="video" id="video" class="form-control"
-                                                placeholder="Enter Video link" value="{{ $lot->video }}"
-                                                onkeyup="generatePreview(this.value)">
-                                            <div class="my-2" id="previewContainer"></div>
-                                        </div>
-                                    </div>
-
                                     <!-- Column 3 -->
                                     <div class="col-md-6 col-lg-4">
+                                        <div class="mb-3">
+                                            <label for="type" class="form-label">Type</label>
+                                            <input type="text" name="type" id="type" class="form-control"
+                                                placeholder="Enter Type" value="{{ $lot->type }}" required>
+                                        </div>
+
                                         <div class="mb-3">
                                             <label for="polish" class="form-label">Polish</label>
                                             <input type="text" name="polish" id="polish" class="form-control"
@@ -307,7 +307,7 @@
                     const inputGroup = document.createElement('div');
                     inputGroup.classList.add('input-group', 'mb-2');
                     inputGroup.innerHTML = `
-                    <input type="file" name="images[]" class="form-control image-input" accept="image/*">
+                    <input type="file" name="images[]" class="form-control image-input" accept=".jpg,.png,.jpeg">
                     <button type="button" class="btn btn-sm btn-danger remove-image">-</button>
                 `;
 
@@ -402,5 +402,23 @@
             `;
             }
         }
+    </script>
+    <script>
+        document.getElementById('imageUpload').addEventListener('change', function() {
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            const files = this.files;
+            const invalidFiles = [];
+
+            for (let i = 0; i < files.length; i++) {
+                if (!allowedTypes.includes(files[i].type)) {
+                    invalidFiles.push(files[i].name);
+                }
+            }
+
+            if (invalidFiles.length > 0) {
+                alert("Only JPG and PNG images are allowed. Invalid files:\n" + invalidFiles.join("\n"));
+                this.value = ''; // Clear the file input
+            }
+        });
     </script>
 @endpush

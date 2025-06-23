@@ -199,6 +199,22 @@
                         <div class="card-header bg-light py-3 px-4 border-bottom">
                             <h5 class="card-title mb-0 fw-semibold">Lot Information</h5>
                         </div>
+
+                        @if (session('error'))
+                            <div class="alert alert-danger m-4 rounded-3 shadow-sm" id="danger-alert">
+                                {{ session('error') }}
+                            </div>
+                            {{-- <script>
+                                // Check if the page has already been reloaded
+                                if (!sessionStorage.getItem('reloaded')) {
+                                    sessionStorage.setItem('reloaded', 'true');
+                                    location.reload();
+                                } else {
+                                    // Clear the flag after reload
+                                    sessionStorage.removeItem('reloaded');
+                                }
+                            </script> --}}
+                        @endif
                         <div class="card-body px-4 py-4">
                             <form action="{{ route('admin.lots.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
@@ -226,28 +242,38 @@
                                             </select>
                                         </div>
 
-                                        <div class="mb-3">
-                                            <label for="title" class="form-label">Title</label>
-                                            <input type="text" name="title" id="title" class="form-control"
-                                                placeholder="Enter Title" required>
-                                        </div>
+                                        <!-- Highlighted Grouped Section -->
+                                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 shadow-sm mb-4">
 
-                                        <div class="mb-3">
-                                            <label for="type" class="form-label">Type</label>
-                                            <input type="text" name="type" id="type" class="form-control"
-                                                placeholder="Enter Type" required>
-                                        </div>
+                                            <div class="mb-3">
+                                                <label for="weight" class="form-label">Weight</label>
+                                                <input type="text" name="weight" id="weight" class="form-control"
+                                                    placeholder="Enter Weight" required>
+                                            </div>
 
-                                        <div class="mb-3">
-                                            <label for="color" class="form-label">Color</label>
-                                            <input type="text" name="color" id="color" class="form-control"
-                                                placeholder="Enter Color">
-                                        </div>
+                                            <div class="mb-3">
+                                                <label for="color" class="form-label">Color</label>
+                                                <input type="text" name="color" id="color" class="form-control"
+                                                    placeholder="Enter Color">
+                                            </div>
 
-                                        <div class="mb-3">
-                                            <label for="weight" class="form-label">Weight</label>
-                                            <input type="text" name="weight" id="weight" class="form-control"
-                                                placeholder="Enter Weight" required>
+                                            <div class="mb-3">
+                                                <label for="clarity" class="form-label">Clarity</label>
+                                                <input type="text" name="clarity" id="clarity" class="form-control"
+                                                    placeholder="Enter clarity">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="colour_grade" class="form-label">Colour Grade</label>
+                                                <input type="text" name="colour_grade" id="colour_grade"
+                                                    class="form-control" placeholder="Enter Grade">
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="shape" class="form-label">Shape</label>
+                                                <input type="text" name="shape" id="shape" class="form-control"
+                                                    placeholder="Enter Shape">
+                                            </div>
                                         </div>
 
                                         <div class="mb-3">
@@ -256,35 +282,24 @@
                                                 placeholder="Enter Size">
                                         </div>
 
-                                        {{-- <div class="mb-3">
+                                        <div class="mb-3">
                                             <label for="status" class="form-label">Status</label>
                                             <select name="status" id="status" class="form-select">
                                                 <option value="0">Pending</option>
                                                 <option value="1" selected>Live</option>
                                                 <option value="2">Sold</option>
                                             </select>
-                                        </div> --}}
-
-                                        <div class="mb-3">
-                                            <label class="form-label">Upload Images</label>
-                                            <div id="image-upload-group">
-                                                <div class="input-group mb-2">
-                                                    <input type="file" name="images[]"
-                                                        class="form-control image-input" accept="image/*">
-                                                    <button type="button"
-                                                        class="btn btn-outline-success btn-sm add-more-image">+</button>
-                                                </div>
-                                                <div class="preview-group d-flex flex-wrap gap-2"></div>
-                                            </div>
                                         </div>
+
                                     </div>
 
                                     <!-- Column 2 -->
                                     <div class="col-md-6 col-lg-4">
+
                                         <div class="mb-3">
-                                            <label for="shape" class="form-label">Shape</label>
-                                            <input type="text" name="shape" id="shape" class="form-control"
-                                                placeholder="Enter Shape">
+                                            <label for="title" class="form-label">Title</label>
+                                            <input type="text" name="title" id="title" class="form-control"
+                                                placeholder="Enter Title" required>
                                         </div>
 
                                         <div class="mb-3">
@@ -300,12 +315,6 @@
                                         </div>
 
                                         <div class="mb-3">
-                                            <label for="colour_grade" class="form-label">Colour Grade</label>
-                                            <input type="text" name="colour_grade" id="colour_grade"
-                                                class="form-control" placeholder="Enter Grade">
-                                        </div>
-
-                                        <div class="mb-3">
                                             <label for="colour_origin" class="form-label">Origin</label>
                                             <input type="text" name="colour_origin" id="colour_origin"
                                                 class="form-control" placeholder="Enter Origin">
@@ -318,24 +327,34 @@
                                         </div>
 
                                         <div class="mb-3">
-                                            <label for="status" class="form-label">Status</label>
-                                            <select name="status" id="status" class="form-select">
-                                                <option value="0">Pending</option>
-                                                <option value="1" selected>Live</option>
-                                                <option value="2">Sold</option>
-                                            </select>
-                                        </div>
-
-                                        <div class="mb-3">
                                             <label for="video" class="form-label">Video Link</label>
                                             <input type="text" name="video" id="video" class="form-control"
                                                 placeholder="Enter Video link" onkeyup="generatePreview(this.value)">
                                             <div class="my-2" id="previewContainer"></div>
                                         </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Upload Images</label>
+                                            <div id="image-upload-group">
+                                                <div class="input-group mb-2">
+                                                    <input id="imageUpload" type="file" required name="images[]"
+                                                        class="form-control image-input" accept=".jpg,.png,.jpeg">
+                                                    <button type="button"
+                                                        class="btn btn-outline-success btn-sm add-more-image">+</button>
+                                                </div>
+                                                <div class="preview-group d-flex flex-wrap gap-2"></div>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <!-- Column 3 -->
                                     <div class="col-md-6 col-lg-4">
+                                        <div class="mb-3">
+                                            <label for="type" class="form-label">Type</label>
+                                            <input type="text" name="type" id="type" class="form-control"
+                                                placeholder="Enter Type" required>
+                                        </div>
+
                                         <div class="mb-3">
                                             <label for="polish" class="form-label">Polish</label>
                                             <input type="text" name="polish" id="polish" class="form-control"
@@ -428,7 +447,7 @@
                     const inputGroup = document.createElement('div');
                     inputGroup.classList.add('input-group', 'mb-2');
                     inputGroup.innerHTML = `
-                    <input type="file" name="images[]" class="form-control image-input" accept="image/*">
+                    <input type="file" name="images[]" class="form-control image-input" accept=".jpg,.png,.jpeg">
                     <button type="button" class="btn btn-sm btn-danger remove-image">-</button>
                 `;
                     const previewGroup = document.createElement('div');
@@ -521,5 +540,23 @@
             `;
             }
         }
+    </script>
+    <script>
+        document.getElementById('imageUpload').addEventListener('change', function() {
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            const files = this.files;
+            const invalidFiles = [];
+
+            for (let i = 0; i < files.length; i++) {
+                if (!allowedTypes.includes(files[i].type)) {
+                    invalidFiles.push(files[i].name);
+                }
+            }
+
+            if (invalidFiles.length > 0) {
+                alert("Only JPG and PNG images are allowed. Invalid files:\n" + invalidFiles.join("\n"));
+                this.value = ''; // Clear the file input
+            }
+        });
     </script>
 @endpush

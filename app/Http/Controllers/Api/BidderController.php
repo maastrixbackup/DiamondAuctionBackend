@@ -443,7 +443,10 @@ class BidderController extends Controller
                 ->pluck('lot_id')
                 ->toArray();
 
-            $availableLots = Lot::whereNotIn('id', $bookedLotIds)->get();
+            // $availableLots = Lot::whereNotIn('id', $bookedLotIds)->get();
+            $availableLots = Lot::whereNotIn('id', $bookedLotIds)
+                ->orderByRaw('CAST(weight AS DECIMAL(10,2)) DESC')
+                ->get();
 
             if ($availableLots->isEmpty()) {
                 return response()->json([

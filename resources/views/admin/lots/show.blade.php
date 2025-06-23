@@ -120,6 +120,7 @@
                                         <div><strong>Size:</strong> {{ $lot->size }}</div>
                                         <div><strong>Stone:</strong> {{ $lot->stone }}</div>
                                         <div><strong>Shape:</strong> {{ $lot->shape }}</div>
+                                        <div><strong>Clarity:</strong> {{ $lot->clarity }}</div>
                                         <div><strong>Batch Code:</strong> {{ $lot->batch_code }}</div>
                                     </div>
                                 </div>

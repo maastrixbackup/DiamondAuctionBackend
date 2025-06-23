@@ -32,10 +32,20 @@
             @endforeach
         </div>
 
-        <div id="meetingLinkContainer" class="mt-2 d-none">
+        {{-- <div id="meetingLinkContainer" class="mt-2 d-none">
             <label for="meeting_link" class="form-label">Meeting Number :</label>
             <input type="text" name="meeting_link" id="meeting_link" class="form-control"
                 placeholder="Enter Meeting Number">
+        </div> --}}
+
+        <div id="meetingLinkContainer" class="mt-2 d-none">
+            <label for="meeting_link" class="form-label">Meeting Link :</label>
+            <select name="meeting_link" id="meeting_link" class="form-control" required>
+                <option value="">-- Select Meeting Link --</option>
+                @foreach ($availableMeetingLinks as $link)
+                    <option value="{{ $link }}">{{ $link }}</option>
+                @endforeach
+            </select>
         </div>
 
         @php
