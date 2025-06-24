@@ -49,7 +49,7 @@
                                             <th>Phone</th>
                                             <th>Document Status</th>
                                             <th>Account Status</th>
-                                            <th>VIP Bidding</th>
+                                            <th>Bulk Bidding</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -90,9 +90,9 @@
 
                                                 <td>
                                                     @if ($bidder->vip_bidding)
-                                                        <span class="badge bg-success-subtle border border-success text-success-emphasis px-3 py-2">Yes</span>
+                                                        <span class="badge rounded-pill px-3 py-2 border border-success bg-success-subtle text-success-emphasis">Yes</span>
                                                     @else
-                                                        <span class="badge bg-secondary-subtle border border-secondary text-secondary-emphasis px-3 py-2">No</span>
+                                                        <span class="badge rounded-pill px-3 py-2 border border-warning bg-warning-subtle text-warning-emphasis">No</span>
                                                     @endif
                                                 </td>
 

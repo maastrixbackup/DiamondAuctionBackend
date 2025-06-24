@@ -60,6 +60,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/get-bidding-history', [BidderController::class, 'getBiddingHistory']);
     Route::get('/get-bidding-summary', [BidderController::class, 'getBiddingSummary']);
 
+    // Bulk Bidding
+    Route::get('/vip-available-lots', [BidderController::class, 'vipAvailableLots']);
+    Route::post('/vip-update-bid-details', [BidderController::class, 'vipUpdateBidDetails']);
+    Route::post('/vip-lot-details', [BidderController::class, 'vipLotDetails']);
+
     // Zoom Signature
     // Route::any('/zoom-signature', [ZoomController::class, 'generateSignature']);
 });
