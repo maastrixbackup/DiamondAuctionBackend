@@ -40,5 +40,7 @@ class Bidder extends Model
         'proof_of_address_status',
         'kyc_status',
         'account_status',
+
+        'vip_bidding',
     ];
 }

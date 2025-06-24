@@ -66,6 +66,7 @@ class BidderController extends Controller
             $bidder->type = $request->type === 'company' ? 1 : 2;
             $bidder->kyc_status = 0;
             $bidder->account_status = 0;
+            $bidder->vip_bidding = 0;
 
             $destinationPath = public_path('storage/document/bidder/');
             if (!is_dir($destinationPath)) {
