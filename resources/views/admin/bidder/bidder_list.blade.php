@@ -49,6 +49,7 @@
                                             <th>Phone</th>
                                             <th>Document Status</th>
                                             <th>Account Status</th>
+                                            <th>VIP Bidding</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -85,6 +86,14 @@
                                                     : 'px-3 py-2 border border-warning bg-warning-subtle text-warning-emphasis') }}">
                                                         {{ $bidder->account_status == 1 ? 'Active' : ($bidder->account_status == 2 ? 'Suspended' : 'Pending') }}
                                                     </span>
+                                                </td>
+
+                                                <td>
+                                                    @if ($bidder->vip_bidding)
+                                                        <span class="badge bg-success-subtle border border-success text-success-emphasis px-3 py-2">Yes</span>
+                                                    @else
+                                                        <span class="badge bg-secondary-subtle border border-secondary text-secondary-emphasis px-3 py-2">No</span>
+                                                    @endif
                                                 </td>
 
                                                 <!-- View Action -->
