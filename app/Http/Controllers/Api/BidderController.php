@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Bidder;
 use App\Models\BiddingPrice;
 use App\Models\Booking;
+use App\Models\BulkBidding;
 use App\Models\Lot;
 use App\Models\Room;
 use App\Models\Slot;
@@ -364,6 +365,7 @@ class BidderController extends Controller
                 'total_lots_listed' => $totalLotsListed,
                 'bids_received' => $result->total_bids,
                 'highest_bid_amount' => $result->max_bid,
+                'bulk_bidding' => $bidder->vip_bidding,
             ];
 
             return response()->json([
@@ -545,7 +547,7 @@ class BidderController extends Controller
                         return 'storage/images/lots/' . ltrim($image, '/');
                     }, $lot->images);
                 } else {
-                    $lot->images = ['storage/images/lots/sample.jpg'];
+                    $lot->images = [];
                 }
                 unset($lot->image_urls);
                 return $lot;
@@ -1004,6 +1006,123 @@ class BidderController extends Controller
             'status' => true,
             'message' => 'Bidding summary fetched',
             'summary' => $biddingSummary
+        ]);
+    }
+
+    public function vipAvailableLots(Request $request)
+    {
+        $bidderId = $request->user()->id;
+
+        $availableLots = Lot::where('status', 1)
+            ->orderByRaw('CAST(weight AS DECIMAL(10,2)) DESC')
+            ->get();
+
+        if ($availableLots->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No available lots found.',
+                'available_lots' => []
+            ], 200);
+        }
+
+        $availableLots = $availableLots->map(function ($lot)  use ($bidderId) {
+            if (is_array($lot->images)) {
+                $lot->images = array_map(function ($image) {
+                    return 'storage/images/lots/' . ltrim($image, '/');
+                }, $lot->images);
+            } else {
+                $lot->images = [];
+            }
+            unset($lot->image_urls);
+
+            $lot->price = BulkBidding::where('bidder_id', $bidderId)
+                ->where('lot_id', $lot->id)
+                ->orderByDesc('id')
+                ->first() ?? '0';
+
+            return $lot;
+        });
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Available lots fetched successfully.',
+            'available_lots' => $availableLots,
+        ]);
+    }
+
+    public function vipUpdateBidDetails(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'lot_id' => 'required|integer',
+            'price' => 'required|numeric|min:0',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        $bidderId = $request->user()->id;
+
+        DB::beginTransaction();
+        try {
+            $bb = new BulkBidding();
+            $bb->bidder_id = $bidderId;
+            $bb->lot_id = $request->lot_id;
+            $bb->price = $request->price;
+            $bb->bidding_time = Carbon::now();
+            $bb->save();
+
+            DB::commit();
+            return response()->json(['status' => true, 'message' => 'Bid Successfully']);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json(['status' => false, 'message' => $th->getMessage()]);
+        }
+    }
+
+    public function vipLotDetails(Request $request)
+    {
+        $bidderId = $request->user()->id;
+        $lotId = $request->lot_id;
+
+        if (!$lotId) {
+            return response()->json([
+                'status' => false,
+                'message' => "Lot i'd required."
+            ]);
+        }
+
+        $lotDetails = Lot::find($lotId);
+
+        if (!$lotDetails) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Lot not found.'
+            ], 404);
+        }
+
+        // Normalize images
+        $lotDetails->images = is_array($lotDetails->images)
+            ? array_map(fn($img) => 'storage/images/lots/' . ltrim($img, '/'), $lotDetails->images)
+            : [];
+
+        // Remove deprecated or unwanted fields
+        unset($lotDetails->image_urls);
+
+        // Attach latest price/bid
+        $latestBid = BulkBidding::where('bidder_id', $bidderId)
+            ->where('lot_id', $lotId)
+            ->orderByDesc('id')
+            ->first()->price ?? '0';
+
+        $lotDetails->price = $latestBid;
+
+        return response()->json([
+            'status' => true,
+            'lotDetails' => $lotDetails
         ]);
     }
 

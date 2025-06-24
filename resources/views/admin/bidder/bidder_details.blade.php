@@ -188,7 +188,7 @@
                             </tr>
 
                             <tr>
-                                <th>VIP Bidding</th>
+                                <th>Bulk Bidding</th>
                                 <td>
                                     <span
                                         class="badge {{ $bidder->vip_bidding ? 'bg-success' : 'bg-secondary' }} px-3 py-2 me-3">
@@ -197,10 +197,10 @@
 
                                     @if ($bidder->vip_bidding)
                                         <a href="{{ route('admin.change-VipBidding-Status', ['id' => $bidder->id, 'status' => 0]) }}"
-                                            class="btn btn-sm btn-outline-danger">Disable VIP</a>
+                                            class="btn btn-sm btn-outline-danger">Disable</a>
                                     @else
                                         <a href="{{ route('admin.change-VipBidding-Status', ['id' => $bidder->id, 'status' => 1]) }}"
-                                            class="btn btn-sm btn-outline-success">Enable VIP</a>
+                                            class="btn btn-sm btn-outline-success">Enable</a>
                                     @endif
                                 </td>
                             </tr>
