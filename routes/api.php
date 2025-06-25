@@ -59,6 +59,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/update-bid-details', [BidderController::class, 'updateBiddetails']);
     Route::post('/get-bidding-history', [BidderController::class, 'getBiddingHistory']);
     Route::get('/get-bidding-summary', [BidderController::class, 'getBiddingSummary']);
+    Route::get('/my-bids', [BidderController::class, 'getBiddingOfBidder']);
 
     // Bulk Bidding
     Route::get('/vip-available-lots', [BidderController::class, 'vipAvailableLots']);

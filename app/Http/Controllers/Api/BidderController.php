@@ -338,10 +338,15 @@ class BidderController extends Controller
             // $maxBidAmount = SlotBooking::where('bidder_id', $bidder->id)
             //     ->whereNotNull('bidding_price')
             //     ->max('bidding_price');
-            $result = SlotBooking::where('bidder_id', $bidder->id)
-                ->whereNotNull('bidding_price')
-                ->selectRaw('COUNT(*) as total_bids, MAX(bidding_price) as max_bid')
-                ->first();
+            // $result = BulkBidding::where('bidder_id', $bidder->id)
+            //     ->whereNotNull('price')
+            //     ->selectRaw('COUNT(*) as total_bids, MAX(price) as max_bid')
+            //     ->first();
+
+            $result = BulkBidding::where('bidder_id', $bidder->id)
+                ->whereNotNull('price')
+                ->distinct('lot_id')
+                ->count('lot_id');
 
             $dashboardData = [
                 'full_name' => $bidder->full_name,
@@ -363,8 +368,8 @@ class BidderController extends Controller
                 'type' => $bidder->type,
                 'type_name' => $typeStatus[$bidder->type],
                 'total_lots_listed' => $totalLotsListed,
-                'bids_received' => $result->total_bids,
-                'highest_bid_amount' => $result->max_bid,
+                'bids_received' => $result,
+                // 'highest_bid_amount' => $result->max_bid,
                 'bulk_bidding' => $bidder->vip_bidding,
             ];
 
@@ -937,6 +942,13 @@ class BidderController extends Controller
                 'bidding_time' => Carbon::now(),
             ]);
 
+            $bb = new BulkBidding();
+            $bb->bidder_id = $request->user()->id;
+            $bb->lot_id = $request->lot_id;
+            $bb->price = $request->bidding_price;
+            $bb->bidding_time = Carbon::now();
+            $bb->save();
+
             DB::table('slot_bookings')
                 ->where('booking_id', $request->booking_id)
                 ->where('lot_id', $request->lot_id)
@@ -1005,8 +1017,49 @@ class BidderController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Bidding summary fetched',
-            'summary' => $biddingSummary
+            'summary' => [] //$biddingSummary
         ]);
+    }
+
+    public function getBiddingOfBidder(Request $request)
+    {
+        $bidderId = $request->user()->id;
+
+        // Step 1: Get the max price per lot for the bidder
+        $maxBids = BulkBidding::where('bidder_id', $bidderId)
+            ->whereNotNull('price')
+            ->select('lot_id', DB::raw('MAX(price) as max_price'))
+            ->groupBy('lot_id')
+            ->get()
+            ->pluck('max_price', 'lot_id');
+
+        // Step 2: Get full bid records matching those max prices
+        $bb = BulkBidding::where('bidder_id', $bidderId)
+            ->where(function ($query) use ($maxBids) {
+                foreach ($maxBids as $lotId => $maxPrice) {
+                    $query->orWhere(function ($q) use ($lotId, $maxPrice) {
+                        $q->where('lot_id', $lotId)
+                            ->where('price', $maxPrice);
+                    });
+                }
+            })->with('lot') // Assumes you have a `lot()` relationship in BulkBidding
+            ->get()
+            ->map(function ($l) {
+                return [
+                    'id' => $l->id,
+                    'lot_id' => $l->lot_id,
+                    'title' => $l->lot->title ?? null,
+                    'weight' => $l->lot->weight ?? null,
+                    'image' => (is_array($l->lot->images ?? []) && !empty($l->lot->images))
+                        ? 'storage/images/lots/' . ltrim($l->lot->images[0], '/')
+                        : 'storage/images/lots/sample.jpg',
+                    'price' => $l->price,
+                    'bidding_time' => $l->bidding_time,
+                ];
+            });
+
+
+        return response()->json(['status' => true, 'allBids' => $bb ?? []]);
     }
 
     public function vipAvailableLots(Request $request)
