@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Bidder;
 use App\Models\Booking;
+use App\Models\BulkBidding;
 use App\Models\Category;
 use App\Models\Lot;
 use App\Models\Room;
@@ -438,6 +440,36 @@ class LotController extends Controller
         $lot->delete();
 
         return redirect()->route('admin.lots.index')->with('success', 'Lot deleted successfully.');
+    }
+
+
+    public function allBidDetails()
+    {
+        $latestBids = BulkBidding::whereNotNull('price')
+            ->select('lot_id', DB::raw('MAX(price) as max_price'))
+            ->groupBy('lot_id',)
+            ->get();
+
+        // dd($latestBids);
+        return view('admin.lots.all_bidding', compact('latestBids'));
+    }
+
+    public function lotBidDetails(Request $request, $id)
+    {
+        $lotId = $id;
+        $lot = Lot::with(['seller', 'category'])->findOrFail($id);
+        $bb = BulkBidding::where('lot_id', $lotId)->whereNotNull('price')->get()->map(function ($b) {
+            return [
+                'lot_id' => $b->lot_id,
+                'bidder_name' => Bidder::find($b->bidder_id)->full_name ?? 'N/A',
+                'price' => $b->price,
+                'bidding_time' => $b->bidding_time
+            ];
+        });
+        return view(
+            'admin.lots.viewBidLotDetails',
+            compact('bb', 'lot')
+        );
     }
 
     public function viewingRequest(Request $request)

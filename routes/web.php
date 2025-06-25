@@ -94,6 +94,8 @@ Route::prefix('admin')->group(function () {
 
         // slots
         Route::resource('viewing-slots', SlotController::class)->names('admin.viewing-slots');
+        Route::get('bid-details', [LotController::class, 'allBidDetails'])->name('admin.bid-details');
+        Route::get('viewLotBidDetails/{id}', [LotController::class, 'lotBidDetails'])->name('admin.viewLotBidDetails');
     });
 });
 

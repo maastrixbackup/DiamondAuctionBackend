@@ -41,6 +41,10 @@
             class="flex items-center px-4 py-3 hover:bg-[#3B4756] transition rounded-r-full {{ request()->routeIs('admin.viewing-slots.index') ? 'bg-[#3B4756]' : '' }}">
             <i class="fa fa-table me-2"></i> Viewing Slots
         </a>
+        <a href="{{ route('admin.bid-details') }}"
+            class="flex items-center px-4 py-3 hover:bg-[#3B4756] transition rounded-r-full {{ request()->routeIs(['admin.bid-details', 'admin.viewLotBidDetails']) ? 'bg-[#3B4756]' : '' }}">
+            <i class="fa fa-table me-2"></i> Bid Details
+        </a>
     </nav>
     <div class="pb-8"></div>
 </aside>
