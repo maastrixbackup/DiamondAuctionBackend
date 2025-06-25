@@ -1038,7 +1038,7 @@ class BidderController extends Controller
             $lot->price = BulkBidding::where('bidder_id', $bidderId)
                 ->where('lot_id', $lot->id)
                 ->orderByDesc('id')
-                ->first() ?? '0';
+                ->first()->price ?? '0';
 
             return $lot;
         });
