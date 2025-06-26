@@ -75,10 +75,10 @@
                                                 <td>
                                                     @if ($lotData->images && is_array($lotData->images))
                                                         <img src="{{ asset('storage/images/lots/' . $lotData->images[0]) }}"
-                                                            width="100px" height="auto" alt="">
+                                                            width="100px" height="auto" class="rounded" alt="">
                                                     @else
                                                         <img src="{{ asset('storage/images/lots/sample.jpg') }}"
-                                                            width="100px" height="auto" alt="">
+                                                            width="100px" height="auto" class="rounded" alt="">
                                                     @endif
                                                 </td>
                                                 <td>{{ $lotData->title ?? '' }}</td>
