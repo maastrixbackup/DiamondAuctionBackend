@@ -447,7 +447,8 @@ class LotController extends Controller
     {
         $latestBids = BulkBidding::whereNotNull('price')
             ->select('lot_id', DB::raw('MAX(price) as max_price'))
-            ->groupBy('lot_id',)
+            ->groupBy('lot_id')
+            ->orderByDesc('lot_id')
             ->get();
 
         // dd($latestBids);

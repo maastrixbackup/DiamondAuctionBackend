@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bidder;
+use App\Models\BulkBidding;
 use App\Models\Lot;
 use App\Models\Seller;
 use App\Models\SlotBooking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -44,10 +46,22 @@ class DashboardController extends Controller
             ->orderByDesc('id')
             ->get(['bidder_name', 'room_name', 'room_type', 'start_time', 'date_for_reservation']);
 
-        $recentBids = SlotBooking::whereNotNull('bidding_price')
-            ->orderByDesc('date_for_reservation')
-            ->take(3)
-            ->get(['lot_id', 'bidder_name', 'bidding_price']);
+        // $recentBids = SlotBooking::whereNotNull('bidding_price')
+        //     ->orderByDesc('date_for_reservation')
+        //     ->take(3)
+        //     ->get(['lot_id', 'bidder_name', 'bidding_price']);
+
+        // B
+        $recentBids = BulkBidding::whereIn('id', function ($query) {
+            $query->select(DB::raw('MAX(id)'))
+                ->from('bulk_biddings')
+                ->whereNotNull('price')
+                ->groupBy('lot_id', 'bidder_id');
+        })
+            ->with('lot')
+            ->orderByDesc('id')
+            ->take(5)
+            ->get();
 
 
         return view('admin.dashboard', compact(
