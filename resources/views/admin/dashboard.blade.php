@@ -131,19 +131,27 @@
                         <h6 class="mb-0 text-danger">💰 Recent Bids</h6>
                     </div>
                     <div class="card-body">
-                        <ul class="list-group list-group-flush">
-                            @forelse($recentBids as $bid)
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <strong>LOT-{{ $bid->lot_id }}</strong><br><small
-                                            class="text-muted text-capitalize">{{ $bid->bidder_name }}</small>
-                                    </div>
-                                    <span class="badge bg-success">₹ {{ number_format($bid->bidding_price, 2) }}</span>
-                                </li>
-                            @empty
-                                <li class="list-group-item text-muted">No recent bids available.</li>
-                            @endforelse
-                        </ul>
+                        <table class="table">
+                            <thead>
+                                @forelse($recentBids as $bid)
+                                    @php
+                                        $bData = \App\Models\Bidder::find($bid->bidder_id);
+                                    @endphp
+                                    <tr class="text-capitalize">
+                                        <th>LOT-{{ $bid->lot_id }}</th>
+                                        <td><strong title="{{ $bid->lot->title }}">{{ strlen($bid->lot->title) > 20 ? substr($bid->lot->title, 0, 20) . '...' : $bid->lot->title ?? 'N/A' }}</strong>
+                                        </td>
+                                        <td><strong>{{ $bData->full_name }}</strong></td>
+                                        <td> <span class="badge bg-success">$
+                                                {{ number_format($bid->price, 2) }}</span></td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center">No recent bids available.</td>
+                                    </tr>
+                                @endforelse
+                            </thead>
+                        </table>
                     </div>
                 </div>
             </div>
