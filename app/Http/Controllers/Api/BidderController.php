@@ -1096,6 +1096,14 @@ class BidderController extends Controller
             return $lot;
         });
 
+
+        $cutoff = Carbon::create(2025, 6, 29, 23, 59, 0); // 29th June 2025, 11:59 PM
+        $now = Carbon::now();
+
+        if ($now->greaterThan($cutoff)) {
+            $availableLots = [];
+        }
+
         return response()->json([
             'status' => true,
             'message' => 'Available lots fetched successfully.',
