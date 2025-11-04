@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\SellerController;
 use App\Http\Controllers\Admin\SlotController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 
@@ -25,13 +26,26 @@ use Illuminate\Support\Facades\Artisan;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('admin/login');
+});
+
+Route::get('/test-email', function () {
+    try {
+        Mail::raw('Test email from Laravel', function ($message) {
+            $message->to('bibhuprasad.maastrix@gmail.com')
+                ->subject('SMTP Test');
+        });
+        return 'Email sent!';
+    } catch (\Exception $e) {
+        return '❌ Error: ' . $e->getMessage();
+    }
 });
 
 Route::get('/optimize', function () {
     Artisan::call('route:clear');
     Artisan::call('config:clear');
     Artisan::call('cache:clear');
+    Artisan::call('optimize:clear');
     return 'Command executed successfully!';
 });
 Route::get('/', function () {
@@ -55,13 +69,9 @@ Route::prefix('admin')->group(function () {
 
     Route::middleware(['admin', 'admin.role:superadmin'])->group(function () {
         Route::post('/logout', [LoginController::class, 'logout'])->name('admin.logout');
-        Route::get('/change-password', [AdminController::class, 'showChangePasswordForm'])->name('admin.changePasswordForm');
-        Route::post('/change-password', [AdminController::class, 'changePassword'])->name('admin.changePassword');
-
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
         Route::get('/profile', [DashboardController::class, 'profileDetails'])->name('admin.profile');
         Route::resource('lots', LotController::class)->names('admin.lots');
-        Route::get('lotsExport', [LotController::class, 'export'])->name('admin.lotsExport');
         Route::get('/seller', [SellerController::class, 'sellerList'])->name('admin.seller');
         Route::get('/sellerDetails/{id}', [SellerController::class, 'sellerDetails'])->name('admin.sellerDetails');
         // Route::get('change-seller-status/{id}', [SellerController::class, 'changeSellerStatus'])->name('admin.change-seller-status');

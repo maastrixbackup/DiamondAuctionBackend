@@ -137,73 +137,71 @@
 
 
 
-<!-- HEADER -->
-<header class="fixed top-0 left-0 right-0 h-20 bg-white shadow flex items-center justify-between px-6 z-40">
-    <div class="flex items-center space-x-4">
-        <!-- <svg viewBox="0 0 576 512" fill="#d4af37" class="h-10 w-10">
-            <path
-                d="M485.5 0L576 160H474.9L405.7 0h79.8zm-128 0l69.2 160H149.3L218.5 0h139zm-267 0h79.8l-69.2 160H0L90.5 0zM0 192h100.7l123 251.7c1.5 3.1-2.7 5.9-5 3.3L0 192zm148.2 0h279.6l-137 318.2c-1 2.4-4.5 2.4-5.5 0L148.2 192zm204.1 251.7l123-251.7H576L357.3 446.9c-2.3 2.7-6.5-.1-5-3.2z">
-            </path>
-        </svg> -->
-        <img src="{{ asset('assets/img/diamond-with-gold.png') }}" alt="Logo" height="100" width="80"
-            srcset="">
-        <span class="ml-2 text-3xl font-normal font-aleo text-black">Dexterous DMCC</span>
-    </div>
-    <div class="flex-1 flex items-center justify-center">
-        <span class="font-bold text-gray-700 text-xl font-aleo text-capitalize">Welcome,
-            {{ Auth::guard('admin')->user()->name ?? 'Admin' }}</span>
+    <!-- HEADER -->
+    <header class="fixed top-0 left-0 right-0 h-20 bg-white shadow flex items-center justify-between px-6 z-40">
+        <div class="flex items-center space-x-4">
+            {{-- <svg viewBox="0 0 576 512" fill="#d4af37" class="h-10 w-10">
+                <path
+                    d="M485.5 0L576 160H474.9L405.7 0h79.8zm-128 0l69.2 160H149.3L218.5 0h139zm-267 0h79.8l-69.2 160H0L90.5 0zM0 192h100.7l123 251.7c1.5 3.1-2.7 5.9-5 3.3L0 192zm148.2 0h279.6l-137 318.2c-1 2.4-4.5 2.4-5.5 0L148.2 192zm204.1 251.7l123-251.7H576L357.3 446.9c-2.3 2.7-6.5-.1-5-3.2z">
+                </path>
+            </svg> --}}
+            <img src="{{ asset('assets/img/diamond-with-gold.png') }}" alt="Logo" height="100" width="80" srcset="">
+            <span class="ml-2 text-3xl font-normal font-aleo text-black">Dexterous DMCC</span>
+        </div>
+        <div class="flex-1 flex items-center justify-center">
+            <span class="font-bold text-gray-700 text-xl font-aleo">Welcome, {{ Auth::guard('admin')->user()->name ?? 'Admin' }}</span>
+        </div>
+        {{-- <div class="flex items-center space-x-4">
+            <button class="relative focus:outline-none">
+                <i class="fa fa-bell-o w-6 h-6"></i>
 
-    </div>
-    {{-- <div class="flex items-center space-x-4">
-        <button class="relative focus:outline-none">
-            <i class="fa fa-bell-o w-6 h-6"></i>
-
-            <span class="absolute top-0 right-0 block h-2 w-2 bg-red-500 rounded-full ring-2 ring-white"></span>
-        </button>
-        <img src="https://randomuser.me/api/portraits/men/44.jpg" alt="Profile"
-            class="h-10 w-10 rounded-full border-2 border-brand-gold">
-        <button id="sidebar-toggle"
-            class="lg:hidden ml-2 p-2 rounded hover:bg-gray-100 focus:outline-none transition">
-            <i data-lucide="menu" class="w-7 h-7 text-gray-500"></i>
-        </button>
-    </div> --}}
-    <div class="flex items-center space-x-4">
-        <!-- Notification Icon -->
-        <button class="relative focus:outline-none">
-            <i class="fa fa-bell w-6 h-6"></i>
-            <span class="absolute top-0 right-0 block h-2 w-2 bg-red-500 rounded-full ring-2 ring-white"></span>
-        </button>
-
-        <!-- Profile Picture and Dropdown -->
-        <div class="relative">
-            <!-- Profile Image Button -->
-            <button id="profileDropdownBtn" class="focus:outline-none">
-                <img src="{{ asset('assets/img/diamond-with-gold.png') }}" alt="Profile"
-                    class="h-10 w-10 rounded-full border-2 border-brand-gold">
+                <span class="absolute top-0 right-0 block h-2 w-2 bg-red-500 rounded-full ring-2 ring-white"></span>
+            </button>
+            <img src="https://randomuser.me/api/portraits/men/44.jpg" alt="Profile"
+                class="h-10 w-10 rounded-full border-2 border-brand-gold">
+            <button id="sidebar-toggle"
+                class="lg:hidden ml-2 p-2 rounded hover:bg-gray-100 focus:outline-none transition">
+                <i data-lucide="menu" class="w-7 h-7 text-gray-500"></i>
+            </button>
+        </div> --}}
+        <div class="flex items-center space-x-4">
+            <!-- Notification Icon -->
+            <button class="relative focus:outline-none">
+                <i class="fa fa-bell w-6 h-6"></i>
+                <span class="absolute top-0 right-0 block h-2 w-2 bg-red-500 rounded-full ring-2 ring-white"></span>
             </button>
 
-            <!-- Dropdown Menu -->
-            <div id="profileDropdown"
-                class="hidden absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-50">
-                <a href="{{ route('admin.profile') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                    View Profile
-                </a>
-                <form method="POST" action="{{ route('admin.logout') }}">
-                    @csrf
-                    <button type="submit" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
-                        Logout
-                    </button>
-                </form>
 
+            <!-- Profile Picture and Dropdown -->
+            <div class="relative">
+                <!-- Profile Image Button -->
+                <button id="profileDropdownBtn" class="focus:outline-none">
+                    <img src="{{ asset('assets/img/diamond-with-gold.png') }}" alt="Profile"
+                            class="h-10 w-10 rounded-full border-2 border-brand-gold">
+                </button>
+                
+                <!-- Dropdown Menu -->
+                <div id="profileDropdown"
+                    class="hidden absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-50">
+                    <a href="{{ route('admin.profile') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        View Profile
+                    </a>
+                    <form method="POST" action="{{ route('admin.logout') }}">
+                        @csrf
+                        <button type="submit" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
+                            Logout
+                        </button>
+                    </form>
+    
+                </div>
             </div>
+
+            <!-- Sidebar Toggle -->
+            <button id="sidebar-toggle"
+                class="lg:hidden ml-2 p-2 rounded hover:bg-gray-100 focus:outline-none transition">
+                <i data-lucide="menu" class="w-7 h-7 text-gray-500"></i>
+            </button>
         </div>
 
-        <!-- Sidebar Toggle -->
-        <button id="sidebar-toggle"
-            class="lg:hidden ml-2 p-2 rounded hover:bg-gray-100 focus:outline-none transition">
-            <i data-lucide="menu" class="w-7 h-7 text-gray-500"></i>
-        </button>
-    </div>
 
-
-</header>
+    </header>

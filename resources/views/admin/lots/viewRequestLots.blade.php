@@ -8,6 +8,27 @@
         <input type="hidden" name="start_time" value="{{ $startTime }}">
         <input type="hidden" name="date" value="{{ $date }}">
 
+        {{-- <div class="mb-3 d-flex"> --}}
+        {{-- @foreach ($rooms as $room) --}}
+        {{-- <div class="form-check">
+                    <input class="form-check-input" type="radio" name="rooms[]" value="{{ $room->id }}"
+                        id="room_{{ $room->id }}" {{ $room->is_available ? '' : 'disabled' }}
+                        onclick="toggleMeetingLink()">
+                    <label class="form-check-label" for="room_{{ $room->id }}">
+                        {{ $room->room_name }} - {{ $room->is_available ? 'Available' : 'Unavailable' }}
+                    </label>
+                </div> --}}
+        {{-- @endforeach --}}
+        {{-- </div> --}}
+        {{-- @if ($roomType === 'Virtual' && $room->is_available) --}}
+        {{-- Initially hidden; only shown when a virtual room is selected --}}
+        {{-- <div id="meetingLinkContainer" class="mt-2 d-none">
+                <label for="meeting_link" class="form-label">Meeting Link :</label>
+                <input type="url" name="meeting_link" id="meeting_link" class="form-control"
+                    placeholder="https://example.com/meeting-link" required>
+            </div> --}}
+        {{-- @endif --}}
+
         <div class="mb-3 d-flex flex-wrap">
             @foreach ($rooms as $room)
                 @php
@@ -32,12 +53,6 @@
             @endforeach
         </div>
 
-        {{-- <div id="meetingLinkContainer" class="mt-2 d-none">
-            <label for="meeting_link" class="form-label">Meeting Number :</label>
-            <input type="text" name="meeting_link" id="meeting_link" class="form-control"
-                placeholder="Enter Meeting Number">
-        </div> --}}
-
         <div id="meetingLinkContainer" class="mt-2 d-none">
             <label for="meeting_link" class="form-label">Meeting Link :</label>
             <select name="meeting_link" id="meeting_link" class="form-control" required>
@@ -47,7 +62,6 @@
                 @endforeach
             </select>
         </div>
-
         @php
             $bookingStatus = \App\Models\SlotBooking::where('booking_id', $booking->booking_id)
                 ->orderByDesc('id')
@@ -80,6 +94,7 @@
                 <th>Room Type</th>
                 <th>Date</th>
                 <th>Start Time</th>
+                {{-- <th>Status</th> --}}
             </tr>
         </thead>
         <tbody>
@@ -101,11 +116,26 @@
                         {{ \Carbon\Carbon::parse($firstLot->date_for_reservation)->format('d-m-Y') }}
                     </td>
                     <td>{{ \Carbon\Carbon::parse($firstLot->start_time)->format('h:i A') }}</td>
+                    {{-- <td>
+                        @if ($firstLot->status == 0)
+                            <span class="badge bg-warning">Pending</span>
+                        @elseif ($firstLot->status == 1)
+                            <span class="badge bg-success">Approved</span>
+                        @else
+                            <span class="badge bg-danger">Rejected</span>
+                        @endif
+                    </td> --}}
                 </tr>
             @endforeach
         </tbody>
     </table>
+
+    {{-- <div class="text-end mt-3">
+        <button type="button" class="btn btn-primary" onclick="submitLotStatuses()">Update Slot</button>
+    </div> --}}
 </form>
+
+
 
 @if (!empty($requestedLots))
     <hr />

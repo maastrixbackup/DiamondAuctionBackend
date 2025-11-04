@@ -189,10 +189,8 @@
                                                                                 <label for="meeting_link">Meeting Link <span
                                                                                         class="text-danger">*</span></label>
                                                                                 <select name="meeting_link"
-                                                                                    id="meeting_link" class="form-control"
-                                                                                    required>
-                                                                                    <option value="" selected
-                                                                                        disabled>
+                                                                                    id="meeting_link" class="form-control" required>
+                                                                                    <option value="" selected disabled>
                                                                                         Select Link
                                                                                     </option>
                                                                                     @foreach ($availableMeetingLinks as $lk => $link)
@@ -201,11 +199,11 @@
                                                                                             {{ $link }}</option>
                                                                                     @endforeach
                                                                                 </select>
-                                                                                {{-- <input type="url" name="meeting_link"
-                                                                                    class="form-control"
-                                                                                    placeholder="Enter meeting link"
-                                                                                    value="{{ $meetingLink->meeting_link ?? '' }}"
-                                                                                    required> --}}
+                                                                                <!--<input type="url" name="meeting_link"-->
+                                                                                <!--    class="form-control"-->
+                                                                                <!--    placeholder="Enter meeting link"-->
+                                                                                <!--    value="{{ $meetingLink->meeting_link ?? '' }}"-->
+                                                                                <!--    required>-->
                                                                             </div>
                                                                         @endif
 
@@ -240,8 +238,7 @@
                                                         @if (!empty($roomIds))
                                                             <tr>
                                                                 <td colspan="2" class="text-right">
-                                                                    <button class="btn btn-primary" type="submit"
-                                                                        id="reAssignRoomBtn">Re-Assign
+                                                                    <button class="btn btn-primary" type="submit">Re-Assign
                                                                         Room</button>
                                                                 </td>
                                                             </tr>
@@ -249,6 +246,7 @@
                                                     </tbody>
                                                 </table>
                                             </form>
+
                                         </tbody>
                                     </table>
                                 </div>
@@ -283,14 +281,14 @@
                 return;
             }
 
-            const submitBtn = document.getElementById('reAssignRoomBtn');
-            if (!submitBtn) {
-                console.warn("Submit button not found");
-                return;
-            }
+            // const submitBtn = document.getElementById('reAssignRoomBtn');
+            // if (!submitBtn) {
+            //     console.warn("Submit button not found");
+            //     return;
+            // }
 
-            submitBtn.setAttribute("disabled", true);
-            submitBtn.innerText = "Processing...";
+            // submitBtn.setAttribute("disabled", true);
+            // submitBtn.innerText = "Processing...";
 
             // Let the submit happen in the next tick
             setTimeout(() => this.submit(), 10);

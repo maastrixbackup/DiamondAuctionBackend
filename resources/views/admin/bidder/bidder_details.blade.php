@@ -123,11 +123,9 @@
                                 @endforeach
                             @else
                                 {{-- Individual Docs --}}
+                                {{-- ['proof_of_address', 'Proof of Address'], --}}
                                 @php
-                                    $individualDocs = [
-                                        ['passport_copy', 'Passport Copy'],
-                                        ['proof_of_address', 'Proof of Address'],
-                                    ];
+                                    $individualDocs = [['passport_copy', 'Passport Copy']];
                                 @endphp
 
                                 @foreach ($individualDocs as [$field, $label])

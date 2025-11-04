@@ -54,20 +54,19 @@ class BidderController extends Controller
             'password' => 'required_if:type,individual|string|min:6',
 
             'passport_ind' => 'required_if:type,individual|file',
-            'ownership_proof' => 'required_if:type,individual|file',
+            // 'ownership_proof' => 'required_if:type,individual|file',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
+        DB::beginTransaction();
 
         try {
-            DB::beginTransaction();
             $bidder = new Bidder();
             $bidder->type = $request->type === 'company' ? 1 : 2;
             $bidder->kyc_status = 0;
             $bidder->account_status = 0;
-            $bidder->vip_bidding = 0;
 
             $destinationPath = public_path('storage/document/bidder/');
             if (!is_dir($destinationPath)) {
@@ -118,7 +117,7 @@ class BidderController extends Controller
                 $bidder->passport_copy = $handleUpload('passport_ind');
                 $bidder->passport_copy_status = 0;
 
-                $bidder->proof_of_address = $handleUpload('ownership_proof');
+                // $bidder->proof_of_address = $handleUpload('ownership_proof');
                 $bidder->proof_of_address_status = 0;
             }
 
@@ -126,6 +125,11 @@ class BidderController extends Controller
 
             // Send registration confirmation email
             $subject = "Thank You for Registering with Dexterous Tender";
+            // $messageText = "Hi {$bidder->full_name},\n\n" .
+            //     "Thank you for registering for Dexterous Tender. Please sit tight while we check your documents and approve your account.\n\n" .
+            //     "You'll be notified via email once your account is activated.\n\n" .
+            //     "--\nTeam Dexterous";
+
             $messageText = '
             <html>
               <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
@@ -162,26 +166,15 @@ class BidderController extends Controller
 
                       <p style="font-size: 16px; color: #555;">
                         If you have any questions or require help, please call us on
-                        <a href="tel:+4400000000" style="color: #007bff;">+44 xxx xxx xxxx</a> or email us at
-                        <a href="mailto:support@dexteroustender.com" style="color: #007bff;">support@dexteroustender.com</a>.
+                        <a href="tel: +18134371452" style="color: #007bff;"> +1 813 437 1452</a> or email us at
+                        <a href="mailto:tenders@dexterousdmcc.com" style="color: #007bff;">tenders@dexterousdmcc.com</a>.
                       </p>
 
                       <hr style="margin: 30px 0;" />
 
-                      <h3 style="color: #333;">Buyer\'s Premium</h3>
-                      <p style="font-size: 15px; color: #555;">
-                        On the first £100,000 of the Hammer Price (of any individual lot), the buyer will pay the hammer price and a premium of
-                        <strong>25% (plus VAT)</strong> or <strong>30% (inclusive of VAT)</strong>.<br />
-                        On the excess over £100,001 of the hammer price (of any individual lot), the buyer will pay the hammer price and a premium of
-                        <strong>15% (plus VAT)</strong> or <strong>18% (inclusive of VAT)</strong>.
-                      </p>
 
-                      <h3 style="color: #333;">Seller\'s Commission</h3>
-                      <p style="font-size: 15px; color: #555;">
-                        Our seller’s commission charge is <strong>15% (plus VAT)</strong>. A marketing fee is charged at <strong>£10 (plus VAT)</strong> per lot.<br />
-                        There is also a loss/liability charge of <strong>1.5% (plus VAT)</strong> per lot.<br />
-                        We offer free worldwide shipping subject to our T&Cs.
-                      </p>
+
+
 
                       <p style="font-size: 14px; color: #999; margin-top: 30px;">--<br />Team Dexterous</p>
                     </td>
@@ -203,10 +196,22 @@ class BidderController extends Controller
               </body>
             </html>';
 
+
+            // Mail::raw($messageText, function ($message) use ($bidder, $subject) {
+            //     $message->to($bidder->email_address)
+            //         ->subject($subject);
+            // });
+
             Mail::html($messageText, function ($message) use ($bidder, $subject) {
                 $message->to($bidder->email_address)
                     ->subject($subject);
             });
+
+
+
+
+
+
 
             // Notify internal team
             $internalSubject = "New Bidder Registration: {$bidder->full_name}";
@@ -220,13 +225,11 @@ class BidderController extends Controller
                 $message->to([
                     'conner@dexterousdmcc.com',
                     'abdul@dexterousdmcc.com',
-                    // 'diana@dextrousdmcc.com',
                     'sam.miah@bbndry.com',
+                    // 'diana@dextrousdmcc.com',
                 ])->subject($internalSubject);
             });
-
             DB::commit();
-
             return response()->json([
                 'status' => true,
                 'message' => 'Bidder created successfully',
@@ -348,6 +351,7 @@ class BidderController extends Controller
                 ->distinct('lot_id')
                 ->count('lot_id');
 
+
             $dashboardData = [
                 'full_name' => $bidder->full_name,
                 'email_address' => $bidder->email_address,
@@ -449,7 +453,8 @@ class BidderController extends Controller
                 'room_type' => 'required|in:Physical,Virtual',
                 'date' => 'required|date',
             ]);
-            $bidderId = $request->user()->id;
+
+            $bidderId = $request->id;
 
             $roomType = $request->room_type;
             $date = $request->date;
@@ -538,6 +543,9 @@ class BidderController extends Controller
                 ->orderByRaw('CAST(weight AS DECIMAL(10,2)) DESC')
                 ->get();
 
+
+            //sort $availableLots here
+
             if ($availableLots->isEmpty()) {
                 return response()->json([
                     'status' => false,
@@ -552,7 +560,7 @@ class BidderController extends Controller
                         return 'storage/images/lots/' . ltrim($image, '/');
                     }, $lot->images);
                 } else {
-                    $lot->images = [];
+                    $lot->images = ['storage/images/lots/sample.jpg'];
                 }
                 unset($lot->image_urls);
                 return $lot;
@@ -610,7 +618,7 @@ class BidderController extends Controller
                 ], 400);
             }
 
-            $bidder = Bidder::find($request->user()->id);
+            $bidder = Bidder::find($request->id);
             if (!$bidder) {
                 return response()->json([
                     'status' => false,
@@ -690,7 +698,7 @@ class BidderController extends Controller
 
     public function bidderAssignedLotsBySlot(Request $request, $slotId)
     {
-        $bidderId = $request->user()->id;
+        $bidderId = $request->id;
 
         // Ensure the bidder has this slot assigned
         $hasAccess = SlotBooking::where('bidder_id', $bidderId)
@@ -737,7 +745,7 @@ class BidderController extends Controller
     public function getBidderSlots(Request $request)
     {
         try {
-            $bidderId = $request->user()->id;
+            $bidderId = $request->id;
             $currentDate = now()->format('Y-m-d');
             // $currentTime = now()->format('H:i:s');
             $currentTime = now()->addMinutes(21)->format('H:i:s');
@@ -772,9 +780,10 @@ class BidderController extends Controller
         }
     }
 
-    public function getBookingDetails(Request $request, $id)
+    public function getBookingDetails(Request $request)
     {
-        $bidderId = $request->user()->id;
+        $bidderId = $request->id;
+        $id = $request->booking_id;
 
         try {
             $booking = Booking::where('booking_id', $id)
@@ -785,6 +794,7 @@ class BidderController extends Controller
             if (!$booking) {
                 return response()->json(['status' => false, 'message' => 'Booking Not Found'], 404);
             }
+
 
             // Decode JSON array from DB
             $lotIds = is_array($booking->booking_lot_id)
@@ -943,7 +953,7 @@ class BidderController extends Controller
             ]);
 
             $bb = new BulkBidding();
-            $bb->bidder_id = $request->user()->id;
+            $bb->bidder_id = $request->id;
             $bb->lot_id = $request->lot_id;
             $bb->price = $request->bidding_price;
             $bb->bidding_time = Carbon::now();
@@ -1005,9 +1015,10 @@ class BidderController extends Controller
         }
     }
 
+
     public function getBiddingSummary(Request $request)
     {
-        $bidderId = $request->user()->id;
+        $bidderId = $request->id;
         $biddingSummary = SlotBooking::where('bidder_id', $bidderId)
             ->whereNotNull('bidding_price')
             ->where('status', 1)
@@ -1017,13 +1028,13 @@ class BidderController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Bidding summary fetched',
-            'summary' => [] //$biddingSummary
+            'summary' => []
         ]);
     }
 
     public function getBiddingOfBidder(Request $request)
     {
-        $bidderId = $request->user()->id;
+        $bidderId = $request->id;
 
         // Step 1: Get the max price per lot for the bidder
         $maxBids = BulkBidding::where('bidder_id', $bidderId)
@@ -1064,7 +1075,7 @@ class BidderController extends Controller
 
     public function vipAvailableLots(Request $request)
     {
-        $bidderId = $request->user()->id;
+        $bidderId = $request->id;
 
         $availableLots = Lot::where('status', 1)
             ->orderByRaw('CAST(weight AS DECIMAL(10,2)) DESC')
@@ -1125,7 +1136,7 @@ class BidderController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
-        $bidderId = $request->user()->id;
+        $bidderId = $request->id;
 
         DB::beginTransaction();
         try {
@@ -1146,7 +1157,7 @@ class BidderController extends Controller
 
     public function vipLotDetails(Request $request)
     {
-        $bidderId = $request->user()->id;
+        $bidderId = $request->id;
         $lotId = $request->lot_id;
 
         if (!$lotId) {
@@ -1189,7 +1200,7 @@ class BidderController extends Controller
 
     public function requestedLots(Request $request)
     {
-        $bidderId = $request->user()->id;
+        $bidderId = $request->id;
         $bidder = Bidder::find($bidderId);
         $lotIds = is_array($request->requested_lot_ids)
             ? $request->requested_lot_ids
@@ -1213,11 +1224,11 @@ class BidderController extends Controller
             $currentLots = is_array($booking->requested_lot_id)
                 ? $booking->requested_lot_id
                 : json_decode($booking->requested_lot_id, true);
-
             $currentLots = is_array($currentLots) ? $currentLots : [];
 
             // Merge existing with new and remove duplicates
             $updatedLots = array_values(array_unique(array_merge($currentLots, $lotIds)));
+            // return $updatedLots;
 
             // Update booking with merged requested_lot_id
             $booking->update([
@@ -1385,7 +1396,7 @@ class BidderController extends Controller
             ], 422);
         }
 
-        $bidder = $request->user();
+        $bidder = Bidder::find($request->id);
 
         if (!Hash::check($request->current_password, $bidder->password)) {
             return response()->json([
@@ -1415,31 +1426,20 @@ class BidderController extends Controller
 
     public function bidderLogout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        $bidder = Bidder::find($request->id);
+
+        if (!$bidder) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Bidder not found',
+            ], 404);
+        }
+
+        $bidder->tokens()->delete(); // delete all personal access tokens
+
         return response()->json([
             'status' => true,
-            'message' => 'Logged out successfully',
+            'message' => 'Bidder logged out successfully',
         ]);
-    }
-
-
-    private function getEnvData()
-    {
-        $envLines = file(base_path('.env'), FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-
-        $envVars = [];
-        foreach ($envLines as $line) {
-            // Ignore comments
-            if (strpos(trim($line), '#') === 0) {
-                continue;
-            }
-
-            // Parse key=value
-            [$key, $value] = array_pad(explode('=', $line, 2), 2, null);
-            $envVars[trim($key)] = trim($value);
-        }
-        return $envVars;
-        // Now you can access the value like this:
-        // dd($envVars['ZOOM_CLIENT_ID'] ?? 'Not found');
     }
 }

@@ -69,20 +69,21 @@
                                         @foreach ($latestBids as $bid)
                                             @php
                                                 $lotData = \App\Models\Lot::find($bid->lot_id);
+                                                $bData = \App\Models\Bidder::find($bid->bidder_id);
                                             @endphp
                                             <tr>
                                                 <td><b>{{ $bid->lot_id }}</b></td>
                                                 <td>
-                                                    @if ($lotData->images && is_array($lotData->images))
+                                                    @if ($lotData && $lotData->images && is_array($lotData->images))
                                                         <img src="{{ asset('storage/images/lots/' . $lotData->images[0]) }}"
-                                                            width="100px" height="auto" class="rounded" alt="">
+                                                            width="100px" height="auto" class="rounded" alt="Diamond">
                                                     @else
                                                         <img src="{{ asset('storage/images/lots/sample.jpg') }}"
-                                                            width="100px" height="auto" class="rounded" alt="">
+                                                            width="100px" height="auto" class="rounded" alt="Diamond">
                                                     @endif
                                                 </td>
-                                                <td>{{ $lotData->title ?? '' }}</td>
-                                                <td>{{ $lotData->weight ?? '' }}</td>
+                                                <td>{{ $lotData->title ?? 'N/A' }}</td>
+                                                <td>{{ $lotData->weight ?? 'N/A' }}</td>
                                                 <td>
                                                     <b>
                                                         ${{ $bid->max_price }}

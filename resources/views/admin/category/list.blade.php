@@ -28,7 +28,7 @@
         <div class="card shadow-sm border-0 rounded-4">
             <div class="card-header d-flex justify-content-between align-items-center bg-light py-3 px-4">
                 <h4 class="card-title mb-0 fw-semibold">All Categories</h4>
-                <a href="{{ route('admin.category.create') }}" class="btn btn-sm btn-primary" title="Add Category">
+                <a href="{{ route('admin.category.create') }}" class="btn btn-sm btn-primary">
                     + Add
                 </a>
             </div>

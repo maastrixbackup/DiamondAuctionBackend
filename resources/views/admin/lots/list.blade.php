@@ -22,9 +22,10 @@
                     </ul>
                 </div>
             </div>
-
+            
+            
             <form method="GET" action="{{ route('admin.lots.index') }}" class="mb-4">
-                <div class="bg-light rounded-4 px-1 py-4 d-flex flex-wrap align-items-center gap-2 shadow-sm">
+                <div class="bg-light rounded-4 px-3 py-4 d-flex flex-wrap align-items-center gap-2 shadow-sm">
 
                     {{-- Search Field with extra padding --}}
                     <div class="px-4">
@@ -87,16 +88,10 @@
                     <div class="card shadow-sm border-0 rounded-4">
                         <div class="card-header bg-light d-flex justify-content-between align-items-center py-3 px-4">
                             <h4 class="card-title mb-0 fw-semibold">All Lots</h4>
-                            <div class="d-flex gap-2">
-                                <a href="{{ route('admin.lotsExport', request()->query()) }}" class="btn btn-outline-primary btn-sm fw-semibold shadow-sm"
-                                    title="Export CSV">
-                                    <i class="bi bi-download me-1"></i> Export CSV
-                                </a>
-                                <a href="{{ route('admin.lots.create') }}"
-                                    class="btn btn-success btn-sm fw-semibold shadow-sm" title="Add Lot">
-                                    + Add
-                                </a>
-                            </div>
+                            <a href="{{ route('admin.lots.create') }}" class="btn btn-success btn-sm fw-semibold shadow-sm"
+                                title="Add Lot">
+                                + Add
+                            </a>
                         </div>
 
                         @if (session('success'))
@@ -110,7 +105,7 @@
                             </div>
                         @endif
 
-                        <div class="card-body py-4 mt-1">
+                        <div class="card-body py-2">
                             <div class="table-responsive">
                                 <table id="lotsTable"
                                     class="table table-hover align-middle text-nowrap table-bordered rounded-3 overflow-hidden">

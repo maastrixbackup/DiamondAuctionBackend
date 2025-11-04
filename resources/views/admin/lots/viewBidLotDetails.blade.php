@@ -25,7 +25,7 @@
                 </div>
             </div>
 
-            <div class="row g-4">
+            <div class="row g-4 mb-3">
                 <div class="col-lg-6">
                     <div class="card shadow-sm">
                         @if ($lot->images && is_array($lot->images) && count($lot->images))

@@ -91,6 +91,7 @@
             background-color: #388E3C;
             /* Darker green */
         }
+        
     </style>
     <script>
         WebFont.load({
@@ -123,6 +124,7 @@
         @yield('content')
     </main>
     <!-- Page Content -->
+
 
     <!--   Core JS Files   -->
     <script src="{{ asset('assets/js/core/jquery-3.7.1.min.js') }}"></script>
@@ -182,8 +184,7 @@
             });
         });
     </script>
-
-
+    
     <script>
         $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {
             type: "line",
@@ -212,6 +213,7 @@
             fillColor: "rgba(255, 165, 52, .14)",
         });
     </script>
+
 
 
 </body>
