@@ -17,6 +17,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/test', function (Request $request) {
+    return response()->json([
+        'status' => 'success',
+        'message' => 'API is working!',
+        'timestamp' => now()
+    ]);
+});
+
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -34,38 +43,36 @@ Route::post('/sellerlogin', [SellerController::class, 'sellerLogin']);
 Route::post('/seller-password-reset', [SellerController::class, 'forgotPassword']);
 Route::post('/seller-reset-password', [SellerController::class, 'resetPassword']);
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::post('/bidderdashboard', [BidderController::class, 'bidderDashboard']);
+Route::post('/get-bidder-slots', [BidderController::class, 'getBidderSlots']);
+// Route::middleware('auth:sanctum')->group(function () {
 
-    Route::post('/sellerdashboard', [SellerController::class, 'sellerDashboard']);
-    Route::post('/bidderdashboard', [BidderController::class, 'bidderDashboard']);
-    Route::post('/bidderlogout', [BidderController::class, 'bidderLogout']);
-    Route::post('/sellerlogout', [SellerController::class, 'sellerLogout']);
-    Route::get('/view-seller-lot', [SellerController::class, 'viewSellerLots']);
-    Route::get('/seller-lot-details/{id}', [SellerController::class, 'sellerLotDetails']);
-    Route::post('/available-slots', [BidderController::class, 'availableSlots']);
-    Route::post('/available-lots', [BidderController::class, 'availableLots']);
-    Route::get('/get-bidder-slots', [BidderController::class, 'getBidderSlots']);
-    Route::post('/slot-booking', [BidderController::class, 'slotBooking']);
-    Route::get('/bidder-assigned-lots-by-slots/{slotId}', [BidderController::class, 'bidderAssignedLotsBySlot']);
-    Route::post('/reupload-bidder-document', [BidderController::class, 'reuploadBidderDocument']);
-    Route::post('/reupload-seller-document', [SellerController::class, 'reuploadSellerDocument']);
-    Route::post('/bidder-change-password', [BidderController::class, 'bidderChangePassword']);
-    Route::post('/seller-change-password', [SellerController::class, 'sellerChangePassword']);
+Route::post('/sellerdashboard', [SellerController::class, 'sellerDashboard']);
+Route::post('/bidderlogout', [BidderController::class, 'bidderLogout']);
+Route::post('/sellerlogout', [SellerController::class, 'sellerLogout']);
+Route::post('/view-seller-lot', [SellerController::class, 'viewSellerLots']);
+Route::post('/seller-lot-details/{id}', [SellerController::class, 'sellerLotDetails']);
+Route::post('/available-slots', [BidderController::class, 'availableSlots']);
+Route::post('/available-lots', [BidderController::class, 'availableLots']);
+Route::post('/slot-booking', [BidderController::class, 'slotBooking']);
+Route::get('/bidder-assigned-lots-by-slots/{slotId}', [BidderController::class, 'bidderAssignedLotsBySlot']);
+Route::post('/reupload-bidder-document', [BidderController::class, 'reuploadBidderDocument']);
+Route::post('/reupload-seller-document', [SellerController::class, 'reuploadSellerDocument']);
 
-    // Bibhu
-    Route::get('/get-booking-details/{booking_id}', [BidderController::class, 'getBookingDetails']);
-    Route::post('/store-requested-lots', [BidderController::class, 'requestedLots']);
-    Route::get('/lots-bid-details', [SellerController::class, 'getLotsBidDetails']);
-    Route::post('/update-bid-details', [BidderController::class, 'updateBiddetails']);
-    Route::post('/get-bidding-history', [BidderController::class, 'getBiddingHistory']);
-    Route::get('/get-bidding-summary', [BidderController::class, 'getBiddingSummary']);
-    Route::get('/my-bids', [BidderController::class, 'getBiddingOfBidder']);
+// Bibhu
+Route::post('/get-booking-details', [BidderController::class, 'getBookingDetails']);
+Route::post('/store-requested-lots', [BidderController::class, 'requestedLots']);
+Route::post('/lots-bid-details', [SellerController::class, 'getLotsBidDetails']);
+Route::post('/update-bid-details', [BidderController::class, 'updateBiddetails']);
+Route::post('/get-bidding-history', [BidderController::class, 'getBiddingHistory']);
+Route::get('/get-bidding-summary', [BidderController::class, 'getBiddingSummary']);
+Route::post('/my-bids', [BidderController::class, 'getBiddingOfBidder']);
 
-    // Bulk Bidding
-    Route::get('/vip-available-lots', [BidderController::class, 'vipAvailableLots']);
-    Route::post('/vip-update-bid-details', [BidderController::class, 'vipUpdateBidDetails']);
-    Route::post('/vip-lot-details', [BidderController::class, 'vipLotDetails']);
+// Bulk Bidding
+Route::post('/vip-available-lots', [BidderController::class, 'vipAvailableLots']);
+Route::post('/vip-update-bid-details', [BidderController::class, 'vipUpdateBidDetails']);
+Route::post('/vip-lot-details', [BidderController::class, 'vipLotDetails']);
 
-    // Zoom Signature
-    // Route::any('/zoom-signature', [ZoomController::class, 'generateSignature']);
-});
+// Zoom Signature
+// Route::any('/zoom-signature', [ZoomController::class, 'generateSignature']);
+// });

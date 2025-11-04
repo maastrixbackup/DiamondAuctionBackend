@@ -12,9 +12,9 @@
 
         /* Works in Chrome, Edge, Safari */
         ::-webkit-scrollbar {
-            width: 12px;
+            width: 18px;
             /* Scrollbar width */
-            height: 12px;
+            height: 18px;
             /* For horizontal scroll */
         }
 
@@ -35,7 +35,7 @@
 
         /* On hover */
         ::-webkit-scrollbar-thumb:hover {
-            background-color: #000;
+            background-color: #ad0000;
             /* Darker green */
         }
     </style>

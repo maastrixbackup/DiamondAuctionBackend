@@ -60,7 +60,10 @@
                                 @forelse ($groupedSlots as $index => $slot)
                                     @php
                                         $booking = \App\Models\Booking::where('booking_id', $slot->booking_id)->first();
-                                        $meetingLink = \App\Models\SlotBooking::where('booking_id', $slot->booking_id)
+                                        $meetingLink = \App\Models\SlotBooking::where(
+                                            'booking_id',
+                                            $slot->booking_id,
+                                        )
                                             ->where('status', 1)
                                             ->latest('id')
                                             ->first();

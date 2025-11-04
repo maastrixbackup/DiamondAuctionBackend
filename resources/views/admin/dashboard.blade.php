@@ -78,7 +78,7 @@
                                 <li class="list-group-item d-flex justify-content-between align-items-start">
                                     <div>
                                         <strong class="text-capitalize">{{ $booking->bidder_name }}</strong><br>
-                                        <small class="text-muted">{{ $booking->room_name }}</small>
+                                        <small class="text-muted text-capitalize">{{ $booking->room_name }}</small>
                                     </div>
                                     <div class="text-end">
                                         <small class="text-muted d-block">
@@ -139,9 +139,13 @@
                                     @endphp
                                     <tr class="text-capitalize">
                                         <th>LOT-{{ $bid->lot_id }}</th>
-                                        <td><strong title="{{ $bid->lot->title }}">{{ strlen($bid->lot->title) > 20 ? substr($bid->lot->title, 0, 20) . '...' : $bid->lot->title ?? 'N/A' }}</strong>
+                                        <td><span
+                                                title="{{ $bid->lot->title ?? '' }}">{{ strlen($bid->lot->title ?? '') > 20 ? substr($bid->lot->title ?? '', 0, 20) . '...' : $bid->lot->title ?? 'N/A' }}</span>
                                         </td>
-                                        <td><strong>{{ $bData->full_name }}</strong></td>
+                                        {{-- <td><span
+                                                title="{{ $bid->lot->title }}">{{ strlen($bid->lot->title) > 20 ? substr($bid->lot->title, 0, 20) . '...' : $bid->lot->title ?? 'N/A' }}</span>
+                                        </td> --}}
+                                        <td>{{ $bData->full_name }}</td>
                                         <td> <span class="badge bg-success">$
                                                 {{ number_format($bid->price, 2) }}</span></td>
                                     </tr>
@@ -152,6 +156,21 @@
                                 @endforelse
                             </thead>
                         </table>
+                        <!--<ul class="list-group list-group-flush">-->
+                        <!--    @forelse($recentBids as $bid)
+    -->
+                        <!--        <li class="list-group-item d-flex justify-content-between align-items-center">-->
+                        <!--            <div>-->
+                        <!--                <strong>LOT-{{ $bid->lot_id }}</strong><br><small-->
+                        <!--                    class="text-muted">{{ $bid->bidder_name }}</small>-->
+                        <!--            </div>-->
+                        <!--            <span class="badge bg-success">$ {{ number_format($bid->bidding_price, 2) }}</span>-->
+                        <!--        </li>-->
+                    <!--    @empty-->
+                        <!--        <li class="list-group-item text-muted">No recent bids available.</li>-->
+                        <!--
+    @endforelse-->
+                        <!--</ul>-->
                     </div>
                 </div>
             </div>

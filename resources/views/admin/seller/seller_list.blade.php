@@ -123,6 +123,7 @@
             }
         };
     </script>
+
     <script>
         $(document).ready(function() {
             var table = $('#sellerTable').DataTable({
