@@ -179,12 +179,16 @@
                     <img src="{{ asset('assets/img/diamond-with-gold.png') }}" alt="Profile"
                             class="h-10 w-10 rounded-full border-2 border-brand-gold">
                 </button>
-                
+
                 <!-- Dropdown Menu -->
                 <div id="profileDropdown"
                     class="hidden absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-50">
                     <a href="{{ route('admin.profile') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
                         View Profile
+                    </a>
+
+                    <a href="{{ route('admin.changePassword') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        Change Password
                     </a>
                     <form method="POST" action="{{ route('admin.logout') }}">
                         @csrf
@@ -192,7 +196,7 @@
                             Logout
                         </button>
                     </form>
-    
+
                 </div>
             </div>
 

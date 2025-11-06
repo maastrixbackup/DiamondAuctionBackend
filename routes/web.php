@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\SellerController;
 use App\Http\Controllers\Admin\SlotController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProfileController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
@@ -65,12 +66,28 @@ Route::get('/', function () {
 Route::prefix('admin')->group(function () {
 
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('admin.login');
+
+    Route::get('/forget-password', [LoginController::class, 'forgetPassword'])->name('admin.password.request');
+    Route::post('/forgot-password', [LoginController::class, 'sendResetLink'])->name('admin.password.email');
+    Route::get('/reset-password/{token}', function (Request $request, $token) {
+        return view('admin.auth.reset-password', [
+            'token' => $token,
+            'request' => $request
+        ]);
+    })->name('admin.password.reset');
+
+    Route::post('/reset-password', [LoginController::class, 'reset'])->name('admin.password.store');
+
     Route::post('/login', [LoginController::class, 'login'])->name('admin.login.submit');
 
     Route::middleware(['admin', 'admin.role:superadmin'])->group(function () {
         Route::post('/logout', [LoginController::class, 'logout'])->name('admin.logout');
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
         Route::get('/profile', [DashboardController::class, 'profileDetails'])->name('admin.profile');
+        Route::get('/changePassword', function () {
+            return view('admin.admin.change_password');
+        })->name('admin.changePassword');
+        Route::post('/changePassword',  [DashboardController::class, 'passwordChangeStore'])->name('admin.changePassword.store');
         Route::resource('lots', LotController::class)->names('admin.lots');
         Route::get('/seller', [SellerController::class, 'sellerList'])->name('admin.seller');
         Route::get('/sellerDetails/{id}', [SellerController::class, 'sellerDetails'])->name('admin.sellerDetails');
