@@ -533,17 +533,37 @@ class BidderController extends Controller
 
             $bookedLotIds = SlotBooking::where('start_time', $time)
                 ->where('date_for_reservation', $date)
-                ->where('room_type', $roomType)
+                ->where('room_type', $roomType) // Should be changed
                 ->where('status', 1)
                 ->pluck('lot_id')
                 ->toArray();
 
             // $availableLots = Lot::whereNotIn('id', $bookedLotIds)->get();
-            $availableLots = Lot::whereNotIn('id', $bookedLotIds)
-                ->orderByRaw('CAST(weight AS DECIMAL(10,2)) DESC')
-                ->get();
+            $query = Lot::whereNotIn('id', $bookedLotIds);
+            // ->get();
 
+            // Search by color
+            if ($request->has('color')) {
+                $query->whereIn('color', $request->color);
+            }
+            // Search by carat
+            // if ($request->has('carat')) {
+            //     $query->whereIn('carat', $request->carat);
+            // }
 
+            // Search by carat
+            if ($request->has('shape')) {
+                $query->whereIn('shape', $request->shape);
+            }
+
+            $query->orderByRaw('CAST(weight AS DECIMAL(10,2)) DESC');
+            if ($request->sorting == 'Ascending') {
+                $query->orderBy('id');
+            } elseif ($request->sorting == 'Descending') {
+                $query->orderByDesc('id');
+            }
+            
+            $availableLots = $query->get();
             //sort $availableLots here
 
             if ($availableLots->isEmpty()) {
