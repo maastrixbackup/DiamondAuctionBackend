@@ -121,6 +121,7 @@ class BidderController extends Controller
                 $bidder->proof_of_address_status = 0;
             }
 
+            $bidder->referal_code = $request->referal_code;
             $bidder->save();
 
             // Send registration confirmation email
@@ -562,7 +563,7 @@ class BidderController extends Controller
             } elseif ($request->sorting == 'Descending') {
                 $query->orderByDesc('id');
             }
-            
+
             $availableLots = $query->get();
             //sort $availableLots here
 

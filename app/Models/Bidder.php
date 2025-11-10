@@ -42,5 +42,6 @@ class Bidder extends Model
         'account_status',
 
         'vip_bidding',
+        'referal_code',
     ];
 }
