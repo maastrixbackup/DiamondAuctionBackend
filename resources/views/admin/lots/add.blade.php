@@ -253,8 +253,18 @@
 
                                             <div class="mb-3">
                                                 <label for="color" class="form-label">Color</label>
-                                                <input type="text" name="color" id="color" class="form-control"
-                                                    placeholder="Enter Color">
+                                                <select name="color" id="color" class="form-control">
+                                                    <option value="">Select Color</option>
+                                                    <option value="yellow">Yellow</option>
+                                                    <option value="pink">Pink</option>
+                                                    <option value="blue">Blue</option>
+                                                    <option value="green">Green</option>
+                                                    <option value="orange">Orange</option>
+                                                    <option value="red">Red</option>
+                                                    <option value="white">White</option>
+                                                </select>
+                                                {{-- <input type="text" name="color" id="color" class="form-control"
+                                                    placeholder="Enter Color"> --}}
                                             </div>
 
                                             <div class="mb-3">
@@ -271,8 +281,22 @@
 
                                             <div class="mb-3">
                                                 <label for="shape" class="form-label">Shape</label>
-                                                <input type="text" name="shape" id="shape" class="form-control"
-                                                    placeholder="Enter Shape">
+                                                <select name="shape" id="shape" class="form-control">
+                                                    <option value="">Select Shape</option>
+                                                    <option value="round">Round</option>
+                                                    <option value="cushion">Cushion</option>
+                                                    <option value="princess">Princess</option>
+                                                    <option value="oval">Oval</option>
+                                                    <option value="emerald">Emerald</option>
+                                                    <option value="radiant">Radiant</option>
+                                                    <option value="pear">Pear</option>
+                                                    <option value="asscher">Asscher</option>
+                                                    <option value="marquise">Marquise</option>
+                                                    <option value="heart">Heart</option>
+                                                    <option value="others">Others</option>
+                                                </select>
+                                                {{-- <input type="text" name="shape" id="shape" class="form-control"
+                                                    placeholder="Enter Shape"> --}}
                                             </div>
                                         </div>
 
@@ -344,6 +368,33 @@
                                                 </div>
                                                 <div class="preview-group d-flex flex-wrap gap-2"></div>
                                             </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="carat" class="form-label">Carat</label>
+                                            <input type="number" step="0.01" min="0.1" max="100"
+                                                name="carat" id="carat" class="form-control"
+                                                placeholder="Enter Carat (0.1 - 100)">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="search_by_type" class="form-label">Search by Type</label>
+                                            <select name="search_by_type" id="search_by_type" class="form-control">
+                                                <option value="">Select Type</option>
+                                                <option value="Singles">Singles</option>
+                                                <option value="Pairs only">Pairs only</option>
+                                                <option value="Parcels">Parcels</option>
+                                                <option value="Jewellery">Jewellery</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="availability" class="form-label">Availability</label>
+                                            <select name="availability" id="availability" class="form-control">
+                                                <option value="">Select Availability</option>
+                                                <option value="Physical only">Physical only</option>
+                                                <option value="Virtual only">Virtual only</option>
+                                            </select>
                                         </div>
                                     </div>
 

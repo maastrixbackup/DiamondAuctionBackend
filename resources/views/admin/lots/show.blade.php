@@ -122,6 +122,9 @@
                                         <div><strong>Shape:</strong> {{ $lot->shape }}</div>
                                         <div><strong>Clarity:</strong> {{ $lot->clarity }}</div>
                                         <div><strong>Batch Code:</strong> {{ $lot->batch_code }}</div>
+                                        <div><strong>Carat:</strong> {{ $lot->carat }}</div>
+                                        <div><strong>Search by type:</strong> {{ $lot->search_by_type }}</div>
+                                        <div><strong>Availability:</strong> {{ $lot->availability }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -244,6 +247,7 @@
             const match = url.match(/(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(?:.*\/)?(\d+)/);
             return match ? match[1] : null;
         }
+
         function playVideo(videoId, platform) {
             const container = document.getElementById("previewContainer");
 

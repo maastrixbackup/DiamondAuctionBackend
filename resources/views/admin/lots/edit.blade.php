@@ -74,10 +74,33 @@
                                                     placeholder="Enter Weight" value="{{ $lot->weight }}" required>
                                             </div>
 
+                                            @php
+                                                $colors = ['yellow', 'pink', 'blue', 'green', 'orange', 'red', 'white'];
+                                                $shapes = [
+                                                    'round',
+                                                    'cushion',
+                                                    'princess',
+                                                    'oval',
+                                                    'emerald',
+                                                    'radiant',
+                                                    'pear',
+                                                    'asscher',
+                                                    'marquise',
+                                                    'heart',
+                                                    'others',
+                                                ];
+                                            @endphp
                                             <div class="mb-3">
                                                 <label for="color" class="form-label">Color</label>
-                                                <input type="text" name="color" id="color" class="form-control"
-                                                    placeholder="Enter Color" value="{{ $lot->color }}">
+                                                <select name="color" id="color" class="form-control">
+                                                    <option value="">Select Color</option>
+                                                    @foreach ($colors as $color)
+                                                        <option value="{{ $color }}"
+                                                            {{ $lot->color == $color ? 'selected' : '' }}>
+                                                            {{ ucfirst($color) }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
                                             </div>
 
                                             <div class="mb-3">
@@ -95,8 +118,15 @@
 
                                             <div class="mb-3">
                                                 <label for="shape" class="form-label">Shape</label>
-                                                <input type="text" name="shape" id="shape" class="form-control"
-                                                    placeholder="Enter Shape" value="{{ $lot->shape }}">
+                                                <select name="shape" id="shape" class="form-control">
+                                                    <option value="">Select Shape</option>
+                                                    @foreach ($shapes as $shape)
+                                                        <option value="{{ $shape }}"
+                                                            {{ $lot->shape == $shape ? 'selected' : '' }}>
+                                                            {{ ucfirst($shape) }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
                                             </div>
                                         </div>
 
@@ -196,6 +226,43 @@
                                                 <div class="preview-group d-flex flex-wrap gap-2"></div>
                                             </div>
                                         </div>
+
+                                        <div class="mb-3">
+                                            <label for="carat" class="form-label">Carat</label>
+                                            <input type="number" step="0.01" min="0.1" max="100"
+                                                name="carat" id="carat" class="form-control"
+                                                placeholder="Enter Carat (0.1 - 100)"
+                                                value="{{ old('carat', $lot->carat) }}">
+                                        </div>
+                                        @php
+                                            $types = ['Singles', 'Pairs only', 'Parcels', 'Jewellery'];
+                                        @endphp
+                                        <div class="mb-3">
+                                            <label for="search_by_type" class="form-label">Search by Type</label>
+                                            <select name="search_by_type" id="search_by_type" class="form-control">
+                                                <option value="">Select Type</option>
+                                                @foreach ($types as $type)
+                                                    <option value="{{ $type }}"
+                                                        {{ old('search_by_type', $lot->search_by_type) == $type ? 'selected' : '' }}>
+                                                        {{ $type }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="availability" class="form-label">Availability</label>
+                                            <select name="availability" id="availability" class="form-control">
+                                                <option value="">Select Availability</option>
+                                                <option value="Physical only"
+                                                    {{ old('availability', $lot->availability) == 'Physical only' ? 'selected' : '' }}>
+                                                    Physical only</option>
+                                                <option value="Virtual only"
+                                                    {{ old('availability', $lot->availability) == 'Virtual only' ? 'selected' : '' }}>
+                                                    Virtual only</option>
+                                            </select>
+                                        </div>
+
                                     </div>
 
                                     <!-- Column 3 -->
