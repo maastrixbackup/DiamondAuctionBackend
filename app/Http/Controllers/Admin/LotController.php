@@ -93,6 +93,10 @@ class LotController extends Controller
             'fluorescence' => 'nullable|string|max:255',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'video' => 'nullable|string|max:255',
+
+            'carat' => 'nullable|numeric|min:0.1|max:100',
+            'search_by_type' => 'nullable|in:Singles,Pairs only,Parcels,Jewellery',
+            'availability' => 'nullable|in:Physical only,Virtual only',
         ]);
 
         if ($validator->fails()) {
@@ -125,6 +129,10 @@ class LotController extends Controller
             $lot->polish = $request->polish;
             $lot->symmetry = $request->symmetry;
             $lot->fluorescence = $request->fluorescence;
+
+            $lot->carat = $request->carat;
+            $lot->search_by_type = $request->search_by_type;
+            $lot->availability = $request->availability;
 
             // Handle multiple image uploads
             $imageNames = [];
@@ -220,6 +228,10 @@ class LotController extends Controller
             'fluorescence' => 'nullable|string|max:255',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'video' => 'nullable|string|max:255',
+
+            'carat' => 'nullable|numeric|min:0.1|max:100',
+            'search_by_type' => 'nullable|in:Singles,Pairs only,Parcels,Jewellery',
+            'availability' => 'nullable|in:Physical only,Virtual only',
         ]);
 
         if ($validator->fails()) {
@@ -251,6 +263,10 @@ class LotController extends Controller
             $lot->polish = $request->polish;
             $lot->symmetry = $request->symmetry;
             $lot->fluorescence = $request->fluorescence;
+
+            $lot->carat = $request->carat;
+            $lot->search_by_type = $request->search_by_type;
+            $lot->availability = $request->availability;
 
             $destinationPath = public_path('storage/images/lots/');
             if (!file_exists($destinationPath)) {
