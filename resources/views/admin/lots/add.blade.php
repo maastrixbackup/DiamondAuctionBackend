@@ -254,7 +254,7 @@
                                             <div class="mb-3">
                                                 <label for="color" class="form-label">Color</label>
                                                 <select name="color" id="color" class="form-control">
-                                                    <option value="">Select Color</option>
+                                                    <option value="" selected disabled>Select Color</option>
                                                     <option value="yellow">Yellow</option>
                                                     <option value="pink">Pink</option>
                                                     <option value="blue">Blue</option>
@@ -282,7 +282,7 @@
                                             <div class="mb-3">
                                                 <label for="shape" class="form-label">Shape</label>
                                                 <select name="shape" id="shape" class="form-control">
-                                                    <option value="">Select Shape</option>
+                                                    <option value="" selected disabled>Select Shape</option>
                                                     <option value="round">Round</option>
                                                     <option value="cushion">Cushion</option>
                                                     <option value="princess">Princess</option>
@@ -380,7 +380,7 @@
                                         <div class="mb-3">
                                             <label for="search_by_type" class="form-label">Search by Type</label>
                                             <select name="search_by_type" id="search_by_type" class="form-control">
-                                                <option value="">Select Type</option>
+                                                <option value="" selected disabled>Select Type</option>
                                                 <option value="Singles">Singles</option>
                                                 <option value="Pairs only">Pairs only</option>
                                                 <option value="Parcels">Parcels</option>
@@ -391,7 +391,7 @@
                                         <div class="mb-3">
                                             <label for="availability" class="form-label">Availability</label>
                                             <select name="availability" id="availability" class="form-control">
-                                                <option value="">Select Availability</option>
+                                                <option value="" selected disabled>Select Availability</option>
                                                 <option value="Physical only">Physical only</option>
                                                 <option value="Virtual only">Virtual only</option>
                                             </select>

@@ -93,7 +93,7 @@
                                             <div class="mb-3">
                                                 <label for="color" class="form-label">Color</label>
                                                 <select name="color" id="color" class="form-control">
-                                                    <option value="">Select Color</option>
+                                                    <option value="" selected disabled>Select Color</option>
                                                     @foreach ($colors as $color)
                                                         <option value="{{ $color }}"
                                                             {{ $lot->color == $color ? 'selected' : '' }}>
@@ -119,7 +119,7 @@
                                             <div class="mb-3">
                                                 <label for="shape" class="form-label">Shape</label>
                                                 <select name="shape" id="shape" class="form-control">
-                                                    <option value="">Select Shape</option>
+                                                    <option value="" selected disabled>Select Shape</option>
                                                     @foreach ($shapes as $shape)
                                                         <option value="{{ $shape }}"
                                                             {{ $lot->shape == $shape ? 'selected' : '' }}>
@@ -240,7 +240,7 @@
                                         <div class="mb-3">
                                             <label for="search_by_type" class="form-label">Search by Type</label>
                                             <select name="search_by_type" id="search_by_type" class="form-control">
-                                                <option value="">Select Type</option>
+                                                <option value="" selected disabled>Select Type</option>
                                                 @foreach ($types as $type)
                                                     <option value="{{ $type }}"
                                                         {{ old('search_by_type', $lot->search_by_type) == $type ? 'selected' : '' }}>
@@ -253,7 +253,7 @@
                                         <div class="mb-3">
                                             <label for="availability" class="form-label">Availability</label>
                                             <select name="availability" id="availability" class="form-control">
-                                                <option value="">Select Availability</option>
+                                                <option value="" selected disabled>Select Availability</option>
                                                 <option value="Physical only"
                                                     {{ old('availability', $lot->availability) == 'Physical only' ? 'selected' : '' }}>
                                                     Physical only</option>

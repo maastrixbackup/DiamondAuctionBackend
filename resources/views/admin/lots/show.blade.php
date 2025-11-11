@@ -122,9 +122,9 @@
                                         <div><strong>Shape:</strong> {{ $lot->shape }}</div>
                                         <div><strong>Clarity:</strong> {{ $lot->clarity }}</div>
                                         <div><strong>Batch Code:</strong> {{ $lot->batch_code }}</div>
-                                        <div><strong>Carat:</strong> {{ $lot->carat }}</div>
-                                        <div><strong>Search by type:</strong> {{ $lot->search_by_type }}</div>
-                                        <div><strong>Availability:</strong> {{ $lot->availability }}</div>
+                                        <div><strong>Carat:</strong> {{ $lot->carat ?? 'NA' }}</div>
+                                        <div><strong>Search by type:</strong> {{ $lot->search_by_type ?? 'NA' }}</div>
+                                        <div><strong>Availability:</strong> {{ $lot->availability ?? 'NA' }}</div>
                                     </div>
                                 </div>
                             </div>
