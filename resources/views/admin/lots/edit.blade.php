@@ -235,7 +235,7 @@
                                                 value="{{ old('carat', $lot->carat) }}">
                                         </div>
                                         @php
-                                            $types = ['Singles', 'Pairs only', 'Parcels', 'Jewellery'];
+                                            $types = ['Diamonds', 'Gemstones', 'Jewellery', 'Parcels and Pairs'];
                                         @endphp
                                         <div class="mb-3">
                                             <label for="search_by_type" class="form-label">Search by Type</label>

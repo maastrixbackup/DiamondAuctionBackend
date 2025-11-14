@@ -47,6 +47,7 @@
                                             <th>Name</th>
                                             <th>Email</th>
                                             <th>Phone</th>
+                                            <th>Referal Code</th>
                                             <th>Document Status</th>
                                             <th>Account Status</th>
                                             <th>Bulk Bidding</th>
@@ -61,6 +62,7 @@
                                                 <td class="text-capitalize">{{ $bidder->full_name }}</td>
                                                 <td>{{ $bidder->email_address }}</td>
                                                 <td>{{ $bidder->phone_number }}</td>
+                                                <td>{{ $bidder->referal_code ?? 'NA' }}</td>
 
                                                 <!-- KYC Status -->
                                                 <td>

@@ -381,10 +381,10 @@
                                             <label for="search_by_type" class="form-label">Search by Type</label>
                                             <select name="search_by_type" id="search_by_type" class="form-control">
                                                 <option value="" selected disabled>Select Type</option>
-                                                <option value="Singles">Singles</option>
-                                                <option value="Pairs only">Pairs only</option>
-                                                <option value="Parcels">Parcels</option>
-                                                <option value="Jewellery">Jewellery</option>
+                                                <option value="Diamonds"> Diamonds</option>
+                                                <option value="Gemstones"> Gemstones</option>
+                                                <option value="Jewellery"> Jewellery</option>
+                                                <option value="Parcels and Pairs"> Parcels and Pairs</option>
                                             </select>
                                         </div>
 

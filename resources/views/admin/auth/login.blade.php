@@ -1,3 +1,6 @@
+<!-- In your <head> -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
 <x-guest-layout>
     <!-- Session Status -->
     @if (session('success'))
@@ -24,19 +27,30 @@
         <div>
             <x-input-label for="email" :value="__('Email')" />
             <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')"
-                required autofocus autocomplete="username" />
+                required autofocus autocomplete="username" aria-placeholder="Email" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
-        <!-- Password -->
         <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />
 
-            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required
-                autocomplete="current-password" />
+            <div class="flex items-center border rounded-md overflow-hidden mt-1">
+                <x-text-input id="password" class="flex-1 border-0 rounded-none" type="password" name="password"
+                    required autocomplete="current-password" placeholder="Password" />
+
+                <!-- Toggle Button -->
+                <button type="button" id="togglePassword"
+                    class="px-3 text-gray-500 hover:text-gray-700 focus:outline-none">
+                    <i class="fas fa-eye" id="eyeIcon"></i>
+                    <i class="fas fa-eye-slash hidden" id="eyeSlashIcon"></i>
+                </button>
+            </div>
 
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
+
+
+
 
         <!-- Remember Me -->
         <div class="block mt-4">
@@ -73,4 +87,17 @@
             }, 3000);
         }
     };
+</script>
+<script>
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const input = document.getElementById('password');
+        const eye = document.getElementById('eyeIcon');
+        const eyeSlash = document.getElementById('eyeSlashIcon');
+
+        const isHidden = input.type === 'password';
+        input.type = isHidden ? 'text' : 'password';
+
+        eye.classList.toggle('hidden', !isHidden);
+        eyeSlash.classList.toggle('hidden', isHidden);
+    });
 </script>

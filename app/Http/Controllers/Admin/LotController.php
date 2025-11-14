@@ -95,7 +95,7 @@ class LotController extends Controller
             'video' => 'nullable|string|max:255',
 
             'carat' => 'nullable|numeric|min:0.1|max:100',
-            'search_by_type' => 'nullable|in:Singles,Pairs only,Parcels,Jewellery',
+            'search_by_type' => 'nullable',
             'availability' => 'nullable|in:Physical only,Virtual only',
         ]);
 
@@ -230,7 +230,7 @@ class LotController extends Controller
             'video' => 'nullable|string|max:255',
 
             'carat' => 'nullable|numeric|min:0.1|max:100',
-            'search_by_type' => 'nullable|in:Singles,Pairs only,Parcels,Jewellery',
+            'search_by_type' => 'nullable',
             'availability' => 'nullable|in:Physical only,Virtual only',
         ]);
 
