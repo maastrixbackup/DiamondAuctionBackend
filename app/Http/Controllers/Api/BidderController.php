@@ -1129,7 +1129,7 @@ class BidderController extends Controller
         });
 
 
-        $cutoff = Carbon::create(2025, 12, 3, 23, 59, 0); // 29th June 2025, 11:59 PM
+        $cutoff = Carbon::create(2025, 12, 30, 23, 59, 0); // 30th Dec 2025, 11:59 PM
         $now = Carbon::now();
 
         if ($now->greaterThan($cutoff)) {
